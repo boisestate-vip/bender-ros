@@ -21,10 +21,7 @@
 
 
     <!-- RViz to visualize robot state -->
-    <arg unless="$(arg groundtruth)" name="rviz_args" value="-d $(find bender_gazebo)/config/bender.rviz" />
-    <arg     if="$(arg groundtruth)" name="rviz_args" value="-d $(find bender_gazebo)/config/bender_groundtruth.rviz" />
-
-    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="$(arg rviz_args)" output="screen"/>
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_empty_box.rviz" output="screen"/>
 
     <!-- <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
         <remap from="/cmd_vel" to="/bender/swerve_controller/cmd_vel" />

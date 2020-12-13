@@ -17,13 +17,13 @@ TebLocalPlannerROS:
     
  # Robot
          
- max_vel_x: 0.4
- max_vel_x_backwards: 0.2
- max_vel_y: 0.1
- max_vel_theta: 0.3
+ max_vel_x: 1.0
+ max_vel_x_backwards: 1.0
+ max_vel_y: 1.0
+ max_vel_theta: 1.2
  acc_lim_x: 0.5
- acc_lim_y: 0.2
- acc_lim_theta: 0.5
+ acc_lim_y: 0.5
+ acc_lim_theta: 0.8
  min_turning_radius: 0.0 # omni-drive robot (can turn on place!)
 
  footprint_model:
@@ -59,10 +59,10 @@ TebLocalPlannerROS:
  weight_max_vel_y: 2
  weight_max_vel_theta: 1
  weight_acc_lim_x: 1
- weight_acc_lim_y: 1
+ weight_acc_lim_y: 0  # If robot is holonomic, set to 0 to speed up computation
  weight_acc_lim_theta: 1
  weight_kinematics_nh: 1 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY
- weight_kinematics_forward_drive: 1
+ weight_kinematics_forward_drive: 0
  weight_kinematics_turning_radius: 1
  weight_optimaltime: 1 # must be > 0
  weight_shortest_path: 0

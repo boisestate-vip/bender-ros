@@ -6,6 +6,7 @@
     <rosparam file="$(find bender_nav)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find bender_nav)/param/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find bender_nav)/param/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find bender_nav)/param/teb_local_planner_params.yaml" command="load" />
     <!-- <rosparam file="$(find bender_nav)/param/base_global_planner_param.yaml" command="load" /> -->
     <!-- <rosparam file="$(find bender_nav)/param/base_local_planner_param.yaml" command="load" /> -->
 
