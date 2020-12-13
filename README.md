@@ -13,5 +13,5 @@ Launch a simple navigation demo in Gazebo using the following:
 ```
 roslaunch bender_gazebo simple_nav.launch
 ```
-![Alt Text](https://github.com/{user}/{repo}/raw/master/media/gifs/first-nav.gif)
+![Alt Text](https://github.com/boisestate-vip/bender-ros/raw/master/media/gifs/first-nav.gif)
 
