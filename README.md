@@ -2,11 +2,11 @@
 This repository contain ROS code for the Bender robot designed and built by a group of students from the Vertically Integrated Projects (VIP) program at Boise State University.
 
 # Installation
-Put the contents of this repository into the `<your_catkin_ws>/src` then run `catkin_make`. After it is done building, run
+Put the contents of this repository into your catkin workspace, i.e.
+`<your_catkin_ws>/src`, then run `catkin_make`. After it is done building, install the required ROS packages to run this by executing
 ```
 rosdep install bender_robot
 ```
-to install the required ROS packages.
 
 # Simple Navigation
 Launch a simple navigation demo in Gazebo using the following:
