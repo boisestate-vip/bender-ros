@@ -15,7 +15,7 @@
       <visual>
         <origin xyz="0 0 0" rpy="${pi/2} 0 0" />
         <geometry>
-          <mesh filename="package://magni_description/meshes/sensors/raspi_camera.dae" />
+          <mesh filename="package://bender_description/meshes/sensors/raspi_camera.dae" />
         </geometry>
       </visual>
       <collision>
