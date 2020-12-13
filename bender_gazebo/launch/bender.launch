@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    
+    <arg name="groundtruth" default="false"/>
+
+    <!-- Load the robot description with xacro -->
+    <include file="$(find bender_description)/launch/description.launch" />
+
+    <!-- Spawn the robot into Gazebo -->
+    <node name="bender_spawn" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
+        args="-urdf -param /bender/robot_description -model bender -z 1" />
+
+   <!-- Load the control parameters -->
+    <rosparam file="$(find bender_gazebo)/config/bender_controllers.yaml" command="load"/>
+    
+    <!-- Spawn the low-level attitude controllers -->
+	<node name="control" pkg="controller_manager" type="spawner" respawn="false"
+		output="screen" ns="/bender" args="joint_state_controller swerve_controller"/>
+
+    <!-- Convert joint states to TF transforms -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen">
+	    <rosparam param="publish_frequency">100</rosparam>
+        <remap from="robot_description" to="/bender/robot_description" />
+		<remap from="/joint_states" to="/bender/joint_states" />
+	</node>
+
+    <group if="$(arg groundtruth)">
+		<node pkg="bender_gazebo" type="tf_ground_truth" name="world_groundtruth_publisher" />
+	</group>
+
+</launch>

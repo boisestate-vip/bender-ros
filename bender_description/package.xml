@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>bender_description</name>
+  <version>0.4.3</version>
+  <description>The bender_description package</description>
+
+  <maintainer email="viprobotics@boisestate.edu">Wankun Sirichotiyakul</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>joint_state_publisher</exec_depend>
+
+  <export></export>
+</package>

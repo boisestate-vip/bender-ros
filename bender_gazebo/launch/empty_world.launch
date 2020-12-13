@@ -1,0 +1,44 @@
+<launch>
+
+    <arg name="groundtruth" default="false"/>
+
+    <!-- load empty world -->
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false" />
+    <arg name="debug" default="false" />
+    <arg name="paused" default="false"/>
+    <arg name="use_sim_time" default="true"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="headless" value="$(arg headless)" />
+        <arg name="paused" value="$(arg paused)" />
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="use_sim_time" value="true" />
+    </include>
+
+    <!-- Start robot and controllers -->
+    <include file="$(find bender_gazebo)/launch/bender.launch">
+        <arg name="groundtruth" value="$(arg groundtruth)"/>
+    </include>
+
+
+    <!-- RViz to visualize robot state -->
+    <arg unless="$(arg groundtruth)" name="rviz_args" value="-d $(find bender_gazebo)/config/bender.rviz" />
+    <arg     if="$(arg groundtruth)" name="rviz_args" value="-d $(find bender_gazebo)/config/bender_groundtruth.rviz" />
+
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="$(arg rviz_args)" output="screen"/>
+
+    <!-- <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
+        <remap from="/cmd_vel" to="/bender/swerve_controller/cmd_vel" />
+    </node> -->
+
+    <!-- GUI for robot control via 'cmd_vel' topic -->
+    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
+        <param name="default_topic" type="str" value="/bender/swerve_controller/cmd_vel"/>
+        <param name="default_vx_max" type="double" value="1.5" />
+        <param name="default_vx_min" type="double" value="-1.5" />
+        <param name="default_vw_max" type="double" value="1.5" />
+        <param name="default_vw_min" type="double" value="-1.5" />
+    </node>
+
+</launch>

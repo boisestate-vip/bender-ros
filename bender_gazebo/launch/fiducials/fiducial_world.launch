@@ -1,0 +1,14 @@
+<launch>
+
+    <include file="$(find magni_gazebo)/launch/empty_world.launch">
+        <arg name="raspicam_mount" value="upward"/>
+        <arg name="sonars_installed" value="false"/>
+    </include>
+
+    <!-- spawn feducial markers -->
+    <include file="$(find magni_gazebo)/launch/fiducials/fiducial_grid_spawn.launch"/>
+
+    <!-- run feducial SLAM -->
+    <include file="$(find magni_gazebo)/launch/fiducials/fiducial_slam_gazebo.launch"/>
+
+</launch>

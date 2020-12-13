@@ -1,0 +1,5 @@
+<launch>
+  <param name="/bender/robot_description" 
+      command="$(find xacro)/xacro --inorder
+        '$(find bender_description)/urdf/bender.urdf.xacro'" />
+</launch>
