@@ -38,7 +38,7 @@
 
 
     <node name="map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
-        <param name="frame_id" value="world"/>
+        <param name="frame_id" value="map"/>
 	</node>
 
     <include file="$(find bender_nav)/launch/move_base.launch" />

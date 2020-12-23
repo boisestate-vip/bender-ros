@@ -49,7 +49,7 @@ class Link2TF():
         self.rate = ros.Rate(100)
         self.tf_pub = tf.TransformBroadcaster()
         self.tf_orig = "odom"
-        self.tf_dest = "world"
+        self.tf_dest = "map"
         self.world_sub = ros.Subscriber("/bender/ground_truth_pose", Odometry, self.update_world)
         self.odom_sub = ros.Subscriber("/bender/swerve_controller/odom", Odometry, self.update_odom)
 

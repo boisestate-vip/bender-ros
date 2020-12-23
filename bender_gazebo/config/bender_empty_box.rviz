@@ -4,7 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /RobotModel1/Links1/body1
+        - /RobotModel1/Links1/base_link1
         - /RobotModel1/Links1/leg_lf1
         - /RobotModel1/Links1/leg_lh1
         - /RobotModel1/Links1/leg_rf1
@@ -69,7 +69,7 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        body:
+        base_link:
           Alpha: 0.699999988079071
           Show Axes: true
           Show Trail: false
@@ -139,7 +139,7 @@ Visualization Manager:
       Length: 0.20000000298023224
       Name: Axes
       Radius: 0.019999999552965164
-      Reference Frame: world
+      Reference Frame: map
       Value: true
     - Class: rviz/Axes
       Enabled: true
@@ -216,7 +216,7 @@ Visualization Manager:
   Global Options:
     Background Color: 97; 120; 134
     Default Light: true
-    Fixed Frame: world
+    Fixed Frame: map
     Frame Rate: 30
   Name: root
   Tools:

@@ -59,7 +59,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 
 	<!-- BODY link -->
-	<link name="body">
+	<link name="base_link">
 		<collision>
 			<origin xyz="0 0 0" rpy="0 0 0"/>
 			<geometry>
@@ -81,32 +81,38 @@ POSSIBILITY OF SUCH DAMAGE.
 					 izz="${body_m / 12.0 * (body_w*body_w + body_l*body_l)}"/>
 		</inertial>
 	</link>
+	<link name="base_footprint"/>
+	<joint name="base_footprint_joint" type="fixed">
+		<parent link="base_footprint"/>
+		<child link="base_link"/>
+		<origin xyz="0 0 ${height + body_h/2}" rpy="0 0 0"/>
+	</joint>
 
 	<!-- LEG joints -->
 	<joint name="leg_lf_joint" type="continuous">
 		<origin xyz="${body_l / 2} ${body_w / 2} ${-body_h/2 - (height - 2*wheel_r - wheel_off)/2}" rpy="0 0 0"/>
-		<parent link="body" />
+		<parent link="base_link" />
 		<child link="leg_lf" />
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 0 1" />
 	</joint>
 	<joint name="leg_rf_joint" type="continuous">
 		<origin xyz="${body_l / 2} ${-body_w / 2} ${-body_h/2 - (height - 2*wheel_r - wheel_off)/2}" rpy="0 0 0"/>
-		<parent link="body" />
+		<parent link="base_link" />
 		<child link="leg_rf" />
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 0 1" />
 	</joint>
 	<joint name="leg_lh_joint" type="continuous">
 		<origin xyz="${-body_l / 2} ${body_w / 2} ${-body_h/2 - (height - 2*wheel_r - wheel_off)/2}" rpy="0 0 0"/>
-		<parent link="body" />
+		<parent link="base_link" />
 		<child link="leg_lh" />
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 0 1" />
 	</joint>
 	<joint name="leg_rh_joint" type="continuous">
 		<origin xyz="${-body_l / 2} ${-body_w / 2} ${-body_h/2 - (height - 2*wheel_r - wheel_off)/2}" rpy="0 0 0"/>
-		<parent link="body" />
+		<parent link="base_link" />
 		<child link="leg_rh" />
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 0 1" />
