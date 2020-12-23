@@ -11,6 +11,7 @@
 
     <param name="controller_frequency" value="15.0" />
     <param name="planner_frequency" value="0.0" />    <!-- 0.0 for planning once when new goal is received -->
+    
     <remap from="cmd_vel" to="/bender/swerve_controller/cmd_vel" />
     <remap from="odom" to="/bender/swerve_controller/odom" />
 </node>

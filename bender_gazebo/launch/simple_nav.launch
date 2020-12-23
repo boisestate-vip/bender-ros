@@ -1,60 +1,28 @@
 <launch>
 
+    <arg name="groundtruth" default="true"/>
 
-    <arg name="groundtruth" default="false"/>
-
-    
-    <!-- load empty world -->
-    <arg name="gui" default="true"/>
-    <arg name="headless" default="false" />
-    <arg name="debug" default="false" />
-    <arg name="paused" default="false"/>
-    <arg name="use_sim_time" default="true"/>
-    <include file="$(find gazebo_ros)/launch/empty_world.launch">
-        <arg name="gui" value="$(arg gui)" />
-        <arg name="headless" value="$(arg headless)" />
-        <arg name="paused" value="$(arg paused)" />
-        <arg name="debug" value="$(arg debug)" />
-        <arg name="use_sim_time" value="true" />
+    <include file="$(find bender_gazebo)/launch/empty_world.launch">
+        <arg name="rviz" value="false" />
+        <arg name="world_name" value="$(find bender_gazebo)/worlds/igvc_basic.world"/> 
+        <arg name="x"     value="-2"/>
+        <arg name="y"     value="-21.5"/>
+        <arg name="z"     value="0"/>
+        <arg name="roll"  value="0"/>
+        <arg name="pitch" value="0"/>
+        <arg name="yaw"   value="3.14"/>
     </include>
-
-
-    <!-- Start robot and controllers -->
-    <include file="$(find bender_gazebo)/launch/bender.launch" />
-
-
-    <!-- Use groundtruth pose from Gazebo for localization -->
-    <group if="$(arg groundtruth)">
-        <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false" output="screen">
-            <param name="base_frame_id" value="base_footprint" />
-            <remap from="base_pose_ground_truth" to="/bender/ground_truth_pose" />
-        </node>
-	</group>
-
 
     <!-- Load known map -->
     <node name="map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
         <param name="frame_id" value="map"/>
 	</node>
 
-
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
     
-
     <!-- RViz to visualize robot state -->
     <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_empty_box.rviz" output="screen"/>
-
-
-    <!-- GUI for robot control via 'cmd_vel' topic -->
-    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
-        <param name="default_topic" type="str" value="/bender/swerve_controller/cmd_vel"/>
-        <param name="default_vx_max" type="double" value="1.5" />
-        <param name="default_vx_min" type="double" value="-1.5" />
-        <param name="default_vw_max" type="double" value="1.5" />
-        <param name="default_vw_min" type="double" value="-1.5" />
-    </node>
-
 
 
 </launch>

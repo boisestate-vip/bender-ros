@@ -1,12 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    
+
+    <!-- Robot Pose -->
+    <arg name="x"     default="0"/>
+    <arg name="y"     default="0"/>
+    <arg name="z"     default="0"/>
+    <arg name="roll"  default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw"   default="0"/>
+
     <!-- Load the robot description with xacro -->
     <include file="$(find bender_description)/launch/description.launch" />
 
     <!-- Spawn the robot into Gazebo -->
     <node name="bender_spawn" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
-        args="-urdf -param /bender/robot_description -model bender -z 1" />
+        args="-urdf 
+              -param /bender/robot_description 
+              -model bender 
+              -x $(arg x)
+              -y $(arg y)
+              -z $(arg z)
+              -R $(arg roll)
+              -P $(arg pitch)
+              -Y $(arg yaw)" />
 
    <!-- Load the control parameters -->
     <rosparam file="$(find bender_gazebo)/config/bender_controllers.yaml" command="load"/>

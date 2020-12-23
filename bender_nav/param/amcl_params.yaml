@@ -5,7 +5,7 @@ base_frame_id: "base_footprint"
 global_frame_id: "map"
 
 ## Publish scans from best pose at a max of 10 Hz
-odom_model_type: "diff"
+odom_model_type: "omni-corrected"
 odom_alpha5: 0.1
 gui_publish_rate: 10.0
 laser_max_beams: 60
