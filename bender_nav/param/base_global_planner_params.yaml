@@ -19,5 +19,3 @@ GlobalPlanner:                                  # Also see: http://wiki.ros.org/
   cost_factor: 3.0                              # Factor to multiply each cost from costmap by, default 3.0
   publish_potential: true                       # Publish Potential Costmap (this is not like the navfn pointcloud2 potential), default true
 
-  planner_frequency: 1.0
-  planner_patience: 5.0

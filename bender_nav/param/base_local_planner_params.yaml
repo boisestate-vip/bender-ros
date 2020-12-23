@@ -14,8 +14,6 @@ TebLocalPlannerROS:
   exact_arc_length: False
   feasibility_check_no_poses: 5
   publish_feedback: False
-  controller_frequency: 5.0
-  controller_patience: 15.0
   
   # Robot
   max_vel_x: 1.0

@@ -1,5 +1,9 @@
 <launch>
 
+
+    <arg name="groundtruth" default="false"/>
+
+    
     <!-- load empty world -->
     <arg name="gui" default="true"/>
     <arg name="headless" default="false" />
@@ -14,18 +18,33 @@
         <arg name="use_sim_time" value="true" />
     </include>
 
-    <!-- Start robot and controllers -->
-    <include file="$(find bender_gazebo)/launch/bender.launch">
-        <arg name="groundtruth" value="true"/>
-    </include>
 
+    <!-- Start robot and controllers -->
+    <include file="$(find bender_gazebo)/launch/bender.launch" />
+
+
+    <!-- Use groundtruth pose from Gazebo for localization -->
+    <group if="$(arg groundtruth)">
+        <node name="fake_localization" pkg="fake_localization" type="fake_localization" respawn="false" output="screen">
+            <param name="base_frame_id" value="base_footprint" />
+            <remap from="base_pose_ground_truth" to="/bender/ground_truth_pose" />
+        </node>
+	</group>
+
+
+    <!-- Load known map -->
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
+        <param name="frame_id" value="map"/>
+	</node>
+
+
+    <!-- Launch move_base -->
+    <include file="$(find bender_nav)/launch/move_base.launch" />
+    
 
     <!-- RViz to visualize robot state -->
     <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_empty_box.rviz" output="screen"/>
 
-    <!-- <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
-        <remap from="/cmd_vel" to="/bender/swerve_controller/cmd_vel" />
-    </node> -->
 
     <!-- GUI for robot control via 'cmd_vel' topic -->
     <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
@@ -37,10 +56,5 @@
     </node>
 
 
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
-        <param name="frame_id" value="map"/>
-	</node>
-
-    <include file="$(find bender_nav)/launch/move_base.launch" />
 
 </launch>
