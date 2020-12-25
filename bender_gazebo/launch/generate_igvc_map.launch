@@ -1,0 +1,16 @@
+<launch>
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find bender_gazebo)/worlds/igvc_basic_map_saver.world"/> 
+        <arg name="gui" value="false" />
+        <arg name="headless" value="false" />
+        <arg name="paused" value="false" />
+        <arg name="debug" value="false" />
+        <arg name="use_sim_time" value="true" />
+    </include>
+
+    <node pkg="rosservice" type="rosservice" name="rosservice" args="call --wait /gazebo_2Dmap_plugin/generate_map" />
+    <node pkg="map_server" type="map_saver" name="gazebo_map_saver" args="-f $(find bender_gazebo)/maps/igvc_basic_obstacles /map:=/map2d" required="true" />
+
+
+</launch>

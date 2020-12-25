@@ -14,15 +14,22 @@
     </include>
 
     <!-- Load known map -->
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/igvc_basic_lanes.yaml" output="screen">
+    <node name="lane_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/igvc_basic_lanes.yaml" output="screen">
         <param name="frame_id" value="map"/>
+        <remap from="/map" to="/lane_map" />
+        <remap from="/map_metadata" to="/lane_map_metadata" />
+	</node>
+    <node name="obstacle_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/igvc_basic_obstacles.yaml" output="screen">
+        <param name="frame_id" value="map"/>
+        <remap from="/map" to="/obstacle_map" />
+        <remap from="/map_metadata" to="/obstacle_map_metadata" />
 	</node>
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
     
     <!-- RViz to visualize robot state -->
-    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_empty_box.rviz" output="screen"/>
+    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_nav.rviz" output="screen"/>
 
 
 </launch>
