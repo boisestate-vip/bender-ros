@@ -8,9 +8,6 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <exec_depend>bender_description</exec_depend>
-  <exec_depend>bender_gazebo</exec_depend>
-  <exec_depend>bender_nav</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
