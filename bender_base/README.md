@@ -1,4 +1,4 @@
-# bender_hardware
+# bender_base
 This is a ROS package that handles the communication between Teensy MCU and the host computer
 running ROS. The communication between the MCU and the host computer is established 
 via serial over USB with the protocol defined by the ROS package `rosserial`.
