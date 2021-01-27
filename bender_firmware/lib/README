@@ -50,6 +50,6 @@ To include rosserial libraries, first install rosserial_arduino then
 execute the make_libraries script using the following commands
 ```
 sudo apt install ros-$ROS_DISTRO-rosserial-arduino && \
-rosrun rosserial_arduino make_libraries.py path_to_bender_robot/bender_teensy/lib/
+rosrun rosserial_arduino make_libraries.py path_to_bender_robot/bender_firmware/lib/
 
 ```

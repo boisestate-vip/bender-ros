@@ -1,4 +1,4 @@
-# bender_teensy
+# bender_firmware
 This is a PlatformIO project that contains the firmware code for the Teensy 3.6 MCU. An easy way to get started with PlatformIO is to use Visual Studio Code, install the `PlatformIO IDE` extension, and just simply add this directory as an existing project. 
 
 This project requires `rosserial_arduino` to generate the necessary header files to be included under the `lib` directory. These files are excluded from the git repository due to the number of files involved. To generate the required header files, first make sure you are in the `bender_base` directory then execute
