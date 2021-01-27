@@ -17,7 +17,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   sensor_msgs
-  serial
   std_msgs
   trajectory_msgs
   rosserial_server
