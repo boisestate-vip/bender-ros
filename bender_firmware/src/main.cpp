@@ -4,24 +4,26 @@
  */
 
 #include <ros.h>
-#include <std_msgs/String.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Empty.h>
 
-ros::NodeHandle  nh;
+#include "pid.h"
+#include "bender_joints.h"
 
+ros::NodeHandle  nh;
+Pid pid(10.0, 0.1, 0.1);
+VelocityJoint hub1(14, 13, 15);
+PositionJoint planet1(2, 3, 35, 16);
 
 void messageCb( const std_msgs::Empty& toggle_msg){
-  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
+  pid.setGains(100.0, 0.1, 0.1);
 }
 
 ros::Subscriber<std_msgs::Empty> sub("toggle_led", messageCb );
+std_msgs::Float32MultiArray chatter_msg;
+ros::Publisher chatter("chatter", &chatter_msg);
 
-
-
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-
-char hello[13] = "hello world!";
+float out[3] = {0.0, 0.0, 0.0};
 
 void setup()
 {
@@ -29,12 +31,14 @@ void setup()
   nh.initNode();
   nh.advertise(chatter);
   nh.subscribe(sub);
+  chatter_msg.data_length = 3;
 }
 
 void loop()
 {
-  str_msg.data = hello;
-  chatter.publish( &str_msg );
+  pid.getGains(out[0],out[1],out[2]);
+  chatter_msg.data = out;
+  chatter.publish( &chatter_msg );
   nh.spinOnce();
   delay(500);
 }
