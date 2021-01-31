@@ -11,11 +11,12 @@ class GenericJoint
 {
     public:
         GenericJoint(float p, float i, float d, 
-                     float lowerLimit, float upperLimit, float effortLimit=1.0);
+                     float lowerLimit, float upperLimit, float effortLimit=100.0);
         void setState(float state)    { state_ = state;   }
         void getState(float &state)   { state = state_;   }
         void setTarget(float target)  { target_ = target; }
         void getTarget(float &target) { target = target_; }
+        void getEffort(float &effort) { effort = effort_; }
         void setGains(float p, float i, float d)    { pid_controller_.setGains(p,i,d); }
         void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); }
         void enable()  { enabled_ = true; }
