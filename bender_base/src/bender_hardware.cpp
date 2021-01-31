@@ -34,7 +34,7 @@
 
 
 #include <boost/assign.hpp>
-#include <bender_base/bender_hardware.h>
+#include "bender_base/bender_hardware.h"
 
 
 namespace bender_base
@@ -66,9 +66,7 @@ BenderHardware::BenderHardware()
     registerInterface(&velocity_joint_interface_);
 
     feedback_sub_ = nh_.subscribe("feedback", 1, &BenderHardware::feedbackCallback, this);
-
-    // Realtime publisher, initializes differently from regular ros::Publisher
-    cmd_drive_pub_.init(nh_, "cmd_drive", 1);
+    cmd_drive_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("cmd_drive", 1);
 }
 
 
@@ -94,14 +92,12 @@ void BenderHardware::copyJointsFromHardware()
 
 void BenderHardware::publishDriveToMCU()
 {
-  if (cmd_drive_pub_.trylock())
+  cmd_msg_.data.clear();
+  for (int i = 0; i < 8; i++)
   {
-    for (int i = 0; i < 8; i++)
-    {
-      cmd_drive_pub_.msg_.data[i] = (float) joints_[i].command;
-    }
-    cmd_drive_pub_.unlockAndPublish();
+    cmd_msg_.data.push_back( (float) joints_[i].command );
   }
+  cmd_drive_pub_.publish(cmd_msg_);
 }
 
 

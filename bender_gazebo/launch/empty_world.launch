@@ -28,7 +28,7 @@
     </include>
 
     <!-- Start robot and controllers -->
-    <include file="$(find bender_gazebo)/launch/bender.launch">
+    <include file="$(find bender_gazebo)/launch/base.launch">
         <arg name="x"     value="$(arg x)"/>
         <arg name="y"     value="$(arg y)"/>
         <arg name="z"     value="$(arg z)"/>

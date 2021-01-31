@@ -36,12 +36,11 @@
 #ifndef BENDER_BASE_BENDER_HARDWARE_H
 #define BENDER_BASE_BENDER_HARDWARE_H
 
-#include "boost/thread.hpp"
+#include <boost/thread.hpp>
 
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
-#include <realtime_tools/realtime_publisher.h>
 
 #include <ros/ros.h>
 #include <urdf/model.h>
@@ -65,7 +64,7 @@ class BenderHardware : public hardware_interface::RobotHW
 
         ros::NodeHandle nh_;
         ros::Subscriber feedback_sub_;
-        realtime_tools::RealtimePublisher<std_msgs::Float32MultiArray> cmd_drive_pub_;
+        ros::Publisher cmd_drive_pub_;
 
         // Interfaces
         hardware_interface::JointStateInterface      joint_state_interface_;
@@ -87,6 +86,7 @@ class BenderHardware : public hardware_interface::RobotHW
         joints_[8];
 
         // This pointer is set from the ROS thread.
+        std_msgs::Float32MultiArray cmd_msg_;
         sensor_msgs::JointState::ConstPtr feedback_msg_;
         boost::mutex feedback_msg_mutex_;
 

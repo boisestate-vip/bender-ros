@@ -1,0 +1,32 @@
+<launch>
+
+    <include file="$(find bender_description)/launch/description.launch" />
+
+    <node pkg="bender_base" type="bender_base_node" name="bender_base_node" output="screen" />
+
+    <!-- Load the control parameters -->
+    <rosparam file="$(find bender_base)/config/bender_controllers.yaml" command="load"/>
+    
+    <!-- Spawn the low-level attitude controllers -->
+	<node name="control" pkg="controller_manager" type="spawner" respawn="false"
+		output="screen" ns="/bender" args="joint_state_controller swerve_controller"/>
+
+    <!-- Convert joint states to TF transforms -->
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen">
+	    <rosparam param="publish_frequency">100</rosparam>
+        <remap from="robot_description" to="/bender/robot_description" />
+		<remap from="/joint_states" to="/bender/joint_states" />
+	</node>
+
+
+    <!-- GUI for robot control via 'cmd_vel' topic -->
+    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
+        <param name="default_topic" type="str" value="/bender/swerve_controller/cmd_vel"/>
+        <param name="default_vx_max" type="double" value="1.5" />
+        <param name="default_vx_min" type="double" value="-1.5" />
+        <param name="default_vw_max" type="double" value="1.5" />
+        <param name="default_vw_min" type="double" value="-1.5" />
+    </node>
+
+</launch>

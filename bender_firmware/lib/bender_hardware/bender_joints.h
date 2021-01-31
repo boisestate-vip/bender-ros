@@ -16,14 +16,17 @@ class GenericJoint
         void getState(float &state)   { state = state_;   }
         void setTarget(float target)  { target_ = target; }
         void getTarget(float &target) { target = target_; }
-        void setGains(float p, float i, float d)    { pid_controller_.setGains(p,i,d); };
-        void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); };
+        void setGains(float p, float i, float d)    { pid_controller_.setGains(p,i,d); }
+        void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); }
+        void enable()  { enabled_ = true; }
+        void disable() { enabled_ = false; }
         void update(unsigned long dt_ms);
         virtual void actuate() { };
         virtual void stop() { };
 
     protected:
         Pid pid_controller_;
+        bool enabled_;
         float upper_limit_;
         float lower_limit_;
         float target_;

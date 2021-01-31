@@ -12,12 +12,13 @@ float clamp(const float val, const float min_val, const float max_val)
 GenericJoint::GenericJoint(float p, float i, float d, 
                            float lowerLimit, float upperLimit, float effortLimit) : 
     pid_controller_(p,i,d),
+    enabled_(false),
     upper_limit_(upperLimit),
     lower_limit_(lowerLimit),
     target_(0.0),
     state_(0.0),
     effort_(0.0),
-    effort_limit_(effortLimit) 
+    effort_limit_(effortLimit)
 {
 }
 
@@ -48,6 +49,10 @@ PositionJoint::PositionJoint(int encAPin, int encBPin, int pwmPin, int dirPin,
     dir_pin_(dirPin),
     encoder_(encAPin,encBPin) 
 { 
+    pinMode(enc_a_pin_, INPUT);
+    pinMode(enc_b_pin_, INPUT);
+    pinMode(pwm_pin_, OUTPUT);
+    pinMode(dir_pin_, OUTPUT);
 }
 
 void PositionJoint::update(unsigned long dt_ms)
@@ -69,9 +74,12 @@ void PositionJoint::update(unsigned long dt_ms)
 
 void PositionJoint::actuate()
 {
-    if (effort_ > 0) { digitalWrite(dir_pin_, HIGH); }
-    else             { digitalWrite(dir_pin_, LOW);  }
-    analogWrite(pwm_pin_, effort_);
+    if (enabled_) 
+    {
+        if (effort_ > 0) { digitalWrite(dir_pin_, HIGH); }
+        else             { digitalWrite(dir_pin_, LOW);  }
+        analogWrite(pwm_pin_, effort_);
+    }
 }
 
 void PositionJoint::stop()
@@ -91,13 +99,19 @@ VelocityJoint::VelocityJoint(int vrPin, int zfPin, int interruptPin,
     zf_dir_pin_(zfPin),
     tach_pin_(interruptPin) 
 {
+    pinMode(vr_speed_pin_, OUTPUT);
+    pinMode(zf_dir_pin_, OUTPUT);
+    pinMode(tach_pin_, INPUT);
 }
 
 void VelocityJoint::actuate()
 {
-    if (effort_ > 0) { digitalWrite(zf_dir_pin_, HIGH); }
-    else             { digitalWrite(zf_dir_pin_, LOW);  }
-    analogWrite(vr_speed_pin_, effort_);
+    if (enabled_)
+    {
+        if (effort_ > 0) { digitalWrite(zf_dir_pin_, HIGH); }
+        else             { digitalWrite(zf_dir_pin_, LOW);  }
+        analogWrite(vr_speed_pin_, effort_);
+    }
 }
 
 void VelocityJoint::stop()

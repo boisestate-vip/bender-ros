@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   boost::thread(boost::bind(&boost::asio::io_service::run, &io_service));
 
   // Background thread for the controls callback.
-  ros::NodeHandle controller_nh("");
+  ros::NodeHandle controller_nh("/bender");
   controller_manager::ControllerManager cm(&bender, controller_nh);
   boost::thread(boost::bind(controlThread, ros::Rate(50), &bender, &cm));
 
