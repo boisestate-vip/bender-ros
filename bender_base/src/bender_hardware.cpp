@@ -67,6 +67,10 @@ BenderHardware::BenderHardware()
 
     feedback_sub_ = nh_.subscribe("feedback", 1, &BenderHardware::feedbackCallback, this);
     cmd_drive_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("cmd_drive", 1);
+	cmd_msg_.layout.dim.push_back(std_msgs::MultiArrayDimension());
+	cmd_msg_.layout.dim[0].label = "joint_targets";
+	cmd_msg_.layout.dim[0].size = 8;
+    cmd_msg_.layout.dim[0].stride = 1;
 }
 
 
@@ -77,36 +81,36 @@ BenderHardware::~BenderHardware()
 
 void BenderHardware::copyJointsFromHardware()
 {
-  boost::mutex::scoped_lock feedback_msg_lock(feedback_msg_mutex_, boost::try_to_lock);
-  if (feedback_msg_ && feedback_msg_lock)
-  {
-    for (int i = 0; i < 8; i++)
+    boost::mutex::scoped_lock feedback_msg_lock(feedback_msg_mutex_, boost::try_to_lock);
+    if (feedback_msg_ && feedback_msg_lock)
     {
-      joints_[i].position = feedback_msg_->position[i];
-      joints_[i].velocity = feedback_msg_->velocity[i];
-      joints_[i].effort   = feedback_msg_->effort[i];  
-    }
-  }
+		for (int i = 0; i < 8; i++)
+		{
+			joints_[i].position = feedback_msg_->position[i];
+			joints_[i].velocity = feedback_msg_->velocity[i];
+			joints_[i].effort   = feedback_msg_->effort[i];  
+		}
+	}
 }
 
 
 void BenderHardware::publishDriveToMCU()
 {
-  cmd_msg_.data.clear();
-  for (int i = 0; i < 8; i++)
-  {
-    cmd_msg_.data.push_back( (float) joints_[i].command );
-  }
-  cmd_drive_pub_.publish(cmd_msg_);
+	cmd_msg_.data.clear();
+	for (int i = 0; i < 8; i++)
+	{
+		cmd_msg_.data.push_back( (float) joints_[i].command );
+	}
+	cmd_drive_pub_.publish(cmd_msg_);
 }
 
 
 void BenderHardware::feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg)
 {
-  // Update the feedback message pointer to point to the current message. Block
-  // until the control thread is not using the lock.
-  boost::mutex::scoped_lock lock(feedback_msg_mutex_);
-  feedback_msg_ = msg;
+	// Update the feedback message pointer to point to the current message. Block
+	// until the control thread is not using the lock.
+	boost::mutex::scoped_lock lock(feedback_msg_mutex_);
+	feedback_msg_ = msg;
 }
 
 }  // namespace bender_base

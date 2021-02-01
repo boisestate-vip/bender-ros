@@ -45,7 +45,7 @@ namespace angles
    * \brief Convert degrees to radians
    */
 
-  static inline double from_degrees(double degrees)
+  static float from_degrees(float degrees)
   {
     return degrees * M_PI / 180.0;
   }
@@ -53,7 +53,7 @@ namespace angles
   /*!
    * \brief Convert radians to degrees
    */
-  static inline double to_degrees(double radians)
+  static float to_degrees(float radians)
   {
     return radians * 180.0 / M_PI;
   }
@@ -65,9 +65,9 @@ namespace angles
    *        Normalizes the angle to be 0 to 2*M_PI
    *        It takes and returns radians.
    */
-  static inline double normalize_angle_positive(double angle)
+  static float normalize_angle_positive(float angle)
   {
-    const double result = fmod(angle, 2.0*M_PI);
+    const float result = fmodf(angle, 2.0*M_PI);
     if(result < 0) return result + 2.0*M_PI;
     return result;
   }
@@ -80,9 +80,9 @@ namespace angles
    * It takes and returns radians.
    *
    */
-  static inline double normalize_angle(double angle)
+  static float normalize_angle(float angle)
   {
-    const double result = fmod(angle + M_PI, 2.0*M_PI);
+    const float result = fmodf(angle + M_PI, 2.0*M_PI);
     if(result <= 0.0) return result + M_PI;
     return result - M_PI;
   }
@@ -100,7 +100,7 @@ namespace angles
    * to "from" will always get you an equivelent angle to "to".
    */
 
-  static inline double shortest_angular_distance(double from, double to)
+  static float shortest_angular_distance(float from, float to)
   {
     return normalize_angle(to-from);
   }
@@ -114,11 +114,11 @@ namespace angles
    * two_pi_complement(M_PI/4) returns -7*M_PI/4
    *
    */
-  static inline double two_pi_complement(double angle)
+  static float two_pi_complement(float angle)
   {
     //check input conditions
     if (angle > 2*M_PI || angle < -2.0*M_PI)
-      angle = fmod(angle, 2.0*M_PI);
+      angle = fmodf(angle, 2.0*M_PI);
     if(angle < 0)
       return (2*M_PI+angle);
     else if (angle > 0)
@@ -138,9 +138,9 @@ namespace angles
    * \param result_min_delta - minimum (delta) angle (in radians) that can be moved from "from" position before hitting the joint stop
    * \param result_max_delta - maximum (delta) angle (in radians) that can be movedd from "from" position before hitting the joint stop
    */
-  static bool find_min_max_delta(double from, double left_limit, double right_limit, double &result_min_delta, double &result_max_delta)
+  static bool find_min_max_delta(float from, float left_limit, float right_limit, float &result_min_delta, float &result_max_delta)
   {
-    double delta[4];
+    float delta[4];
 
     delta[0] = shortest_angular_distance(from,left_limit);
     delta[1] = shortest_angular_distance(from,right_limit);
@@ -151,28 +151,28 @@ namespace angles
     if(delta[0] == 0)
     {
       result_min_delta = delta[0];
-      result_max_delta = std::max<double>(delta[1],delta[3]);
+      result_max_delta = max(delta[1],delta[3]);
       return true;
     }
 
     if(delta[1] == 0)
     {
         result_max_delta = delta[1];
-        result_min_delta = std::min<double>(delta[0],delta[2]);
+        result_min_delta = min(delta[0],delta[2]);
         return true;
     }
 
 
-    double delta_min = delta[0];
-    double delta_min_2pi = delta[2];
+    float delta_min = delta[0];
+    float delta_min_2pi = delta[2];
     if(delta[2] < delta_min)
     {
       delta_min = delta[2];
       delta_min_2pi = delta[0];
     }
 
-    double delta_max = delta[1];
-    double delta_max_2pi = delta[3];
+    float delta_max = delta[1];
+    float delta_max_2pi = delta[3];
     if(delta[3] > delta_max)
     {
       delta_max = delta[3];
@@ -207,7 +207,7 @@ namespace angles
    * Note also that `from` must lie inside the valid range, while `to` does not need to.
    * In fact, this function will evaluate the shortest (valid) angle `shortest_angle` so that `from+shortest_angle` equals `to` up to an integer multiple of `2*M_PI`.
    * As an example, a call to `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 2*M_PI, shortest_angle)` will return `true`, with `shortest_angle=0.5*M_PI`.
-   * This is because `from` and `from+shortest_angle` are both inside the limits, and `fmod(to+shortest_angle, 2*M_PI)` equals `fmod(to, 2*M_PI)`.
+   * This is because `from` and `from+shortest_angle` are both inside the limits, and `fmodf(to+shortest_angle, 2*M_PI)` equals `fmodf(to, 2*M_PI)`.
    * On the other hand, `shortest_angular_distance_with_large_limits(10.5*M_PI, 0, -2*M_PI, 2*M_PI, shortest_angle)` will return false, since `from` is not in the valid range.
    * Finally, note that the call `shortest_angular_distance_with_large_limits(0, 10.5*M_PI, -2*M_PI, 0.1*M_PI, shortest_angle)` will also return `true`.
    * However, `shortest_angle` in this case will be `-1.5*M_PI`.
@@ -219,15 +219,19 @@ namespace angles
    * \param right_limit - right limit of valid interval, must be greater than left_limit.
    * \param shortest_angle - result of the shortest angle calculation.
    */
-  static inline bool shortest_angular_distance_with_large_limits(double from, double to, double left_limit, double right_limit, double &shortest_angle)
+  static bool shortest_angular_distance_with_large_limits(float from, float to, float left_limit, float right_limit, float &shortest_angle)
   {
     // Shortest steps in the two directions
-    double delta = shortest_angular_distance(from, to);
-    double delta_2pi = two_pi_complement(delta);
+    float delta = shortest_angular_distance(from, to);
+    float delta_2pi = two_pi_complement(delta);
 
     // "sort" distances so that delta is shorter than delta_2pi
-    if(std::fabs(delta) > std::fabs(delta_2pi))
+    // float tmp = delta;
+    if(fabsf(delta) > fabsf(delta_2pi)) {
+      // delta = delta_2pi;
+      // delta_2pi = tmp;
       std::swap(delta, delta_2pi);
+    }
 
     if(left_limit > right_limit) {
       // If limits are something like [PI/2 , -PI/2] it actually means that we
@@ -248,7 +252,7 @@ namespace angles
     // Check in which direction we should turn (clockwise or counter-clockwise).
 
     // start by trying with the shortest angle (delta).
-    double to2 = from + delta;
+    float to2 = from + delta;
     if(left_limit <= to2 && to2 <= right_limit) {
       // we can move in this direction: return success if the "from" angle is inside limits
       shortest_angle = delta;
@@ -286,16 +290,16 @@ namespace angles
    * \param right_limit - right limit of valid interval for angular position, left and right limits are specified on the unit circle w.r.t to a reference pointing inwards
    * \param shortest_angle - result of the shortest angle calculation
    */
-  static inline bool shortest_angular_distance_with_limits(double from, double to, double left_limit, double right_limit, double &shortest_angle)
+  static bool shortest_angular_distance_with_limits(float from, float to, float left_limit, float right_limit, float &shortest_angle)
   {
 
-    double min_delta = -2*M_PI;
-    double max_delta = 2*M_PI;
-    double min_delta_to = -2*M_PI;
-    double max_delta_to = 2*M_PI;
+    float min_delta = -2*M_PI;
+    float max_delta = 2*M_PI;
+    float min_delta_to = -2*M_PI;
+    float max_delta_to = 2*M_PI;
     bool flag    = find_min_max_delta(from,left_limit,right_limit,min_delta,max_delta);
-    double delta = shortest_angular_distance(from,to);
-    double delta_mod_2pi  = two_pi_complement(delta);
+    float delta = shortest_angular_distance(from,to);
+    float delta_mod_2pi  = two_pi_complement(delta);
 
 
     if(flag)//from position is within the limits
@@ -313,13 +317,13 @@ namespace angles
       else //to position is outside the limits
       {
         find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);
-          if(fabs(min_delta_to) < fabs(max_delta_to))
-            shortest_angle = std::max<double>(delta,delta_mod_2pi);
-          else if(fabs(min_delta_to) > fabs(max_delta_to))
-            shortest_angle =  std::min<double>(delta,delta_mod_2pi);
+          if(fabsf(min_delta_to) < fabsf(max_delta_to))
+            shortest_angle = max(delta,delta_mod_2pi);
+          else if(fabsf(min_delta_to) > fabsf(max_delta_to))
+            shortest_angle =  min(delta,delta_mod_2pi);
           else
           {
-            if (fabs(delta) < fabs(delta_mod_2pi))
+            if (fabsf(delta) < fabsf(delta_mod_2pi))
               shortest_angle = delta;
             else
               shortest_angle = delta_mod_2pi;
@@ -331,13 +335,13 @@ namespace angles
     {
         find_min_max_delta(to,left_limit,right_limit,min_delta_to,max_delta_to);
 
-          if(fabs(min_delta) < fabs(max_delta))
-            shortest_angle = std::min<double>(delta,delta_mod_2pi);
-          else if (fabs(min_delta) > fabs(max_delta))
-            shortest_angle =  std::max<double>(delta,delta_mod_2pi);
+          if(fabsf(min_delta) < fabsf(max_delta))
+            shortest_angle = min(delta,delta_mod_2pi);
+          else if (fabsf(min_delta) > fabsf(max_delta))
+            shortest_angle =  max(delta,delta_mod_2pi);
           else
           {
-            if (fabs(delta) < fabs(delta_mod_2pi))
+            if (fabsf(delta) < fabsf(delta_mod_2pi))
               shortest_angle = delta;
             else
               shortest_angle = delta_mod_2pi;

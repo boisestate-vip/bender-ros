@@ -1,4 +1,5 @@
 <launch>
+    <arg name="rviz" default="true"/>
 
     <include file="$(find bender_description)/launch/description.launch" />
 
@@ -28,5 +29,7 @@
         <param name="default_vw_max" type="double" value="1.5" />
         <param name="default_vw_min" type="double" value="-1.5" />
     </node>
+
+    <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_base)/config/bender.rviz" output="screen"/>
 
 </launch>

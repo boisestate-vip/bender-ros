@@ -18,20 +18,20 @@ GenericJoint::GenericJoint(float p, float i, float d,
     target_(0.0),
     state_(0.0),
     effort_(0.0),
-    effort_limit_(effortLimit)
+    effort_limit_(effortLimit),
+    error_(0.0)
 {
 }
 
 void GenericJoint::update(unsigned long dt_ms)
 {
-    float error;
-    if      (target_ <= lower_limit_)  { error = state_ - lower_limit_; } 
-    else if (target_ >= upper_limit_)  { error = state_ - upper_limit_; } 
-    else                               { error = state_ - target_; }
+    if      (target_ <= lower_limit_)  { error_ = state_ - lower_limit_; } 
+    else if (target_ >= upper_limit_)  { error_ = state_ - upper_limit_; } 
+    else                               { error_ = state_ - target_; }
     
     if (dt_ms <= 100)
     {
-        effort_ = clamp(pid_controller_.computeCommand(error, dt_ms),
+        effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
                         -effort_limit_, effort_limit_);
     }
 }
@@ -49,8 +49,6 @@ PositionJoint::PositionJoint(int encAPin, int encBPin, int pwmPin, int dirPin,
     dir_pin_(dirPin),
     encoder_(encAPin,encBPin) 
 { 
-    pinMode(enc_a_pin_, INPUT);
-    pinMode(enc_b_pin_, INPUT);
     pinMode(pwm_pin_, OUTPUT);
     pinMode(dir_pin_, OUTPUT);
 }
@@ -58,16 +56,15 @@ PositionJoint::PositionJoint(int encAPin, int encBPin, int pwmPin, int dirPin,
 void PositionJoint::update(unsigned long dt_ms)
 {
     setState(encoder_.read());
-    double error;
     angles::shortest_angular_distance_with_limits(state_,
                                                   target_,
                                                   lower_limit_,
                                                   upper_limit_,
-                                                  error);
+                                                  error_);
     
     if (dt_ms <= 100)
     {
-        effort_ = clamp(pid_controller_.computeCommand((float) error, dt_ms),
+        effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
                         -effort_limit_, effort_limit_);
     }
 }
@@ -78,14 +75,14 @@ void PositionJoint::actuate()
     {
         if (effort_ > 0) { digitalWrite(dir_pin_, HIGH); }
         else             { digitalWrite(dir_pin_, LOW);  }
-        analogWrite(pwm_pin_, effort_);
+        analogWrite(pwm_pin_, floorf(map(effort_,0.0f,effort_limit_,0,255)));
     }
 }
 
 void PositionJoint::stop()
 {
     effort_ = 0.0;
-    analogWrite(pwm_pin_, 0.0);
+    analogWrite(pwm_pin_, 0);
 }
 
 
@@ -110,12 +107,12 @@ void VelocityJoint::actuate()
     {
         if (effort_ > 0) { digitalWrite(zf_dir_pin_, HIGH); }
         else             { digitalWrite(zf_dir_pin_, LOW);  }
-        analogWrite(vr_speed_pin_, effort_);
+        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,effort_limit_,0,255)));
     }
 }
 
 void VelocityJoint::stop()
 {
     effort_ = 0.0;
-    analogWrite(vr_speed_pin_, 0.0);
+    analogWrite(vr_speed_pin_, 0);
 }
