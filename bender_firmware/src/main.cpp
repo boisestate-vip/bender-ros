@@ -11,7 +11,7 @@
 #define CMD_RECEIVE_TIMEOUT_MS 100
 
 
-ros::NodeHandle nh;
+// Robot's joints
 PositionJoint pos_joints[4] = {
 	PositionJoint(2, 3, 35, 16, 10.0, 0.0, 0.0), // leg_lf_joint
 	PositionJoint(4, 5, 36, 17, 10.0, 0.0, 0.0), // leg_rf_joint
@@ -24,11 +24,28 @@ VelocityJoint vel_joints[4] = {
 	VelocityJoint(29, 28, 27, 10.0, 0.0, 0.0), // wheel_lh_joint
 	VelocityJoint(30, 26, 34, 10.0, 0.0, 0.0)  // wheel_rh_joint
 };
+/*
+ * The following is an unfortunate consequence of Arduino's
+ * attachInterrupt function not supporting any way to pass a 
+ * pointer or other context to the attached function.
+ */
+void velJointISR0(void) { vel_joints[0].interruptHandle(); }
+void velJointISR1(void) { vel_joints[1].interruptHandle(); }
+void velJointISR2(void) { vel_joints[2].interruptHandle(); }
+void velJointISR3(void) { vel_joints[3].interruptHandle(); }
+
+
+// Timers
 elapsedMillis since_last_receipt_ms;
 elapsedMillis since_last_update_ms;
 elapsedMillis since_last_spin_ms;
 
 
+// ROS Nodehandle
+ros::NodeHandle nh;
+
+
+// ROS JointState publisher
 char *_jstate_name[] = {
 	"wheel_lf_joint", "wheel_rf_joint", "wheel_lh_joint", "wheel_rh_joint",
 	"leg_lf_joint", "leg_rf_joint", "leg_lh_joint", "leg_rh_joint"
@@ -40,6 +57,7 @@ sensor_msgs::JointState feedback_msg;
 ros::Publisher state_publisher("feedback", &feedback_msg);
 
 
+// ROS cmd_drive subscriber
 void updateCmd(const std_msgs::Float32MultiArray &cmd_msg)
 {
 	since_last_receipt_ms = 0;
@@ -76,6 +94,11 @@ void setup()
 	since_last_update_ms = 0;
 	since_last_spin_ms = 0;
 
+	attachInterrupt(vel_joints[0].getInterruptPin(), velJointISR0, RISING);
+	attachInterrupt(vel_joints[1].getInterruptPin(), velJointISR1, RISING);
+	attachInterrupt(vel_joints[2].getInterruptPin(), velJointISR2, RISING);
+	attachInterrupt(vel_joints[3].getInterruptPin(), velJointISR3, RISING);
+
 	/** Enable the motors **/
 	// for (int i=0; i<4; i++)
 	// {
@@ -101,6 +124,7 @@ void loop()
 	{
 		for (int i=0; i<4; i++)
 		{
+			vel_joints[i].pulsesToRPM();
 			vel_joints[i].update(since_last_update_ms);
 			vel_joints[i].getEffort(_jstate_eff[i]);
 			vel_joints[i].actuate();
@@ -108,7 +132,7 @@ void loop()
 			pos_joints[i].getEffort(_jstate_eff[i+4]);
 			pos_joints[i].actuate();
 		}
-		since_last_update_ms = since_last_update_ms - PID_UPDATE_PERIOD_MS;
+		since_last_update_ms = 0;
 	}
 
 	/** Publish via rosserial at a specified rate **/
@@ -124,6 +148,13 @@ void loop()
 		feedback_msg.header.stamp = nh.now();
 		state_publisher.publish( &feedback_msg );
 		nh.spinOnce();
-		since_last_spin_ms = since_last_spin_ms - ROS_PUBLISH_PERIOD_MS;
+		if (since_last_spin_ms >= 3*ROS_PUBLISH_PERIOD_MS)
+		{
+			since_last_spin_ms = 0;
+		}
+		else 
+		{
+			since_last_spin_ms = since_last_spin_ms - ROS_PUBLISH_PERIOD_MS;
+		}
 	}
 }

@@ -40,7 +40,7 @@ void GenericJoint::update(unsigned long dt_ms)
 /*********************************************************************
  * PositionJoint implementations
 *********************************************************************/
-PositionJoint::PositionJoint(int encAPin, int encBPin, int pwmPin, int dirPin,
+PositionJoint::PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, uint8_t dirPin,
                              float p, float i, float d) :
     GenericJoint(p, i, d, -M_PI_2, M_PI_2),
     enc_a_pin_(encAPin),
@@ -89,7 +89,7 @@ void PositionJoint::stop()
 /*********************************************************************
  * VelocityJoint implementations
 *********************************************************************/
-VelocityJoint::VelocityJoint(int vrPin, int zfPin, int tachPin, 
+VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, 
                              float p, float i, float d, float velLimit) :
     GenericJoint(p, i, d, -velLimit, velLimit),
     vr_speed_pin_(vrPin),
@@ -98,7 +98,12 @@ VelocityJoint::VelocityJoint(int vrPin, int zfPin, int tachPin,
 {
     pinMode(vr_speed_pin_, OUTPUT);
     pinMode(zf_dir_pin_, OUTPUT);
-    pinMode(tach_pin_, INPUT);
+}
+
+void VelocityJoint::update(unsigned long dt_ms)
+{
+    setState(rpm_ / 60.0f * 2 * M_PI);  // convert to rad/s
+    GenericJoint::update(dt_ms);
 }
 
 void VelocityJoint::actuate()
@@ -115,4 +120,44 @@ void VelocityJoint::stop()
 {
     effort_ = 0.0;
     analogWrite(vr_speed_pin_, 0);
+}
+
+uint8_t VelocityJoint::getInterruptPin()
+{
+    return tach_pin_;
+}
+
+void VelocityJoint::interruptHandle()
+{
+    pulses_ += 1;
+    interval_ += since_last_interrupt_;
+    since_last_interrupt_ = 0;
+}
+
+float VelocityJoint::pulsesToRPM()
+{
+    noInterrupts();
+    
+    /* 
+     * If more than 250 ms has elapsed since last pulse was registered, 
+     * wheel isn't moving (< 5.33 RPM).
+     */
+    if (since_last_interrupt_ >= 250000)  
+    {
+        pulses_   = 0;
+        interval_ = 0;
+        rpm_ = 0.0;
+    }
+    /*
+     * Do RPM calculation if we have collected data from 3 pulses or more
+     */
+    else if (pulses_ > 3)
+    {
+        rpm_ = (float) pulses_ / 45.0f / ((float) interval_ * 1000000.0f) * 60.0f;
+        pulses_ = 0;
+        interval_ = 0;
+    }
+
+    interrupts();
+    return rpm_;
 }
