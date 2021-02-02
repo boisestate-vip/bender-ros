@@ -44,7 +44,6 @@ class PositionJoint : public GenericJoint
     public:
         PositionJoint(int encAPin, int encBPin, int pwmPin, int dirPin, 
                       float p=0.0, float i=0.0, float d=0.0);
-        // ~PositionJoint();
         void update(unsigned long dt_ms);
         void actuate();
         void stop();
@@ -63,14 +62,16 @@ class VelocityJoint : public GenericJoint
     public:
         VelocityJoint(int vrPin, int zfPin, int interrputPin, 
                       float p=0.0, float i=0.0, float d=0.0, float velLimit=5.0);
-        // ~VelocityJoint();
         void actuate();
         void stop();
-        
+    
     private:
         int vr_speed_pin_;
         int zf_dir_pin_;
-        int tach_pin_;      // See https://github.com/PaulStoffregen/FreqMeasureMulti for measuring frequency
+        int tach_pin_;      // Some notes about calling attachInterrupt() with member functions
+                            // https://atadiat.com/en/e-arduino-trick-share-interrupt-service-routines-between-libraries-application/
+                            // https://www.onetransistor.eu/2019/05/arduino-class-interrupts-and-callbacks.html
+                            // https://forum.arduino.cc/index.php?topic=365383.0
 }; // class VelocityJoint
 
 #endif // BENDER_FIRMWARE_BENDER_JOINTS_H

@@ -89,12 +89,12 @@ void PositionJoint::stop()
 /*********************************************************************
  * VelocityJoint implementations
 *********************************************************************/
-VelocityJoint::VelocityJoint(int vrPin, int zfPin, int interruptPin, 
+VelocityJoint::VelocityJoint(int vrPin, int zfPin, int tachPin, 
                              float p, float i, float d, float velLimit) :
     GenericJoint(p, i, d, -velLimit, velLimit),
     vr_speed_pin_(vrPin),
     zf_dir_pin_(zfPin),
-    tach_pin_(interruptPin) 
+    tach_pin_(tachPin)
 {
     pinMode(vr_speed_pin_, OUTPUT);
     pinMode(zf_dir_pin_, OUTPUT);
