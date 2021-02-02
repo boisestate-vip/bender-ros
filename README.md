@@ -7,6 +7,11 @@ Put the contents of this repository into your catkin workspace, i.e.
 ```
 rosdep install --from-paths src
 ```
+Then, install IGVC Gazebo model by
+```
+cd bender_gazebo/models
+./install_models.sh
+```
 Finally, build the packages using
 ```
 catkin_make
