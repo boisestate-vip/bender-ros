@@ -1,6 +1,8 @@
 #ifndef BENDER_FIRMWARE_BENDER_JOINTS_H
 #define BENDER_FIRMWARE_BENDER_JOINTS_H
 
+#define RPM_TO_RAD_S 0.10471975511965977f
+
 #include <Arduino.h>
 #include <Encoder.h>
 
@@ -45,6 +47,7 @@ class PositionJoint : public GenericJoint
         PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, uint8_t dirPin, 
                       float p=0.0, float i=0.0, float d=0.0);
         void update(unsigned long dt_ms);
+        void getState(float &state);
         void actuate();
         void stop();
 
@@ -61,14 +64,15 @@ class VelocityJoint : public GenericJoint
 {
     public:
         VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t interrputPin, 
-                      float p=0.0, float i=0.0, float d=0.0, float velLimit=5.0);
+                      float p=0.0, float i=0.0, float d=0.0, int rpmLimit=100);
         
         void update(unsigned long dt_ms);
+        void getState(float &state);
         void actuate();
         void stop();
         uint8_t getInterruptPin();
         void interruptHandle();
-        float pulsesToRPM();
+        void pulsesToRPM();
     
     private:
         uint8_t vr_speed_pin_;

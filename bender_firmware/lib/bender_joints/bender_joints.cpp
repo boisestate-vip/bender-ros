@@ -25,9 +25,9 @@ GenericJoint::GenericJoint(float p, float i, float d,
 
 void GenericJoint::update(unsigned long dt_ms)
 {
-    if      (target_ <= lower_limit_)  { error_ = state_ - lower_limit_; } 
-    else if (target_ >= upper_limit_)  { error_ = state_ - upper_limit_; } 
-    else                               { error_ = state_ - target_; }
+    if      (target_ <= lower_limit_)  { error_ = lower_limit_ - state_; } 
+    else if (target_ >= upper_limit_)  { error_ = upper_limit_ - state_; } 
+    else                               { error_ = target_ - state_; }
     
     if (dt_ms <= 100)
     {
@@ -69,13 +69,26 @@ void PositionJoint::update(unsigned long dt_ms)
     }
 }
 
+void PositionJoint::getState(float &state)
+{
+    state_ = encoder_.read();
+    state = state_;
+}
+
 void PositionJoint::actuate()
 {
     if (enabled_) 
     {
-        if (effort_ > 0) { digitalWrite(dir_pin_, HIGH); }
-        else             { digitalWrite(dir_pin_, LOW);  }
-        analogWrite(pwm_pin_, floorf(map(effort_,0.0f,effort_limit_,0,255)));
+        if (effort_ > 0) 
+        { 
+            digitalWrite(dir_pin_, HIGH); 
+            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+        }
+        else
+        {
+            digitalWrite(dir_pin_, LOW);
+            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,0,255)));
+        }
     }
 }
 
@@ -90,8 +103,8 @@ void PositionJoint::stop()
  * VelocityJoint implementations
 *********************************************************************/
 VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, 
-                             float p, float i, float d, float velLimit) :
-    GenericJoint(p, i, d, -velLimit, velLimit),
+                             float p, float i, float d, int rpmLimit) :
+    GenericJoint(p, i, d, -rpmLimit*RPM_TO_RAD_S, rpmLimit*RPM_TO_RAD_S),
     vr_speed_pin_(vrPin),
     zf_dir_pin_(zfPin),
     tach_pin_(tachPin)
@@ -102,17 +115,32 @@ VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin,
 
 void VelocityJoint::update(unsigned long dt_ms)
 {
-    setState(rpm_ / 60.0f * 2 * M_PI);  // convert to rad/s
+    pulsesToRPM();
+    setState(rpm_*RPM_TO_RAD_S);  // convert to rad/s
     GenericJoint::update(dt_ms);
+}
+
+void VelocityJoint::getState(float &state)
+{
+    pulsesToRPM();
+    setState(rpm_*RPM_TO_RAD_S);
+    state = state_;
 }
 
 void VelocityJoint::actuate()
 {
     if (enabled_)
     {
-        if (effort_ > 0) { digitalWrite(zf_dir_pin_, HIGH); }
-        else             { digitalWrite(zf_dir_pin_, LOW);  }
-        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,effort_limit_,0,255)));
+        if (effort_ > 0) 
+        { 
+            digitalWrite(zf_dir_pin_, HIGH); 
+            analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+        }
+        else
+        { 
+            digitalWrite(zf_dir_pin_, LOW);  
+            analogWrite(vr_speed_pin_, floorf(map(-effort_,0.0f,100.0f,0,255)));
+        }
     }
 }
 
@@ -134,7 +162,7 @@ void VelocityJoint::interruptHandle()
     since_last_interrupt_ = 0;
 }
 
-float VelocityJoint::pulsesToRPM()
+void VelocityJoint::pulsesToRPM()
 {
     noInterrupts();
     
@@ -159,5 +187,4 @@ float VelocityJoint::pulsesToRPM()
     }
 
     interrupts();
-    return rpm_;
 }

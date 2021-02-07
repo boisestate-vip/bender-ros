@@ -10,7 +10,6 @@
 #define ROS_PUBLISH_PERIOD_MS 5
 #define CMD_RECEIVE_TIMEOUT_MS 100
 
-
 // Robot's joints
 PositionJoint pos_joints[4] = {
 	PositionJoint(2, 3, 35, 16, 10.0, 0.0, 0.0), // leg_lf_joint
@@ -19,20 +18,20 @@ PositionJoint pos_joints[4] = {
 	PositionJoint(8, 9, 38, 19, 10.0, 0.0, 0.0)  // leg_rh_joint
 };
 VelocityJoint vel_joints[4] = {
-	VelocityJoint(10, 11, 12, 10.0, 0.0, 0.0), // wheel_lf_joint
-	VelocityJoint(14, 13, 15, 10.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(29, 28, 27, 10.0, 0.0, 0.0), // wheel_lh_joint
-	VelocityJoint(30, 26, 34, 10.0, 0.0, 0.0)  // wheel_rh_joint
+	VelocityJoint(10, 11, 12, 5.0, 0.0, 0.0), // wheel_lf_joint
+	VelocityJoint(14, 13, 15, 5.0, 0.0, 0.0), // wheel_rf_joint
+	VelocityJoint(29, 28, 27, 5.0, 0.0, 0.0), // wheel_lh_joint
+	VelocityJoint(30, 26, 34, 5.0, 0.0, 0.0)  // wheel_rh_joint
 };
 /*
  * The following is an unfortunate consequence of Arduino's
  * attachInterrupt function not supporting any way to pass a 
  * pointer or other context to the attached function.
  */
-void velJointISR0(void) { vel_joints[0].interruptHandle(); }
-void velJointISR1(void) { vel_joints[1].interruptHandle(); }
-void velJointISR2(void) { vel_joints[2].interruptHandle(); }
-void velJointISR3(void) { vel_joints[3].interruptHandle(); }
+void velJoint0ISR(void) { vel_joints[0].interruptHandle(); }
+void velJoint1ISR(void) { vel_joints[1].interruptHandle(); }
+void velJoint2ISR(void) { vel_joints[2].interruptHandle(); }
+void velJoint3ISR(void) { vel_joints[3].interruptHandle(); }
 
 
 // Timers
@@ -66,10 +65,8 @@ void updateCmd(const std_msgs::Float32MultiArray &cmd_msg)
 		float target = cmd_msg.data[i];
 		if (i < 4) {
 			vel_joints[i].setTarget(target);
-			_jstate_vel[i] = target;
 		} else if (4 <= i && i < 8) {
 			pos_joints[i-4].setTarget(target);
-			_jstate_pos[i] = target;
 		}
 	}
 }
@@ -94,10 +91,10 @@ void setup()
 	since_last_update_ms = 0;
 	since_last_spin_ms = 0;
 
-	attachInterrupt(vel_joints[0].getInterruptPin(), velJointISR0, RISING);
-	attachInterrupt(vel_joints[1].getInterruptPin(), velJointISR1, RISING);
-	attachInterrupt(vel_joints[2].getInterruptPin(), velJointISR2, RISING);
-	attachInterrupt(vel_joints[3].getInterruptPin(), velJointISR3, RISING);
+	attachInterrupt(vel_joints[0].getInterruptPin(), velJoint0ISR, RISING);
+	attachInterrupt(vel_joints[1].getInterruptPin(), velJoint1ISR, RISING);
+	attachInterrupt(vel_joints[2].getInterruptPin(), velJoint2ISR, RISING);
+	attachInterrupt(vel_joints[3].getInterruptPin(), velJoint3ISR, RISING);
 
 	/** Enable the motors **/
 	// for (int i=0; i<4; i++)
@@ -124,12 +121,9 @@ void loop()
 	{
 		for (int i=0; i<4; i++)
 		{
-			vel_joints[i].pulsesToRPM();
 			vel_joints[i].update(since_last_update_ms);
-			vel_joints[i].getEffort(_jstate_eff[i]);
 			vel_joints[i].actuate();
 			pos_joints[i].update(since_last_update_ms);
-			pos_joints[i].getEffort(_jstate_eff[i+4]);
 			pos_joints[i].actuate();
 		}
 		since_last_update_ms = 0;
@@ -140,10 +134,16 @@ void loop()
 	{
 		for (int i=0; i<8; i++)
 		{
+			if (i < 4) {
+				vel_joints[i].getState(_jstate_vel[i]);
+				vel_joints[i].getEffort(_jstate_eff[i]);
+			} else if (4 <= i && i < 8) {
+				pos_joints[i-4].getState(_jstate_pos[i]);
+				pos_joints[i-4].getEffort(_jstate_eff[i]);
+			}
 			feedback_msg.position[i] = _jstate_pos[i];
 			feedback_msg.velocity[i] = _jstate_vel[i];
 			feedback_msg.effort[i]   = _jstate_eff[i];
-			// feedback_msg.effort[i]   = floorf(map(_jstate_eff[i], -100.0, 100.0, -255, 255));
 		}
 		feedback_msg.header.stamp = nh.now();
 		state_publisher.publish( &feedback_msg );
