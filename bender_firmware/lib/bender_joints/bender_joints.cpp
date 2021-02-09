@@ -55,7 +55,8 @@ PositionJoint::PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, u
 
 void PositionJoint::update(unsigned long dt_ms)
 {
-    setState(encoder_.read());
+    setState(encoder_.read() / 6672.0f * 2 * M_PI);
+    // GenericJoint::update(dt_ms);
     angles::shortest_angular_distance_with_limits(state_,
                                                   target_,
                                                   lower_limit_,
@@ -71,7 +72,7 @@ void PositionJoint::update(unsigned long dt_ms)
 
 void PositionJoint::getState(float &state)
 {
-    state_ = encoder_.read();
+    state_ = encoder_.read() / 6672.0f * 2 * M_PI;
     state = state_;
 }
 
@@ -102,15 +103,18 @@ void PositionJoint::stop()
 /*********************************************************************
  * VelocityJoint implementations
 *********************************************************************/
-VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, 
+VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, uint8_t powerPin, 
                              float p, float i, float d, int rpmLimit) :
     GenericJoint(p, i, d, -rpmLimit*RPM_TO_RAD_S, rpmLimit*RPM_TO_RAD_S),
     vr_speed_pin_(vrPin),
     zf_dir_pin_(zfPin),
-    tach_pin_(tachPin)
+    tach_pin_(tachPin),
+    power_pin_(powerPin)
 {
     pinMode(vr_speed_pin_, OUTPUT);
     pinMode(zf_dir_pin_, OUTPUT);
+    pinMode(power_pin_, OUTPUT);
+    digitalWrite(power_pin_, LOW);
 }
 
 void VelocityJoint::update(unsigned long dt_ms)
@@ -125,6 +129,12 @@ void VelocityJoint::getState(float &state)
     pulsesToRPM();
     setState(rpm_*RPM_TO_RAD_S);
     state = state_;
+}
+
+void VelocityJoint::enable()
+{
+    enabled_ = true;
+    digitalWrite(power_pin_, HIGH);
 }
 
 void VelocityJoint::actuate()
@@ -146,6 +156,7 @@ void VelocityJoint::actuate()
 
 void VelocityJoint::stop()
 {
+    digitalWrite(power_pin_, LOW);
     effort_ = 0.0;
     analogWrite(vr_speed_pin_, 0);
 }
@@ -181,7 +192,7 @@ void VelocityJoint::pulsesToRPM()
      */
     else if (pulses_ > 3)
     {
-        rpm_ = (float) pulses_ / 45.0f / ((float) interval_ * 1000000.0f) * 60.0f;
+        rpm_ = (float) pulses_ / 45.0f / ((float) interval_ / 1000000.0f) * 60.0f;
         pulses_ = 0;
         interval_ = 0;
     }

@@ -63,11 +63,12 @@ class PositionJoint : public GenericJoint
 class VelocityJoint : public GenericJoint
 {
     public:
-        VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t interrputPin, 
+        VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t interrputPin, uint8_t powerPin, 
                       float p=0.0, float i=0.0, float d=0.0, int rpmLimit=100);
         
         void update(unsigned long dt_ms);
         void getState(float &state);
+        void enable();
         void actuate();
         void stop();
         uint8_t getInterruptPin();
@@ -77,12 +78,13 @@ class VelocityJoint : public GenericJoint
     private:
         uint8_t vr_speed_pin_;
         uint8_t zf_dir_pin_;
-        uint8_t tach_pin_;      
+        uint8_t tach_pin_;
+        uint8_t power_pin_;      
         // Some notes about calling attachInterrupt() with member functions
         // https://atadiat.com/en/e-arduino-trick-share-interrupt-service-routines-between-libraries-application/
         // https://www.onetransistor.eu/2019/05/arduino-class-interrupts-and-callbacks.html
         // https://forum.arduino.cc/index.php?topic=365383.0
-        int pulses_ = 0;
+        volatile unsigned long int pulses_ = 0;
         float rpm_  = 0.0f;
         unsigned long interval_ = 0;
         elapsedMicros since_last_interrupt_;
