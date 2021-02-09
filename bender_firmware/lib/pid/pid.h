@@ -2,12 +2,13 @@
 #define BENDER_FIRMWARE_PID_H
 
 #include <cmath>
+#include "bender_utils.h"
 
 class Pid
 {
     public:
         
-        Pid(float p=0.0, float i=0.0, float d=0.0);
+        Pid(float p=0.0, float i=0.0, float d=0.0, float iMin=0.0, float iMax=0.0);
         void  reset();
         void  getGains(float &p, float &i, float &d);
         void  setGains(float p, float i, float d);
@@ -27,6 +28,9 @@ class Pid
         float p_error_last_; /**< Save position state for derivative state calculation. */
         float p_error_; /**< Position error. */
         float i_error_; /**< Integral of position error. */
+        float i_max_;
+        float i_min_;
+        bool antiwindup_;
         float d_error_; /**< Derivative of position error. */
         float cmd_;     /**< Command to send. */
 }; // class Pid

@@ -1,13 +1,12 @@
 #ifndef BENDER_FIRMWARE_BENDER_JOINTS_H
 #define BENDER_FIRMWARE_BENDER_JOINTS_H
 
-#define RPM_TO_RAD_S 0.10471975511965977f
-
 #include <Arduino.h>
 #include <Encoder.h>
 
 #include "angles.h"
 #include "pid.h"
+#include "bender_utils.h"
 
 class GenericJoint
 {
@@ -24,6 +23,7 @@ class GenericJoint
         void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); }
         void enable()  { enabled_ = true; }
         void disable() { enabled_ = false; }
+        bool isEnabled() { return enabled_; }
         void update(unsigned long dt_ms);
         virtual void actuate() { };
         virtual void stop() { };
@@ -31,12 +31,12 @@ class GenericJoint
     protected:
         Pid pid_controller_;
         bool enabled_;
-        float upper_limit_;
-        float lower_limit_;
+        const float upper_limit_;
+        const float lower_limit_;
+        const float effort_limit_;
         float target_;
         float state_;
         float effort_;
-        float effort_limit_;
         float error_;
 }; // class GenericJoint
 
@@ -45,7 +45,7 @@ class PositionJoint : public GenericJoint
 {
     public:
         PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, uint8_t dirPin, 
-                      float p=0.0, float i=0.0, float d=0.0);
+                      unsigned int encoderPPR, float p=0.0, float i=0.0, float d=0.0);
         void update(unsigned long dt_ms);
         void getState(float &state);
         void actuate();
@@ -56,6 +56,7 @@ class PositionJoint : public GenericJoint
         uint8_t enc_b_pin_;
         uint8_t pwm_pin_;
         uint8_t dir_pin_;
+        const float pulse_per_rev_;
         Encoder encoder_;
 }; // class PositionJoint
 
@@ -63,12 +64,11 @@ class PositionJoint : public GenericJoint
 class VelocityJoint : public GenericJoint
 {
     public:
-        VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t interrputPin, uint8_t powerPin, 
-                      float p=0.0, float i=0.0, float d=0.0, int rpmLimit=100);
+        VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, uint8_t powerPin, 
+                      unsigned int tachPPR, float p=0.0, float i=0.0, float d=0.0, int rpmLimit=100);
         
         void update(unsigned long dt_ms);
         void getState(float &state);
-        void enable();
         void actuate();
         void stop();
         uint8_t getInterruptPin();
@@ -84,9 +84,10 @@ class VelocityJoint : public GenericJoint
         // https://atadiat.com/en/e-arduino-trick-share-interrupt-service-routines-between-libraries-application/
         // https://www.onetransistor.eu/2019/05/arduino-class-interrupts-and-callbacks.html
         // https://forum.arduino.cc/index.php?topic=365383.0
+        const float pulse_per_rev_;
         volatile unsigned long int pulses_ = 0;
-        float rpm_  = 0.0f;
         unsigned long interval_ = 0;
+        float rpm_  = 0.0f;
         elapsedMicros since_last_interrupt_;
 }; // class VelocityJoint
 

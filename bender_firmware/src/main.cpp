@@ -9,31 +9,21 @@
 #define PID_UPDATE_PERIOD_MS 1
 #define ROS_PUBLISH_PERIOD_MS 5
 #define CMD_RECEIVE_TIMEOUT_MS 100
+#define PLANETARY_PPR 6672
+#define HUB_PPR 45
 
 // Robot's joints
-// PositionJoint pos_joints[4] = {
-// 	PositionJoint(2, 3, 35, 16, 10.0, 0.0, 0.0), // leg_lf_joint
-// 	PositionJoint(4, 5, 36, 17, 10.0, 0.0, 0.0), // leg_rf_joint
-// 	PositionJoint(6, 7, 37, 18, 10.0, 0.0, 0.0), // leg_lh_joint
-// 	PositionJoint(8, 9, 38, 19, 10.0, 0.0, 0.0)  // leg_rh_joint
-// };
-// VelocityJoint vel_joints[4] = {
-// 	VelocityJoint(10, 11, 12, 20, 0.0, 0.0, 0.0), // wheel_lf_joint
-// 	VelocityJoint(14, 13, 15, 21, 0.0, 0.0, 0.0), // wheel_rf_joint
-// 	VelocityJoint(29, 28, 27, 22, 0.0, 0.0, 0.0), // wheel_lh_joint
-// 	VelocityJoint(30, 26, 34, 23, 0.0, 0.0, 0.0)  // wheel_rh_joint
-// };
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 16, 10.0, 0.0, 5.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, 50.0, 10.0, 10.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, 50.0, 10.0, 10.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, 50.0, 10.0, 10.0)  // leg_rh_joint
+	PositionJoint(2, 3, 35, 16, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_lf_joint
+	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_rf_joint
+	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_lh_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 50.0, 10.0, 10.0)  // leg_rh_joint
 };
 VelocityJoint vel_joints[4] = {
-	VelocityJoint(10, 11, 12, 20, 5.0, 0.0, 0.0), // wheel_lf_joint
-	VelocityJoint(30, 26, 34, 23, 5.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(14, 13, 15, 21, 5.0, 0.0, 0.0), // wheel_lh_joint
-	VelocityJoint(29, 28, 27, 22, 5.0, 0.0, 0.0)  // wheel_rh_joint
+	VelocityJoint(10, 11, 12, 20, HUB_PPR, 5.0, 0.0, 0.0), // wheel_lf_joint
+	VelocityJoint(30, 26, 34, 23, HUB_PPR, 5.0, 0.0, 0.0), // wheel_rf_joint
+	VelocityJoint(14, 13, 15, 21, HUB_PPR, 5.0, 0.0, 0.0), // wheel_lh_joint
+	VelocityJoint(29, 28, 27, 22, HUB_PPR, 5.0, 0.0, 0.0)  // wheel_rh_joint
 };
 /*
  * The following is an unfortunate consequence of Arduino's
@@ -72,13 +62,16 @@ ros::Publisher state_publisher("feedback", &feedback_msg);
 void updateCmd(const std_msgs::Float32MultiArray &cmd_msg)
 {
 	since_last_receipt_ms = 0;
-	for (unsigned int i=0; i<8; i++)
+	if (cmd_msg.layout.dim[0].size == 8)
 	{
-		float target = cmd_msg.data[i];
-		if (i < 4) {
-			vel_joints[i].setTarget(target);
-		} else if (4 <= i && i < 8) {
-			pos_joints[i-4].setTarget(target);
+		for (unsigned int i=0; i<8; i++)
+		{
+			float target = cmd_msg.data[i];
+			if (i < 4) {
+				vel_joints[i].setTarget(target);
+			} else if (4 <= i && i < 8) {
+				pos_joints[i-4].setTarget(target);
+			}
 		}
 	}
 }
@@ -114,7 +107,6 @@ void setup()
 		// vel_joints[i].enable();
 		// pos_joints[i].enable();
 	// }
-	pos_joints[0].enable();
 }
 
 
