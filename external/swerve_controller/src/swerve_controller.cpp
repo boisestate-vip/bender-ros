@@ -260,10 +260,15 @@ namespace swerve_controller
     void SwerveController::updateOdometry(const ros::Time &time)
     {
         // Get current position and velocities
+        // const double lf_speed = lf_wheel_joint_->getVelocity();
+        // const double rf_speed = rf_wheel_joint_->getVelocity();
+        // const double lh_speed = lh_wheel_joint_->getVelocity();
+        // const double rh_speed = rh_wheel_joint_->getVelocity();
+        // These computations account for L-R wheels oriented in opposite direction
         const double lf_speed = lf_wheel_joint_->getVelocity();
-        const double rf_speed = rf_wheel_joint_->getVelocity();
+        const double rf_speed = rf_wheel_joint_->getVelocity()*-1.0;
         const double lh_speed = lh_wheel_joint_->getVelocity();
-        const double rh_speed = rh_wheel_joint_->getVelocity();
+        const double rh_speed = rh_wheel_joint_->getVelocity()*-1.0;
         if (std::isnan(lf_speed) || std::isnan(rf_speed) ||
             std::isnan(lh_speed) || std::isnan(rh_speed))
             return;
@@ -350,10 +355,16 @@ namespace swerve_controller
             double c = curr_cmd.lin_x - curr_cmd.ang * steering_track / 2;
             double d = curr_cmd.lin_x + curr_cmd.ang * steering_track / 2;
 
+            // lf_speed = sqrt(pow(b, 2) + pow(c, 2)) / wheel_radius_;
+            // rf_speed = sqrt(pow(b, 2) + pow(d, 2)) / wheel_radius_;
+            // lh_speed = sqrt(pow(a, 2) + pow(c, 2)) / wheel_radius_;
+            // rh_speed = sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
+
+            // These computations account for L-R wheels oriented in opposite direction
             lf_speed = sqrt(pow(b, 2) + pow(c, 2)) / wheel_radius_;
-            rf_speed = sqrt(pow(b, 2) + pow(d, 2)) / wheel_radius_;
+            rf_speed = -sqrt(pow(b, 2) + pow(d, 2)) / wheel_radius_;
             lh_speed = sqrt(pow(a, 2) + pow(c, 2)) / wheel_radius_;
-            rh_speed = sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
+            rh_speed = -sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
 
             lf_steering = atan2(b, c);
             rf_steering = atan2(b, d);

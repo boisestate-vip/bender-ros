@@ -3,7 +3,7 @@
 
     <include file="$(find bender_description)/launch/description.launch" />
 
-    <node pkg="bender_base" type="bender_base_node" name="bender_base_node" output="screen" />
+    <node pkg="bender_base" required="true" type="bender_base_node" name="bender_base_node" output="screen" />
 
     <!-- Load the control parameters -->
     <rosparam file="$(find bender_base)/config/bender_controllers.yaml" command="load"/>

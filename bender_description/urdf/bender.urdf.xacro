@@ -219,7 +219,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	<joint name="wheel_rf_joint" type="continuous">
 		<parent link="leg_rf"/>
 		<child link="wheel_rf"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>
@@ -233,7 +233,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	<joint name="wheel_rh_joint" type="continuous">
 		<parent link="leg_rh"/>
 		<child link="wheel_rh"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>
