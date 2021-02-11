@@ -5,7 +5,7 @@ This repository contain ROS code for the Bender robot designed and built by a gr
 Put the contents of this repository into your catkin workspace, i.e.
 `<your_catkin_ws>/src`, Then, install the required ROS packages to build & run this by executing
 ```
-rosdep install --from-paths src
+rosdep install --from-paths src --ignore-src
 ```
 Then, install IGVC Gazebo model by
 ```
