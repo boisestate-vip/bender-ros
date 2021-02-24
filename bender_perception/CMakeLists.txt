@@ -108,7 +108,9 @@ find_package(OpenCV REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+ INCLUDE_DIRS include
+ LIBRARIES ${PROJECT_NAME}
+ CATKIN_DEPENDS ${${PROJECT_NAME}_CATKIN_DEPS}
 #  LIBRARIES bender_perception
 #  CATKIN_DEPENDS image_geometry roscpp rospy sensor_msgs std_msgs nav_msgs
 #  DEPENDS system_lib
@@ -127,9 +129,8 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/bender_perception.cpp
-# )
+add_library(vision src/vision.cpp)
+add_library(lidar src/lidar.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -140,7 +141,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/bender_perception_node.cpp)
-add_executable(vision src/vision.cpp)
+add_executable(perception_node src/perception_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,7 +157,7 @@ add_executable(vision src/vision.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(vision ${OpenCV_LIBS})
+target_link_libraries(perception_node vision lidar ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##

@@ -14,10 +14,10 @@
 
 // Robot's joints
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 16, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 50.0, 10.0, 10.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 50.0, 10.0, 10.0)  // leg_rh_joint
+	PositionJoint(2, 3, 35, 16, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_lf_joint
+	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_rf_joint
+	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_lh_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 20.0, 0.0, 5.0)  // leg_rh_joint
 };
 VelocityJoint vel_joints[4] = {
 	VelocityJoint(10, 11, 12, 20, HUB_PPR, 5.0, 0.0, 0.0), // wheel_lf_joint

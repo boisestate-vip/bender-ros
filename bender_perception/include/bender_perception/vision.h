@@ -2,7 +2,7 @@
 #define BENDER_PERCEPTION_VISION_H
 
 #include <ros/ros.h>
-#include <nav_msgs/OccupancyGrid.h>
+#include <sensor_msgs/Image.h>
 #include <opencv2/opencv.hpp>
 
 using namespace cv;
@@ -11,21 +11,25 @@ using namespace std;
 class LaneDetection
 {
     public:
-        LaneDetection();
+        LaneDetection(ros::NodeHandle *nh, int device_id=0);
+        LaneDetection(ros::NodeHandle *nh, string input_topic);
         ~LaneDetection();
+        void inputCb(const sensor_msgs::ImageConstPtr &msg);
+        void readImage();
+        void findKMeans(const int k, vector<Point3f> *colors);
+        void projectToGrid();
 
     private:
-        void readImage();
-        void applyMask(int convert_type=COLOR_BGR2HSV);
-        void findKMeans(const int k, viz::Color *colors);
-        void projectToGrid();
-        
 
         Mat img_src_;
+        Mat img_out_;
         VideoCapture cam_capture_;
-        string wname_;
-        int8_t grid_[];
+        const uint8_t device_id_;
+        const string wname_ = "Quantized Image";
 
+        ros::Subscriber input_sub_;
+        const string input_topic_;
 }; 
+
 
 #endif // BENDER_PERCEPTION_VISION_H
