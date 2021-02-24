@@ -43,7 +43,7 @@
 #include <ros/ros.h>
 #include <rosserial_server/serial_session.h>
 
-#include "bender_base/bender_hardware.h"
+#include "bender_base/hardware_interface.h"
 
 typedef boost::chrono::steady_clock time_source;
 

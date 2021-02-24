@@ -34,7 +34,7 @@
 
 
 #include <boost/assign.hpp>
-#include "bender_base/bender_hardware.h"
+#include "bender_base/hardware_interface.h"
 
 
 namespace bender_base

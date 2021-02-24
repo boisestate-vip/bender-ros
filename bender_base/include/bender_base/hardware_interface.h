@@ -33,8 +33,8 @@
  */
 
 
-#ifndef BENDER_BASE_BENDER_HARDWARE_H
-#define BENDER_BASE_BENDER_HARDWARE_H
+#ifndef BENDER_BASE_HARDWARE_INTERFACE_H
+#define BENDER_BASE_HARDWARE_INTERFACE_H
 
 #include <boost/thread.hpp>
 
@@ -95,4 +95,4 @@ class BenderHardware : public hardware_interface::RobotHW
 
 }  // namespace bender_base
 
-#endif // BENDER_BASE_BENDER_HARDWARE_H
+#endif // BENDER_BASE_HARDWARE_INTERFACE_H

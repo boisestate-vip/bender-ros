@@ -129,8 +129,8 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(vision src/vision.cpp)
-add_library(lidar src/lidar.cpp)
+# add_library(${PROJECT_NAME}_vision src/vision.cpp)
+# add_library(${PROJECT_NAME}_lidar src/lidar.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -140,14 +140,13 @@ add_library(lidar src/lidar.cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/bender_perception_node.cpp)
-add_executable(perception_node src/perception_node.cpp)
+add_executable(${PROJECT_NAME}_node src/bender_perception.cpp src/vision.cpp src/lidar.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -157,7 +156,10 @@ add_executable(perception_node src/perception_node.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(perception_node vision lidar ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME}_node 
+  ${catkin_LIBRARIES} 
+  ${OpenCV_LIBS}
+)
 
 #############
 ## Install ##

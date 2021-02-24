@@ -11,6 +11,8 @@
 #define CMD_RECEIVE_TIMEOUT_MS 100
 #define PLANETARY_PPR 6672
 #define HUB_PPR 45
+#define MAX_THROTTLE_PERCENT 30
+
 
 // Robot's joints
 PositionJoint pos_joints[4] = {
@@ -102,11 +104,13 @@ void setup()
 	attachInterrupt(vel_joints[3].getInterruptPin(), velJoint3ISR, RISING);
 
 	/** Enable the motors **/
-	// for (int i=0; i<4; i++)
-	// {
+	for (int i=0; i<4; i++)
+	{
 		// vel_joints[i].enable();
 		// pos_joints[i].enable();
-	// }
+		vel_joints[i].setEffortLimit(MAX_THROTTLE_PERCENT);
+		pos_joints[i].setEffortLimit(MAX_THROTTLE_PERCENT);
+	}
 }
 
 

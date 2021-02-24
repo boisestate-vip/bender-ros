@@ -13,6 +13,7 @@ GenericJoint::GenericJoint(float p, float i, float d,
     effort_limit_(effortLimit),
     target_(0.0),
     state_(0.0),
+    state_last_(0.0),
     effort_(0.0),
     error_(0.0)
 {
@@ -65,7 +66,7 @@ void PositionJoint::update(unsigned long dt_ms)
 
 void PositionJoint::getState(float &state)
 {
-    state_ = encoder_.read() / pulse_per_rev_ * 2 * M_PI;
+    setState(encoder_.read() / pulse_per_rev_ * 2 * M_PI);
     state = state_;
 }
 
@@ -109,44 +110,85 @@ VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, uint
     pinMode(zf_dir_pin_, OUTPUT);
     pinMode(power_pin_, OUTPUT);
     digitalWriteFast(power_pin_, LOW);
+    since_last_interrupt_ = 0;
+    since_last_sign_change_ = 0;
 }
 
 void VelocityJoint::update(unsigned long dt_ms)
 {
     pulsesToRPM();
-    setState(rpm_*RPM_TO_RAD_S);  // convert to rad/s
+    setState(direction_*rpm_*RPM_TO_RAD_S);  // convert to rad/s
     GenericJoint::update(dt_ms);
 }
 
 void VelocityJoint::getState(float &state)
 {
     pulsesToRPM();
-    setState(rpm_*RPM_TO_RAD_S);
+    setState(direction_*rpm_*RPM_TO_RAD_S);
     state = state_;
 }
 
+void VelocityJoint::setTarget(float target)
+{
+    direction_last_ = direction_;
+    if (target > 0) {direction_ =  1;}
+    else if (target < 0) {direction_ = -1;}
+    target_ = target;
+}
+
+void VelocityJoint::controllerPowerCycle_()
+{
+    digitalWriteFast(power_pin_, LOW);
+    delayMicroseconds(100);
+    digitalWriteFast(power_pin_, HIGH);
+}
 
 void VelocityJoint::actuate()
 {
     if (enabled_)
     {
-        if (effort_ > 0) 
-        { 
-            digitalWriteFast(power_pin_, HIGH);
-            digitalWriteFast(zf_dir_pin_, HIGH); 
-            analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+        if (direction_last_*direction_ < 0)
+        {
+            controllerPowerCycle_();
         }
-        else if (effort_ < 0) 
+        if (target_ > 0) 
         { 
-            digitalWriteFast(power_pin_, HIGH);
+            // digitalWriteFast(power_pin_, HIGH);
+            digitalWriteFast(zf_dir_pin_, HIGH); 
+            analogWrite(vr_speed_pin_, floorf(map(abs(effort_),0.0f,100.0f,0,255)));
+        }
+        else if (target_ < 0) 
+        { 
+            // digitalWriteFast(power_pin_, HIGH);
             digitalWriteFast(zf_dir_pin_, LOW);  
-            analogWrite(vr_speed_pin_, floorf(map(-effort_,0.0f,100.0f,0,255)));
+            analogWrite(vr_speed_pin_, floorf(map(abs(effort_),0.0f,100.0f,0,255)));
         }
         else
         {
-            digitalWriteFast(power_pin_, LOW);
+            // digitalWriteFast(power_pin_, LOW);
             analogWrite(vr_speed_pin_, LOW);
         }
+        // if (direction_last_*direction_ < 0)
+        // {
+            // controllerPowerCycle_();
+        // }
+        // if (effort_ > 0) 
+        // { 
+        //     // digitalWriteFast(power_pin_, HIGH);
+        //     digitalWriteFast(zf_dir_pin_, HIGH); 
+        //     analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+        // }
+        // else if (effort_ < 0) 
+        // { 
+        //     // digitalWriteFast(power_pin_, HIGH);
+        //     digitalWriteFast(zf_dir_pin_, LOW);  
+        //     analogWrite(vr_speed_pin_, floorf(map(-effort_,0.0f,100.0f,0,255)));
+        // }
+        // else
+        // {
+        //     // digitalWriteFast(power_pin_, LOW);
+        //     analogWrite(vr_speed_pin_, LOW);
+        // }
     }
 }
 

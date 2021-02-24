@@ -13,11 +13,12 @@ class GenericJoint
     public:
         GenericJoint(float p, float i, float d, 
                      float lowerLimit, float upperLimit, float effortLimit=100.0);
-        void setState(float state)    { state_ = state; }
+        void setState(float state)    { state_last_ = state_; state_ = state; }
         void getState(float &state)   { state = state_; }
         void setTarget(float target)  { target_ = target; }
         void getTarget(float &target) { target = target_; }
         void getEffort(float &effort) { effort = effort_; }
+        void setEffortLimit(float effort_limit) { effort_limit_ = effort_limit; }
         void getError(float &error)   { error = error_; }
         void setGains(float p, float i, float d)    { pid_controller_.setGains(p,i,d); }
         void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); }
@@ -33,9 +34,10 @@ class GenericJoint
         bool enabled_;
         const float upper_limit_;
         const float lower_limit_;
-        const float effort_limit_;
+        float effort_limit_;
         float target_;
         float state_;
+        float state_last_;
         float effort_;
         float error_;
 }; // class GenericJoint
@@ -69,6 +71,7 @@ class VelocityJoint : public GenericJoint
         
         void update(unsigned long dt_ms);
         void getState(float &state);
+        void setTarget(float target);
         void actuate();
         void stop();
         uint8_t getInterruptPin();
@@ -76,6 +79,7 @@ class VelocityJoint : public GenericJoint
         void pulsesToRPM();
     
     private:
+        void controllerPowerCycle_();
         uint8_t vr_speed_pin_;
         uint8_t zf_dir_pin_;
         uint8_t tach_pin_;
@@ -86,9 +90,12 @@ class VelocityJoint : public GenericJoint
         // https://forum.arduino.cc/index.php?topic=365383.0
         const float pulse_per_rev_;
         volatile unsigned long int pulses_ = 0;
-        unsigned long interval_ = 0;
+        unsigned long int interval_ = 0;
+        uint8_t direction_ = 0;
+        uint8_t direction_last_ = 0;
         float rpm_  = 0.0f;
         elapsedMicros since_last_interrupt_;
+        elapsedMillis since_last_sign_change_;
 }; // class VelocityJoint
 
 #endif // BENDER_FIRMWARE_BENDER_JOINTS_H
