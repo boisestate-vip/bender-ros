@@ -3,7 +3,9 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
+#include <cv_bridge/cv_bridge.h>
 
 using namespace cv;
 using namespace std;

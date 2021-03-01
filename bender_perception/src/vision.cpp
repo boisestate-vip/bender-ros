@@ -27,22 +27,6 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic) :
 {
     // Subscribe to input image
     input_sub_ = nh->subscribe(input_topic_, 1, &LaneDetection::readImage, this);
-
-    // Wait until message is received
-    int attempts = 0;
-    while (img_src_.empty() && attempts < 5)
-    {
-        ROS_INFO("Waiting for %s to be published", input_topic_.c_str());
-        ros::Duration(2.0).sleep();
-        attempts++;
-    }
-
-    if (img_src_.empty())
-    {
-        ROS_ERROR("No message receieved via %s within 10 seconds. Aborting...", input_topic_.c_str());
-        nh->shutdown();
-    }
-
 }
 
 
@@ -53,15 +37,23 @@ LaneDetection::~LaneDetection()
 
 void LaneDetection::readImage()
 {
-    const float scale = 0.25;
     cam_capture_.read(img_src_);
-    resize(img_src_, img_out_, Size(), scale, scale);
 }
 
 
 void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &msg)
 {
-    ;
+    cv_bridge::CvImagePtr cv_ptr;
+    try
+    {
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+    }
+    img_src_ = cv_ptr->image;
 }
 
 
@@ -103,22 +95,33 @@ void LaneDetection::quantize(const int k)
 
 void LaneDetection::update()
 {
+    const float scale = 0.25;
     if (input_topic_.empty()) 
     {
         readImage();
     }
-    cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-    quantize(2);
+    if (!img_src_.empty())
+    {
+        resize(img_src_, img_out_, Size(), scale, scale);
+        cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
+        quantize(2);
+    } else
+    {
+        ROS_INFO_THROTTLE(2.0, "Waiting for input topic %s", input_topic_.c_str());
+    }
 }
 
 
 void LaneDetection::displayOutput()
 {
-    Mat out, display;
-    resize(img_out_, out, img_src_.size());
-    hconcat(img_src_, out, display);
-    namedWindow(wname_, WINDOW_AUTOSIZE);
-    imshow(wname_, display);
-    waitKey(1);
+    if (!img_src_.empty() && !img_out_.empty())
+    {
+        Mat out, display;
+        resize(img_out_, out, img_src_.size());
+        hconcat(img_src_, out, display);
+        namedWindow(wname_, WINDOW_AUTOSIZE);
+        imshow(wname_, display);
+        waitKey(1);
+    }
 }
 

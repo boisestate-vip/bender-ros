@@ -7,7 +7,7 @@ int main (int argc, char **argv)
     ros::init(argc, argv, "lane_detection");
     ros::NodeHandle nh;
     // LaneDetection ld = LaneDetection(&nh, 0);
-    LaneDetection ld = LaneDetection(&nh, "/bender_camera/image");
+    LaneDetection ld = LaneDetection(&nh, "/usb_cam/image_raw");
     BarrelDetection bd = BarrelDetection(&nh);
     
     ros::Rate rate(5);
