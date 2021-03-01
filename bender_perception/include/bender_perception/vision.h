@@ -11,24 +11,70 @@ using namespace std;
 class LaneDetection
 {
     public:
+        /*
+         * Constructor for reading from USB Camera
+         */
         LaneDetection(ros::NodeHandle *nh, int device_id=0);
+
+
+        /*
+         * Constructor for reading from ros topic `input_topic_`
+         */
         LaneDetection(ros::NodeHandle *nh, string input_topic);
+
+
+        /*
+         * Desctructor
+         */
         ~LaneDetection();
-        void inputCb(const sensor_msgs::ImageConstPtr &msg);
+
+
+        /*
+         * Update image source from incoming msg
+         */
+        void readImage(const sensor_msgs::ImageConstPtr &msg);
+
+
+        /*
+         * Update image source by reading USB camera input
+         */
         void readImage();
-        void findKMeans(const int k, vector<Point3f> *colors);
+
+
+        /*
+         * Compute the two colors to quantize to
+         */
+        void quantize(const int k);
+
+
+        /*
+         * Update the output with latest source
+         */
+        void update();
+
+
+        /*
+         * Perform perspective transform 
+         */
         void projectToGrid();
+
+
+        /*
+         * Display output in GUI window
+         */
+        void displayOutput();
 
     private:
 
-        Mat img_src_;
-        Mat img_out_;
         VideoCapture cam_capture_;
         const uint8_t device_id_;
-        const string wname_ = "Quantized Image";
+        const string wname_ = "bender_perception_vision";
 
         ros::Subscriber input_sub_;
         const string input_topic_;
+
+        Mat img_src_;
+        Mat img_out_;
 }; 
 
 
