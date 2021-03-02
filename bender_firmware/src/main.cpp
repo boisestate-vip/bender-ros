@@ -11,21 +11,22 @@
 #define CMD_RECEIVE_TIMEOUT_MS 100
 #define PLANETARY_PPR 6672
 #define HUB_PPR 45
-#define MAX_THROTTLE_PERCENT 30
+#define MAX_LEG_THROTTLE_PERCENT 50
+#define MAX_WHEEL_THROTTLE_PERCENT 60
 
 
 // Robot's joints
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 16, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 20.0, 0.0, 5.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 20.0, 0.0, 5.0)  // leg_rh_joint
+	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_lf_joint
+	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_rf_joint
+	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_lh_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 20.0, 5.0, 0.0)  // leg_rh_joint
 };
 VelocityJoint vel_joints[4] = {
-	VelocityJoint(10, 11, 12, 20, HUB_PPR, 5.0, 0.0, 0.0), // wheel_lf_joint
-	VelocityJoint(30, 26, 34, 23, HUB_PPR, 5.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(14, 13, 15, 21, HUB_PPR, 5.0, 0.0, 0.0), // wheel_lh_joint
-	VelocityJoint(29, 28, 27, 22, HUB_PPR, 5.0, 0.0, 0.0)  // wheel_rh_joint
+	VelocityJoint(10, 11, 12, 20, HUB_PPR, 20.0, 5.0, 0.0), // wheel_lf_joint
+	VelocityJoint(30, 26, 34, 23, HUB_PPR, 20.0, 5.0, 0.0), // wheel_rf_joint
+	VelocityJoint(14, 13, 15, 21, HUB_PPR, 20.0, 5.0, 0.0), // wheel_lh_joint
+	VelocityJoint(29, 28, 27, 22, HUB_PPR, 20.0, 5.0, 0.0)  // wheel_rh_joint
 };
 /*
  * The following is an unfortunate consequence of Arduino's
@@ -106,10 +107,10 @@ void setup()
 	/** Enable the motors **/
 	for (int i=0; i<4; i++)
 	{
-		// vel_joints[i].enable();
-		// pos_joints[i].enable();
-		vel_joints[i].setEffortLimit(MAX_THROTTLE_PERCENT);
-		pos_joints[i].setEffortLimit(MAX_THROTTLE_PERCENT);
+		vel_joints[i].enable();
+		pos_joints[i].enable();
+		vel_joints[i].setEffortLimit(MAX_WHEEL_THROTTLE_PERCENT);
+		pos_joints[i].setEffortLimit(MAX_LEG_THROTTLE_PERCENT);
 	}
 }
 
