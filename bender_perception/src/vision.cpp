@@ -2,7 +2,8 @@
 
 LaneDetection::LaneDetection(ros::NodeHandle *nh, int device_id) :
     device_id_(device_id),
-    input_topic_("")
+    input_topic_(""),
+    it_(*nh)
 {
     // Starts capture device
     cam_capture_.open(device_id_);
@@ -17,16 +18,26 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, int device_id) :
         ROS_ERROR("Cannot read from camera ID %d", device_id_);
         nh->shutdown();
     } 
+    init(nh);
 
 }
 
 
-LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic) :
+LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string output_topic) :
     device_id_(UINT8_MAX),
-    input_topic_(input_topic)
+    input_topic_(input_topic),
+    output_topic_(output_topic),
+    it_(*nh)
 {
     // Subscribe to input image
-    input_sub_ = nh->subscribe(input_topic_, 1, &LaneDetection::readImage, this);
+    input_sub_ = it_.subscribe(input_topic_, 1, &LaneDetection::readImage, this);
+    init(nh);
+}
+
+
+void LaneDetection::init(ros::NodeHandle *nh)
+{
+    output_pub_ = it_.advertise(output_topic_, 1);
 }
 
 
@@ -57,7 +68,7 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &msg)
 }
 
 
-void LaneDetection::quantize(const int k)
+void LaneDetection::quantize()
 {
     // Convert to float & reshape to a [3 x W*H] Mat 
     // (so every pixel is on a row of it's own)
@@ -68,9 +79,9 @@ void LaneDetection::quantize(const int k)
     Mat labels, centers;
     double compactness = kmeans(
         data, 
-        k, 
+        this->num_colors, 
         labels,
-        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 1.0),
+        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 1.0 ),
         1, 
         KMEANS_PP_CENTERS, 
         centers
@@ -95,7 +106,6 @@ void LaneDetection::quantize(const int k)
 
 void LaneDetection::update()
 {
-    const float scale = 0.25;
     if (input_topic_.empty()) 
     {
         readImage();
@@ -104,11 +114,17 @@ void LaneDetection::update()
     {
         resize(img_src_, img_out_, Size(), scale, scale);
         cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-        quantize(2);
+        quantize();
     } else
     {
         ROS_INFO_THROTTLE(2.0, "Waiting for input topic %s", input_topic_.c_str());
     }
+}
+
+
+void LaneDetection::projectToGrid()
+{
+    ;
 }
 
 
@@ -125,3 +141,12 @@ void LaneDetection::displayOutput()
     }
 }
 
+
+void LaneDetection::publishQuantized()
+{
+    if (!img_out_.empty()) 
+    {
+        output_msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_out_).toImageMsg();
+        output_pub_.publish(output_msg_);
+    }
+}

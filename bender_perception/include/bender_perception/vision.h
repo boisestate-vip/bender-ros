@@ -6,6 +6,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
+#include <image_transport/image_transport.h>
 
 using namespace cv;
 using namespace std;
@@ -20,9 +21,9 @@ class LaneDetection
 
 
         /*
-         * Constructor for reading from ros topic `input_topic_`
+         * Constructor for reading from rostopic `input_topic_`
          */
-        LaneDetection(ros::NodeHandle *nh, string input_topic);
+        LaneDetection(ros::NodeHandle *nh, string input_topic, string output_topic="/bender_perception/image_quantized");
 
 
         /*
@@ -46,11 +47,11 @@ class LaneDetection
         /*
          * Compute the two colors to quantize to
          */
-        void quantize(const int k);
+        void quantize();
 
 
         /*
-         * Update the output with latest source
+         * Update the output with by processing the latest available source
          */
         void update();
 
@@ -66,17 +67,43 @@ class LaneDetection
          */
         void displayOutput();
 
+
+        /*
+         * Publish quantized image via image_transport to preserve bandwidth
+         */
+        void publishQuantized();
+
+        
+        /*
+         * Variable for scaling the image size, must be between 0 and 1
+         */
+        float scale;
+
+
+        /*
+         * The `k` in the k-means algorithm
+         */
+        int num_colors = 2;
+
     private:
 
         VideoCapture cam_capture_;
         const uint8_t device_id_;
         const string wname_ = "bender_perception_vision";
 
-        ros::Subscriber input_sub_;
+        image_transport::ImageTransport it_;
+
+        image_transport::Subscriber input_sub_;
         const string input_topic_;
+
+        image_transport::Publisher output_pub_;
+        const string output_topic_;
+        sensor_msgs::ImagePtr output_msg_; 
 
         Mat img_src_;
         Mat img_out_;
+
+        void init(ros::NodeHandle *nh);
 }; 
 
 
