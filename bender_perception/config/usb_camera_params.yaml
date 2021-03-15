@@ -1,0 +1,26 @@
+image_width: 640
+image_height: 360
+framerate: 10
+
+pixel_format: "yuyv"
+io_method: "mmap"
+
+camera_name: "bender_camera"
+camera_frame_id: "bender_camera"
+
+autofocus: true
+autoexposure: true
+auto_white_balance: true
+exposure: 1000 # (logitech c920) min=3 max=2047 step=1 default=250 
+white_balance: 4000 # (logitech c920) min=2000 max=6500 step=1 default=4000
+
+# Following params take values in 0-255, -1 means "leave alone"
+brightness: -1  
+contrast: -1
+saturation: -1
+sharpness: -1
+focus: -1
+gain: -1
+
+# Fore more info regarding these parameters, see the following
+# https://www.kurokesu.com/main/2016/01/16/manual-usb-camera-settings-in-linux/
