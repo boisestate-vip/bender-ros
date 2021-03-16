@@ -1,6 +1,9 @@
 #ifndef BENDER_FIRMWARE_BENDER_JOINTS_H
 #define BENDER_FIRMWARE_BENDER_JOINTS_H
 
+#define WHEEL_POWER_PIN_OFF 1
+#define WHEEL_DIR_PIN_FORWARD 1
+
 #include <Arduino.h>
 #include <Encoder.h>
 
@@ -12,13 +15,15 @@ class GenericJoint
 {
     public:
         GenericJoint(float p, float i, float d, 
-                     float lowerLimit, float upperLimit, float effortLimit=100.0);
+                     float lowerLimit, float upperLimit, 
+                     float effortLower=-100.0, float effortUpper=100.0);
         void setState(float state)    { state_last_ = state_; state_ = state; }
         void getState(float &state)   { state = state_; }
         void setTarget(float target)  { target_ = target; }
         void getTarget(float &target) { target = target_; }
         void getEffort(float &effort) { effort = effort_; }
-        void setEffortLimit(float effort_limit) { effort_limit_ = effort_limit; }
+        void setEffortUpperLimit(float val) { effort_upper_ = val; }
+        void setEffortLowerLimit(float val) { effort_lower_ = val; }
         void getError(float &error)   { error = error_; }
         void setGains(float p, float i, float d)    { pid_controller_.setGains(p,i,d); }
         void getGains(float &p, float &i, float &d) { pid_controller_.getGains(p,i,d); }
@@ -34,11 +39,13 @@ class GenericJoint
         bool enabled_;
         const float upper_limit_;
         const float lower_limit_;
-        float effort_limit_;
+        float effort_upper_;
+        float effort_lower_;
         float target_;
         float state_;
         float state_last_;
         float effort_;
+        float effort_last_;
         float error_;
 }; // class GenericJoint
 
@@ -71,6 +78,7 @@ class VelocityJoint : public GenericJoint
         
         void update(unsigned long dt_ms);
         void getState(float &state);
+        void getEffort(float &effort);
         void setTarget(float target);
         void actuate();
         void stop();
@@ -91,8 +99,8 @@ class VelocityJoint : public GenericJoint
         const float pulse_per_rev_;
         volatile unsigned long int pulses_ = 0;
         unsigned long int interval_ = 0;
-        uint8_t direction_ = 0;
-        uint8_t direction_last_ = 0;
+        int8_t direction_ = 0;
+        int8_t direction_last_ = 0;
         float rpm_  = 0.0f;
         elapsedMicros since_last_interrupt_;
         elapsedMillis since_last_sign_change_;
