@@ -4,8 +4,6 @@ global_costmap:
   rolling_window: false
   plugins:
     - {name: lane_layer,      type: "costmap_2d::StaticLayer"}
-    - {name: obstacle_layer,  type: "costmap_2d::StaticLayer"}
+    # - {name: obstacle_truth,  type: "costmap_2d::StaticLayer"}
+    - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-
-
-

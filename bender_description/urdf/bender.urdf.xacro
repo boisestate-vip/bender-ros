@@ -52,7 +52,8 @@ POSSIBILITY OF SUCH DAMAGE.
 	<xacro:property name="wheel_off" value="0.01" /> <!-- thickness of the wheels -->
 	<xacro:property name="joint_damping" value="1" /> <!-- damping of all joints -->
 	<xacro:property name="camera_mount_height" value="1" /> 
-	<xacro:property name="camera_tilt_angle_deg" value="15" /> 
+	<xacro:property name="camera_tilt_angle_deg" value="15" />
+	<xacro:property name="lidar_mount_height" value="0.0" />  
 
 
 	<!-- Import all Gazebo-customization elements, including Gazebo colors -->
@@ -61,6 +62,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	<xacro:include filename="$(find bender_description)/urdf/materials.xacro" />
 	<!-- Import Sensors -->
 	<xacro:include filename="$(find bender_description)/urdf/sensors/logitech_c910.xacro" />
+	<xacro:include filename="$(find bender_description)/urdf/sensors/rplidar.xacro" />
 
 
 	<!-- BODY link -->
@@ -335,9 +337,13 @@ POSSIBILITY OF SUCH DAMAGE.
 
 	<!-- SENSORS: -->
 	<xacro:logitech_c910 name="logitech_cam" connected_to="base_link">
-		<origin xyz="${-body_l/2} 0 ${camera_mount_height}" 
+		<origin xyz="${-body_l/2} 0 ${body_h/2 + camera_mount_height}" 
 			    rpy="0 ${camera_tilt_angle_deg*DEG2RAD} 0" />
     </xacro:logitech_c910>
+	<xacro:rplidar name="rplidar" connected_to="base_link">
+		<origin xyz="${body_l/2} 0 ${body_h/2 + lidar_mount_height}" 
+			    rpy="0 0 0" />
+    </xacro:rplidar>
 
 	<!-- ACTUATORS -->
 	<transmission name="leg_lf_trans">
