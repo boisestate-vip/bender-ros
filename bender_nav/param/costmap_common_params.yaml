@@ -2,26 +2,27 @@ footprint: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
 global_frame: map
 robot_base_frame: base_footprint
 
-transform_tolerance: 0.5
+transform_tolerance: 0.2
 
 obstacle_layer:
  enabled: true
  obstacle_range: 6.0
  raytrace_range: 5.0
- inflation_radius: 0.25
  track_unknown_space: true
  combination_method: 1
  observation_sources: laser_scan_sensor
- laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: true}
+ laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: false}
 
 inflation_layer:
   enabled:              true
   cost_scaling_factor:  10.0  # exponential rate at which the obstacle cost drops off (default: 10)
-  inflation_radius:     0.4  # max. distance from an obstacle at which costs are incurred for planning paths.
+  inflation_radius:     1.0  # max. distance from an obstacle at which costs are incurred for planning paths.
 
 lane_layer:
   enabled:              true
   map_topic:            "/lane_map"
+  first_map_only:       true
+
 
 obstacle_truth:
   enabled:              true

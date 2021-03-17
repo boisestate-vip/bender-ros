@@ -5,5 +5,5 @@ global_costmap:
   plugins:
     - {name: lane_layer,      type: "costmap_2d::StaticLayer"}
     # - {name: obstacle_truth,  type: "costmap_2d::StaticLayer"}
-    - {name: obstacle_layer,  type: "costmap_2d::VoxelLayer"}
+    - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}
     - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
