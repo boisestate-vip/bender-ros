@@ -24,12 +24,12 @@ int main (int argc, char **argv)
     }
 
     /* Image processing class */
-    LaneDetection ld = LaneDetection(&nh, "/bender_camera/image_raw");
+    LaneDetection ld(&nh, "/bender_camera/image_raw");
     ld.scale = scale;
     ld.num_colors = num_colors;
 
     /* Lidar processing class */
-    BarrelDetection bd = BarrelDetection(&nh);
+    BarrelDetection bd(&nh);
     
     /* Spin */
     ros::Rate rate(publish_rate);

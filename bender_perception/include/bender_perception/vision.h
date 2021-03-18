@@ -7,6 +7,8 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
+#include <image_geometry/pinhole_camera_model.h>
+#include <tf/transform_listener.h>
 
 using namespace cv;
 using namespace std;
@@ -35,7 +37,7 @@ class LaneDetection
         /*
          * Update image source from incoming msg
          */
-        void readImage(const sensor_msgs::ImageConstPtr &msg);
+        void readImage(const sensor_msgs::ImageConstPtr &msg, const sensor_msgs::CameraInfoConstPtr& info_msg);
 
 
         /*
@@ -93,12 +95,15 @@ class LaneDetection
 
         image_transport::ImageTransport it_;
 
-        image_transport::Subscriber input_sub_;
+        image_transport::CameraSubscriber input_sub_;
         const string input_topic_;
 
         image_transport::Publisher output_pub_;
         const string output_topic_;
         sensor_msgs::ImagePtr output_msg_; 
+
+        tf::TransformListener tf_listener_;
+        image_geometry::PinholeCameraModel cam_model_;
 
         Mat img_src_;
         Mat img_out_;

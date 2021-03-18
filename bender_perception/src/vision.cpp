@@ -30,7 +30,8 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string out
     it_(*nh)
 {
     // Subscribe to input image
-    input_sub_ = it_.subscribe(input_topic_, 1, &LaneDetection::readImage, this);
+    std::string topic = nh->resolveName(input_topic_);
+    input_sub_ = it_.subscribeCamera(topic, 1, &LaneDetection::readImage, this);
     init(nh);
 }
 
@@ -52,19 +53,24 @@ void LaneDetection::readImage()
 }
 
 
-void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &msg)
+void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg, 
+                              const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
+    // Convert incoming ROS image msg to OpenCV msg
     cv_bridge::CvImagePtr cv_ptr;
     try
     {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_ptr = cv_bridge::toCvCopy(img_msg, sensor_msgs::image_encodings::BGR8);
+        img_src_ = cv_ptr->image;
     }
     catch (cv_bridge::Exception& e)
     {
-        ROS_ERROR("cv_bridge exception: %s", e.what());
+        ROS_ERROR("Failed to convert image. cv_bridge exception: %s", e.what());
         return;
     }
-    img_src_ = cv_ptr->image;
+
+    // Get camera model that produced the ROS image msg
+    cam_model_.fromCameraInfo(info_msg);
 }
 
 
@@ -115,6 +121,7 @@ void LaneDetection::update()
         resize(img_src_, img_out_, Size(), scale, scale);
         cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
         quantize();
+        projectToGrid();
     } else
     {
         ROS_INFO_THROTTLE(2.0, "Waiting for input topic %s", input_topic_.c_str());
@@ -124,7 +131,66 @@ void LaneDetection::update()
 
 void LaneDetection::projectToGrid()
 {
-    ;
+    Size image_size = img_out_.size();
+    double w = (double)image_size.width;
+    double h = (double)image_size.height;
+
+    // TODO: Load these from a yaml file
+    double alpha = (15-90) * M_PI / 180.0;
+    double beta = 0;
+    double gamma = 0; 
+    double dist = 0.6;
+
+    // Projecion matrix 2D -> 3D
+    Matx43d A1(
+        1, 0, -w/2,
+        0, 1, -h/2,
+        0, 0, 0,
+        0, 0, 1
+    );
+
+    // Rotation matrices Rx, Ry, Rz
+    Matx44d RX(
+        1, 0, 0, 0,
+        0, cos(alpha), -sin(alpha), 0,
+        0, sin(alpha), cos(alpha), 0,
+        0, 0, 0, 1
+    );
+    Matx44d RY(
+        cos(beta), 0, sin(beta), 0,
+        0, 1, 0, 0,
+        -sin(beta), 0, cos(beta), 0,
+        0, 0, 0, 1
+    );
+    Matx44d RZ(
+        cos(gamma), -sin(gamma), 0, 0,
+        sin(gamma), cos(gamma), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    );
+
+    // Compose the rotations
+    Matx44d R = RX * RY * RZ;
+
+    // T - translation matrix
+    Matx44d T(
+        1, 0, 0, 0,  
+        0, 1, 0, 0,  
+        0, 0, 1, dist*cam_model_.fx(),  
+        0, 0, 0, 1
+    ); 
+    
+    // K - intrinsic matrix 
+    Matx34d K(
+        cam_model_.fx(), 0, w/2, 0,
+        0, cam_model_.fy(), h/2, 0,
+        0, 0, 1, 0
+    ); 
+
+    // H - Homography
+    Mat H(K * (T * (R * A1)));
+
+    warpPerspective(img_out_, img_out_, H, image_size, INTER_CUBIC | WARP_INVERSE_MAP);
 }
 
 
