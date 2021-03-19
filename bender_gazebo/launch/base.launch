@@ -38,5 +38,13 @@
         <remap from="robot_description" to="/bender/robot_description" />
 		<remap from="/joint_states" to="/bender/joint_states" />
 	</node>
+    
+    <!-- Launch perception node -->
+    <node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">
+        <remap to="/logitech_cam_node/image" from="/bender_camera/image_raw" />
+        <param name="publish_rate" value="5" />     <!-- default = 10 -->
+        <param name="scale" value="0.5" />          <!-- default = 1.0 -->
+        <param name="num_colors" value="2" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
+	</node>
 
 </launch>

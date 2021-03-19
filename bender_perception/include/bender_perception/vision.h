@@ -61,6 +61,12 @@ class LaneDetection
         /*
          * Perform perspective transform 
          */
+        void computeHomography();
+
+
+        /*
+         * Perform perspective transform 
+         */
         void projectToGrid();
 
 
@@ -107,6 +113,9 @@ class LaneDetection
 
         Mat img_src_;
         Mat img_out_;
+        
+        bool has_homography_ = false;
+        Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters
 
         void init(ros::NodeHandle *nh);
 }; 

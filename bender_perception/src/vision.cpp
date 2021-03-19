@@ -1,5 +1,6 @@
 #include <bender_perception/vision.h>
 
+
 LaneDetection::LaneDetection(ros::NodeHandle *nh, int device_id) :
     device_id_(device_id),
     input_topic_(""),
@@ -56,6 +57,9 @@ void LaneDetection::readImage()
 void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg, 
                               const sensor_msgs::CameraInfoConstPtr& info_msg)
 {
+    // Get camera model that produced the ROS image msg
+    cam_model_.fromCameraInfo(info_msg);
+    
     // Convert incoming ROS image msg to OpenCV msg
     cv_bridge::CvImagePtr cv_ptr;
     try
@@ -68,9 +72,6 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg,
         ROS_ERROR("Failed to convert image. cv_bridge exception: %s", e.what());
         return;
     }
-
-    // Get camera model that produced the ROS image msg
-    cam_model_.fromCameraInfo(info_msg);
 }
 
 
@@ -116,22 +117,39 @@ void LaneDetection::update()
     {
         readImage();
     }
+    
     if (!img_src_.empty())
     {
-        resize(img_src_, img_out_, Size(), scale, scale);
-        cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-        quantize();
+        if (!has_homography_)
+        {
+            computeHomography();
+            has_homography_ = true;
+        }
+
+        if (scale != 1.0)
+        {
+            resize(img_src_, img_out_, Size(), scale, scale);
+            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
+            quantize();
+            resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale);
+        }
+        else
+        {
+            cvtColor(img_src_, img_out_, COLOR_BGR2HSV);
+            quantize();
+        }
         projectToGrid();
-    } else
+    } 
+    else
     {
         ROS_INFO_THROTTLE(2.0, "Waiting for input topic %s", input_topic_.c_str());
     }
 }
 
 
-void LaneDetection::projectToGrid()
+void LaneDetection::computeHomography()
 {
-    Size image_size = img_out_.size();
+    Size image_size = img_src_.size();
     double w = (double)image_size.width;
     double h = (double)image_size.height;
 
@@ -188,9 +206,19 @@ void LaneDetection::projectToGrid()
     ); 
 
     // H - Homography
-    Mat H(K * (T * (R * A1)));
+    H_ = K * (T * (R * A1));
+}
 
-    warpPerspective(img_out_, img_out_, H, image_size, INTER_CUBIC | WARP_INVERSE_MAP);
+
+void LaneDetection::projectToGrid()
+{
+    warpPerspective(
+        img_out_, 
+        img_out_, 
+        H_, 
+        img_out_.size(), 
+        INTER_CUBIC | WARP_INVERSE_MAP
+    );
 }
 
 

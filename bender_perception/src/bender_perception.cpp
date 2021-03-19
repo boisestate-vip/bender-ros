@@ -17,7 +17,7 @@ int main (int argc, char **argv)
         scale = 1.0;
     }
     int num_colors; nh.param("num_colors", num_colors, 2);
-    if (!(scale > 0 && scale <= 255)) 
+    if (!(num_colors > 0 && num_colors <= 255)) 
     {
         ROS_WARN("The parameter `num_colors' must be in the range [2,255]. Got %d, ignoring and using `num_colors' = 2", num_colors);
         num_colors = 2;
