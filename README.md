@@ -2,10 +2,13 @@
 This repository contain ROS code for the Bender robot designed and built by a group of students from the Vertically Integrated Projects (VIP) program at Boise State University.
 
 # Installation
-Put the contents of this repository into your catkin workspace, i.e.
+
+These ROS packages are tested on ROS Noetic.
+
+To install, put the contents of this repository into your catkin workspace, i.e.
 `<your_catkin_ws>/src`, Then, install the required ROS packages to build & run this by executing
 ```
-rosdep install --from-paths src --ignore-src
+rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 ```
 Then, install IGVC Gazebo model by
 ```
@@ -14,7 +17,7 @@ cd bender_gazebo/models
 ```
 Finally, build the packages using
 ```
-catkin_make
+catkin build
 ```
 
 # Simple Navigation
