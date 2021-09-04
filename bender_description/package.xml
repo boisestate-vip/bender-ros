@@ -4,7 +4,8 @@
   <version>0.4.3</version>
   <description>The bender_description package</description>
 
-  <maintainer email="viprobotics@boisestate.edu">Wankun Sirichotiyakul</maintainer>
+  <maintainer email="viprobotics@boisestate.edu">Boise State VIP Robotics</maintainer>
+  <author email="vip-robotics@boisestate.edu">Wankun Sirichotiyakul</author>
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
