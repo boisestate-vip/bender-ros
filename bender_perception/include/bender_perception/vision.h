@@ -8,7 +8,7 @@
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_geometry/pinhole_camera_model.h>
-#include <tf/transform_listener.h>
+#include <tf2_ros/transform_listener.h>
 
 using namespace cv;
 using namespace std;
@@ -108,7 +108,8 @@ class LaneDetection
         const string output_topic_;
         sensor_msgs::ImagePtr output_msg_; 
 
-        tf::TransformListener tf_listener_;
+        tf2_ros::Buffer tf_buffer_;
+        tf2_ros::TransformListener tf_listener_;
         image_geometry::PinholeCameraModel cam_model_;
 
         Mat img_src_;

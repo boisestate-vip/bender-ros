@@ -4,7 +4,8 @@
 LaneDetection::LaneDetection(ros::NodeHandle *nh, int device_id) :
     device_id_(device_id),
     input_topic_(""),
-    it_(*nh)
+    it_(*nh),
+    tf_listener_(tf_buffer_)
 {
     // Starts capture device
     cam_capture_.open(device_id_);
@@ -28,7 +29,8 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string out
     device_id_(UINT8_MAX),
     input_topic_(input_topic),
     output_topic_(output_topic),
-    it_(*nh)
+    it_(*nh),
+    tf_listener_(tf_buffer_)
 {
     // Subscribe to input image
     std::string topic = nh->resolveName(input_topic_);
