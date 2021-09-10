@@ -1,18 +1,22 @@
 <launch>
 
-    <arg name="groundtruth" default="true"/>
+    <arg name="groundtruth" default="false"/>
     <arg name="gui" default="true"/>
+    <arg name="x" default="-2"/>
+    <arg name="y" default="-21.5"/>
+    <arg name="yaw" default="3.14"/>
 
     <include file="$(find bender_gazebo)/launch/empty_world.launch">
         <arg name="gui" value="$(arg gui)" />
         <arg name="rviz" value="false" />
         <arg name="world_name" value="$(find bender_gazebo)/worlds/igvc_basic.world"/> 
-        <arg name="x"     value="-2"/>
-        <arg name="y"     value="-21.5"/>
+        <arg name="x"     value="$(arg x)"/>
+        <arg name="y"     value="$(arg y)"/>
         <arg name="z"     value="0"/>
         <arg name="roll"  value="0"/>
         <arg name="pitch" value="0"/>
-        <arg name="yaw"   value="3.14"/>
+        <arg name="yaw"   value="$(arg yaw)"/>
+        <arg name="groundtruth" value="$(arg groundtruth)"/>
     </include>
 
     <!-- Load known map -->
@@ -26,6 +30,11 @@
         <remap from="/map" to="/obstacle_map" />
         <remap from="/map_metadata" to="/obstacle_map_metadata" />
 	</node>
+
+    <!-- Static TF (dead reckoning) -->
+    <node name="map_to_base_footprint_tf" unless="$(arg groundtruth)" 
+        pkg="tf" type="static_transform_publisher" 
+        args="$(arg x) $(arg y) 0 $(arg yaw) 0 0 /map /odom 1000" output="screen" />
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
