@@ -3,6 +3,7 @@
     <arg name="groundtruth" default="true"/>
     <arg name="rviz" default="true"/>
     <arg name="world_name" default="worlds/empty.world"/> 
+    <arg name="teleop" default="rqt" doc="[rqt, joy, none]"/> 
 
     <!-- Robot Pose -->
     <arg name="x"     default="0"/>
@@ -29,12 +30,13 @@
 
     <!-- Start robot and controllers -->
     <include file="$(find bender_gazebo)/launch/base.launch">
-        <arg name="x"     value="$(arg x)"/>
-        <arg name="y"     value="$(arg y)"/>
-        <arg name="z"     value="$(arg z)"/>
-        <arg name="roll"  value="$(arg roll)"/>
-        <arg name="pitch" value="$(arg pitch)"/>
-        <arg name="yaw"   value="$(arg yaw)"/>
+        <arg name="x"      value="$(arg x)"/>
+        <arg name="y"      value="$(arg y)"/>
+        <arg name="z"      value="$(arg z)"/>
+        <arg name="roll"   value="$(arg roll)"/>
+        <arg name="pitch"  value="$(arg pitch)"/>
+        <arg name="yaw"    value="$(arg yaw)"/>
+        <arg name="teleop" value="$(arg teleop)"/>
     </include>
 
     <!-- Use groundtruth pose from Gazebo for localization -->
@@ -50,18 +52,5 @@
     <group if="$(arg rviz)">
         <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender.rviz" output="screen"/>
     </group>
-
-    <!-- <node name="keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen">
-        <remap from="/cmd_vel" to="/bender/swerve_controller/cmd_vel" />
-    </node> -->
-
-    <!-- GUI for robot control via 'cmd_vel' topic -->
-    <node pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
-        <param name="default_topic" type="str" value="/bender/swerve_controller/cmd_vel"/>
-        <param name="default_vx_max" type="double" value="1.5" />
-        <param name="default_vx_min" type="double" value="-1.5" />
-        <param name="default_vw_max" type="double" value="1.5" />
-        <param name="default_vw_min" type="double" value="-1.5" />
-    </node>
 
 </launch>

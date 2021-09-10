@@ -5,6 +5,7 @@
     <arg name="x" default="-2"/>
     <arg name="y" default="-21.5"/>
     <arg name="yaw" default="3.14"/>
+    <arg name="teleop" default="rqt" doc="[rqt, joy, none]"/> 
 
     <include file="$(find bender_gazebo)/launch/empty_world.launch">
         <arg name="gui" value="$(arg gui)" />
@@ -17,6 +18,7 @@
         <arg name="pitch" value="0"/>
         <arg name="yaw"   value="$(arg yaw)"/>
         <arg name="groundtruth" value="$(arg groundtruth)"/>
+        <arg name="teleop" value="$(arg teleop)"/>
     </include>
 
     <!-- Load known map -->

@@ -8,6 +8,7 @@
     <arg name="roll"  default="0"/>
     <arg name="pitch" default="0"/>
     <arg name="yaw"   default="0"/>
+    <arg name="teleop" default="rqt" doc="[rqt, joy, none]"/> 
 
     <!-- Load the robot description with xacro -->
     <include file="$(find bender_description)/launch/description.launch" />
@@ -47,4 +48,67 @@
         <param name="num_colors" value="2" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
 	</node>
 
+    <!-- Teleoperation -->
+    <node if="$(eval teleop == 'rqt')"
+        pkg="rqt_robot_steering" type="rqt_robot_steering" name="bender_rqt_teleop">
+        <param name="default_topic" type="str" value="/bender_teleop/rqt_vel"/>
+        <param name="default_vx_max" type="double" value="1.5" />
+        <param name="default_vx_min" type="double" value="-1.5" />
+        <param name="default_vw_max" type="double" value="1.5" />
+        <param name="default_vw_min" type="double" value="-1.5" />
+    </node>
+    <group if="$(eval teleop == 'joy')">
+        <node pkg="joy" type="joy_node" name="joy_node">
+            <param name="dev" value="/dev/input/js0"/>
+            <param name="deadzone" value="0.05"/>
+            <param name="autorepeat_rate" value="10"/>
+        </node>
+        <node pkg="teleop_twist_joy" name="logitech_f710" type="teleop_node">
+            <remap from="cmd_vel" to="/bender_teleop/joy_vel"/>
+            <rosparam>
+                enable_button: 7            # Right Trigger = Deadman's Switch
+                axis_linear:                # X/Y Translation - Left Stick
+                    x: 1
+                    y: 0
+                scale_linear:
+                    x: 1.0
+                    y: 0.0                  # Set to zero to disable Y velocity (non-holonomic)
+                axis_angular:               # Yaw Rotation - Right Stick
+                    yaw: 2
+                scale_angular:
+                    yaw: 1.0
+                enable_turbo_button: 6      # Left trigger
+                scale_linear_turbo: 2.5
+                scale_angular_turbo: 2.0
+            </rosparam>
+        </node>
+    </group>
+    <node pkg="twist_mux" type="twist_mux" name="twist_mux" output="screen">
+        <remap from="cmd_vel_out" to="/bender/swerve_controller/cmd_vel"/>
+        <rosparam>
+        topics:
+        -
+            name    : navigation
+            topic   : /bender_nav/cmd_vel
+            timeout : 0.5
+            priority: 10
+        -
+            name    : joystick
+            topic   : /bender_teleop/joy_vel
+            timeout : 0.5
+            priority: 100
+        -
+            name    : rqt
+            topic   : /bender_teleop/rqt_vel
+            timeout : 0.5
+            priority: 100
+        locks:
+        -
+            name    : pause
+            topic   : pause_navigation
+            timeout : 0.0
+            priority: 100
+        </rosparam>
+    </node>
+    
 </launch>
