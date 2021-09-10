@@ -16,6 +16,7 @@ cd $CATKIN_WS
 rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 cd $CATKIN_WS/src/bender-ros/bender_gazebo/models && ./install_models.sh
 cd $CATKIN_WS/src/bender-ros/bender_base/scripts && ./joy_udev.sh
+cd $CATKIN_WS
 catkin build
 ```
 
