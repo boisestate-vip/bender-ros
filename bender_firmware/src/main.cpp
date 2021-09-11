@@ -7,7 +7,7 @@
 #include "bender_joints.h"
 
 #define PID_UPDATE_PERIOD_MS 1
-#define ROS_PUBLISH_PERIOD_MS 5
+#define ROS_PUBLISH_PERIOD_MS 10
 #define CMD_RECEIVE_TIMEOUT_MS 100
 #define PLANETARY_PPR 6672
 #define HUB_PPR 45
@@ -111,7 +111,7 @@ void setup()
 		vel_joints[i].setEffortUpperLimit(MAX_WHEEL_THROTTLE_PERCENT);
 		vel_joints[i].setEffortLowerLimit(0.0F);
 		
-		// pos_joints[i].enable();
+		pos_joints[i].enable();
 		pos_joints[i].setEffortUpperLimit(MAX_LEG_THROTTLE_PERCENT);
 		pos_joints[i].setEffortLowerLimit(-MAX_LEG_THROTTLE_PERCENT);
 	}

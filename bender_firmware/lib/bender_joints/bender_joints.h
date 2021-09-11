@@ -57,8 +57,8 @@ class PositionJoint : public GenericJoint
                       unsigned int encoderPPR, float p=0.0, float i=0.0, float d=0.0);
         void update(unsigned long dt_ms);
         void getState(float &state);
-        void actuate();
-        void stop();
+        void actuate() override;
+        void stop() override;
 
     private:
         uint8_t enc_a_pin_;
@@ -80,8 +80,9 @@ class VelocityJoint : public GenericJoint
         void getState(float &state);
         void getEffort(float &effort);
         void setTarget(float target);
-        void actuate();
-        void stop();
+        void enable();
+        void actuate() override;
+        void stop() override;
         uint8_t getInterruptPin();
         void interruptHandle();
         void pulsesToRPM();

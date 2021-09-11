@@ -29,7 +29,7 @@ void GenericJoint::update(unsigned long dt_ms)
     {
         effort_last_ = effort_; 
         effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
-                        -effort_lower_, effort_upper_);
+                        effort_lower_, effort_upper_);
     }
 }
 
@@ -65,7 +65,7 @@ void PositionJoint::update(unsigned long dt_ms)
     {
         effort_last_ = effort_;
         effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
-                        -effort_lower_, effort_upper_);
+                        effort_lower_, effort_upper_);
     }
 }
 
@@ -77,18 +77,22 @@ void PositionJoint::getState(float &state)
 
 void PositionJoint::actuate()
 {
-    if (enabled_) 
+    if (enabled_ && effort_ != 0.0) 
     {
         if (effort_ > 0) 
         { 
             digitalWriteFast(dir_pin_, HIGH); 
-            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,15,255)));
         }
         else
         {
             digitalWriteFast(dir_pin_, LOW);
-            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,0,255)));
+            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,15,255)));
         }
+    }
+    else
+    {
+        analogWrite(pwm_pin_, LOW);
     }
 }
 
@@ -104,7 +108,7 @@ void PositionJoint::stop()
 *********************************************************************/
 VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, uint8_t powerPin, 
                              unsigned int tachPPR, float p, float i, float d, int rpmLimit) :
-    GenericJoint(p, i, d, -rpmLimit*RPM_TO_RAD_S, rpmLimit*RPM_TO_RAD_S),
+    GenericJoint(p, i, d, 0.0, rpmLimit*RPM_TO_RAD_S),
     vr_speed_pin_(vrPin),
     zf_dir_pin_(zfPin),
     tach_pin_(tachPin),
@@ -130,7 +134,7 @@ void VelocityJoint::getState(float &state)
 {
     pulsesToRPM();
     setState(rpm_*RPM_TO_RAD_S);
-    state = state_;
+    state = (float)direction_ * state_;
 }
 
 void VelocityJoint::getEffort(float &effort)
@@ -151,6 +155,11 @@ void VelocityJoint::setTarget(float target)
         direction_ = -1;
         target_ = -target;
     }
+    else
+    {
+        direction_ = 0;
+        target_ = target;
+    }
 }
 
 void VelocityJoint::controllerPowerCycle_()
@@ -160,13 +169,18 @@ void VelocityJoint::controllerPowerCycle_()
     digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
 }
 
+void VelocityJoint::enable()
+{
+    digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
+}
+
 void VelocityJoint::actuate()
 {
-    if (enabled_)
+    if (enabled_ && effort_ != 0.0)
     {
         if (direction_last_*direction_ < 0)
         {
-            controllerPowerCycle_();
+            // controllerPowerCycle_();
         }
         if (direction_ > 0) 
         { 
@@ -176,7 +190,7 @@ void VelocityJoint::actuate()
         { 
             digitalWriteFast(zf_dir_pin_, !WHEEL_DIR_PIN_FORWARD);  
         }
-        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,0,255)));
+        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,15,255)));
     }
     else
     {
