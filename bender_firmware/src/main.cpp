@@ -25,7 +25,7 @@ PositionJoint pos_joints[4] = {
 VelocityJoint vel_joints[4] = {
 	VelocityJoint(10, 11, 12, 20, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lf_joint
 	VelocityJoint(30, 26, 34, 23, HUB_PPR, 20.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(14, 13, 15, 21, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lh_joint
+	VelocityJoint(14, 21, 15, 13, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lh_joint
 	VelocityJoint(29, 28, 27, 22, HUB_PPR, 20.0, 0.0, 0.0)  // wheel_rh_joint
 };
 /*

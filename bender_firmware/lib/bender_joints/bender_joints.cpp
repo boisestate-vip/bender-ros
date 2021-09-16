@@ -172,6 +172,7 @@ void VelocityJoint::controllerPowerCycle_()
 void VelocityJoint::enable()
 {
     digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
+    enabled_ = true;
 }
 
 void VelocityJoint::actuate()
@@ -190,7 +191,8 @@ void VelocityJoint::actuate()
         { 
             digitalWriteFast(zf_dir_pin_, !WHEEL_DIR_PIN_FORWARD);  
         }
-        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,15,255)));
+        digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
+        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,40,255)));
     }
     else
     {
@@ -234,7 +236,7 @@ void VelocityJoint::pulsesToRPM()
     /*
      * Do RPM calculation if we have collected data from 3 pulses or more
      */
-    else if (pulses_ > 3)
+    else if (pulses_ > 10)
     {
         rpm_ = (float) pulses_ / pulse_per_rev_ / ((float) interval_ / 1000000.0f) * 60.0f;
         pulses_ = 0;
