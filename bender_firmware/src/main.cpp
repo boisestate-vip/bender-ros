@@ -7,8 +7,8 @@
 #include "bender_joints.h"
 
 #define PID_UPDATE_PERIOD_MS 1
-#define ROS_PUBLISH_PERIOD_MS 10
-#define CMD_RECEIVE_TIMEOUT_MS 100
+#define ROS_PUBLISH_PERIOD_MS 20
+#define CMD_RECEIVE_TIMEOUT_MS 200
 #define PLANETARY_PPR 6672
 #define HUB_PPR 45
 #define MAX_LEG_THROTTLE_PERCENT 50
@@ -25,7 +25,7 @@ PositionJoint pos_joints[4] = {
 VelocityJoint vel_joints[4] = {
 	VelocityJoint(10, 11, 12, 20, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lf_joint
 	VelocityJoint(30, 26, 34, 23, HUB_PPR, 20.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(14, 21, 15, 13, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lh_joint
+	VelocityJoint(14, 13, 15, 21, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lh_joint
 	VelocityJoint(29, 28, 27, 22, HUB_PPR, 20.0, 0.0, 0.0)  // wheel_rh_joint
 };
 /*

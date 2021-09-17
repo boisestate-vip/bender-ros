@@ -82,12 +82,12 @@ void PositionJoint::actuate()
         if (effort_ > 0) 
         { 
             digitalWriteFast(dir_pin_, HIGH); 
-            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,15,255)));
+            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,20,255)));
         }
         else
         {
             digitalWriteFast(dir_pin_, LOW);
-            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,15,255)));
+            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,20,255)));
         }
     }
     else
@@ -118,6 +118,7 @@ VelocityJoint::VelocityJoint(uint8_t vrPin, uint8_t zfPin, uint8_t tachPin, uint
     pinMode(vr_speed_pin_, OUTPUT);
     pinMode(zf_dir_pin_, OUTPUT);
     pinMode(power_pin_, OUTPUT);
+    pinMode(tach_pin_, INPUT);
     digitalWrite(power_pin_, WHEEL_POWER_PIN_OFF);
     since_last_interrupt_ = 0;
     since_last_sign_change_ = 0;
@@ -192,7 +193,8 @@ void VelocityJoint::actuate()
             digitalWriteFast(zf_dir_pin_, !WHEEL_DIR_PIN_FORWARD);  
         }
         digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
-        analogWrite(vr_speed_pin_, floorf(map(effort_,0.0f,100.0f,40,255)));
+        int pwm_duty_cycle = (int) floorf(map(effort_,0.0f,100.0f,30,255));
+        analogWrite(vr_speed_pin_, pwm_duty_cycle);
     }
     else
     {
@@ -236,7 +238,7 @@ void VelocityJoint::pulsesToRPM()
     /*
      * Do RPM calculation if we have collected data from 3 pulses or more
      */
-    else if (pulses_ > 10)
+    else if (pulses_ > 3)
     {
         rpm_ = (float) pulses_ / pulse_per_rev_ / ((float) interval_ / 1000000.0f) * 60.0f;
         pulses_ = 0;
