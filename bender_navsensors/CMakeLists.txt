@@ -156,7 +156,7 @@ include_directories(
 
 
 
-catkin_install_python(PROGRAMS src/test.py
+catkin_install_python(PROGRAMS src/gps.py src/imu.py
   DESTINATION ~/projects/bender_python_fork
   )
 
