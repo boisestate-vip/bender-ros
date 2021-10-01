@@ -11,7 +11,6 @@ def callback(data):
 
     rospy.loginfo(rospy.get_caller_id() + "\nLatitude: [{}]\n Longitude: [{}]\n".format(data.latitude, data.longitude))
     
-    msg = Float64MultiArray
     msg.data = [data.latitude, data.longitude]
 
 def gps():
