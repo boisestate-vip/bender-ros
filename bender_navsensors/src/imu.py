@@ -1,5 +1,4 @@
 import rospy
-from numpy import *
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import Imu
 
