@@ -42,6 +42,8 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string out
 void LaneDetection::init(ros::NodeHandle *nh)
 {
     output_pub_ = it_.advertise(output_topic_, 1);
+    scan_pub_ = nh->advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
+    btl_.set_output_frame("logitech_cam_sensor");
 }
 
 
@@ -244,5 +246,8 @@ void LaneDetection::publishQuantized()
     {
         output_msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_out_).toImageMsg();
         output_pub_.publish(output_msg_);
+        sensor_msgs::CameraInfoConstPtr info_msg( new sensor_msgs::CameraInfo(cam_model_.cameraInfo()) );
+        sensor_msgs::LaserScanPtr scan_msg = btl_.convert_msg(output_msg_, info_msg);
+        scan_pub_.publish(scan_msg);
     }
 }

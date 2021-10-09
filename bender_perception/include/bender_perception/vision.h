@@ -121,6 +121,9 @@ class LaneDetection
         Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters
 
         void init(ros::NodeHandle *nh);
+
+        bitarray_to_laserscan::BitArrayToLaserScan btl_;
+        ros::Publisher scan_pub_;
 }; 
 
 
