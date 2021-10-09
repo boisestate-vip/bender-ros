@@ -24,7 +24,7 @@ class BitArrayToLaserScan
 		 * 
 		 */
 		sensor_msgs::LaserScanPtr convert_msg(const sensor_msgs::ImageConstPtr& image_msg,
-																					const sensor_msgs::CameraInfoConstPtr& info_msg);
+											const sensor_msgs::CameraInfoConstPtr& info_msg);
 
 		/**
 		 * Sets the scan time parameter.

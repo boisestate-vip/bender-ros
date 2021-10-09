@@ -33,6 +33,7 @@ include_directories(
 add_library(bender_perception_lib
   src/vision.cpp 
   src/lidar.cpp
+  src/bitarray_to_laserscan.cpp
 )
 add_dependencies(bender_perception_lib 
   ${${PROJECT_NAME}_EXPORTED_TARGETS} 

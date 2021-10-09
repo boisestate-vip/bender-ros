@@ -10,6 +10,8 @@
 #include <image_geometry/pinhole_camera_model.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <bender_perception/bitarray_to_laserscan.h>
+
 using namespace cv;
 using namespace std;
 
