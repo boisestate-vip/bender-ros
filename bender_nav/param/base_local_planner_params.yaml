@@ -35,10 +35,10 @@ TebLocalPlannerROS:
     # radius: 0.6
 
   # GoalTolerance
-  xy_goal_tolerance: 0.2
-  yaw_goal_tolerance: 0.1
+  xy_goal_tolerance: 1.0
+  yaw_goal_tolerance: 0.707
   free_goal_vel: False
-  complete_global_plan: True
+  complete_global_plan: False
     
   # Obstacles
   min_obstacle_dist: 0.8 # This value must also include our robot radius, since footprint_model is set to "point".
