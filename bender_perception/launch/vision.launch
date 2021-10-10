@@ -1,7 +1,7 @@
 <launch>
 
     <arg name="show_output"   default="false" />
-    <arg name="publish_rate"  default="10"/>
+    <arg name="publish_rate"  default="15"/>
     <arg name="scale"         default="0.5"/>
     <arg name="num_colors"    default="2"/>
     <arg name="input_topic"   default="/logitech_cam_node/image" />
