@@ -128,6 +128,7 @@ class LaneDetection
         Mat img_src_;
         Mat img_out_;
         Mat labels_, centers_;
+        bool has_centers_ = false;
         
         bool has_homography_ = false;
         Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters

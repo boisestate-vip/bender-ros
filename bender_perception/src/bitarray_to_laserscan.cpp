@@ -90,7 +90,10 @@ sensor_msgs::LaserScanPtr BitArrayToLaserScan::convert_msg(
     const uint32_t ranges_size = image_msg->width;
     scan_msg->ranges.assign(ranges_size, std::numeric_limits<float>::infinity());
     // scan_msg->intensities.assign(ranges_size, 0.0);
-    convert(image_msg, cam_model_, scan_msg);
+    if (image_msg->encoding == "8UC1" | image_msg->encoding == "mono8")
+    {
+        convert(image_msg, cam_model_, scan_msg);
+    }
 
     return scan_msg;
 }

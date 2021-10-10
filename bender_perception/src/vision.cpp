@@ -123,15 +123,17 @@ void LaneDetection::quantize()
     data = data.reshape(1, data.total());
     
     // Mat labels, centers;
+    const int init_method = has_centers_ ? KMEANS_USE_INITIAL_LABELS | KMEANS_PP_CENTERS : KMEANS_PP_CENTERS;
     double compactness = kmeans(
         data,
         this->num_colors, 
         labels_,
         TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.5 ),
         2, 
-        KMEANS_USE_INITIAL_LABELS | KMEANS_PP_CENTERS,
+        init_method,
         centers_
     );
+    has_centers_ = true;
 
     // reshape both to a single row of Vec3f pixels:
     centers_ = centers_.reshape(3, centers_.rows);
@@ -175,10 +177,14 @@ void LaneDetection::update()
             computeHomography();
             has_homography_ = true;
         }
-
+        int roi_from_top = 100;
+        int roi_from_bot = 80;
+        Range rowrange(roi_from_top, img_src_.size().height-roi_from_bot);
+        Range colrange(Range::all());
+        img_src_(rowrange, colrange).copyTo(img_out_);
         if (scale != 1.0)
         {
-            resize(img_src_, img_out_, Size(), scale, scale);
+            resize(img_out_, img_out_, Size(), scale, scale);
             cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
             smooth();
             quantize();
@@ -186,11 +192,12 @@ void LaneDetection::update()
         }
         else
         {
-            cvtColor(img_src_, img_out_, COLOR_BGR2HSV);
+            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
             smooth();
             quantize();
         }
         toBinary();
+        copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
     } 
     else
