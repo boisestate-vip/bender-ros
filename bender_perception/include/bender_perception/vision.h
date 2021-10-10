@@ -5,6 +5,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv2/opencv.hpp>
+#include <opencv2/ximgproc.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_geometry/pinhole_camera_model.h>
@@ -47,12 +48,22 @@ class LaneDetection
          */
         void readImage();
 
+        /*
+         * Smooth the image to some degree by applying alternative morphological
+         * closing and opening operations with an enlarging structuring element
+         */
+        void smooth();
 
         /*
          * Compute the two colors to quantize to
          */
         void quantize();
 
+        /*
+         * Turn quantized image with 2 colors into binary image
+         * 
+         */
+        void toBinary();
 
         /*
          * Update the output with by processing the latest available source
@@ -116,6 +127,7 @@ class LaneDetection
 
         Mat img_src_;
         Mat img_out_;
+        Mat labels_, centers_;
         
         bool has_homography_ = false;
         Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters

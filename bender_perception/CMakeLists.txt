@@ -14,6 +14,10 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
 )
 
+find_package(OpenCV REQUIRED COMPONENTS
+  opencv_ximgproc
+)
+
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME} 

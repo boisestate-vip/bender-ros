@@ -6,12 +6,14 @@ transform_tolerance: 0.2
 
 obstacle_layer:
  enabled: true
- obstacle_range: 6.0
- raytrace_range: 5.0
+ obstacle_range: 25.0
+ raytrace_range: 10.0
  track_unknown_space: true
- combination_method: 1
- observation_sources: laser_scan_sensor
- laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: false}
+ footprint_clearing_enabled: true
+ combination_method: 1 # "Overwrite" (0), "Maximum" (1) and "Nothing" (99).
+ observation_sources: laser_scan_sensor scan_from_image
+ scan_from_image: {data_type: LaserScan, topic: /bender_perception/scan_from_image, marking: true, clearing: true}
+ laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: true}
 
 inflation_layer:
   enabled:              true
@@ -19,7 +21,7 @@ inflation_layer:
   inflation_radius:     1.0  # max. distance from an obstacle at which costs are incurred for planning paths.
 
 lane_layer:
-  enabled:              true
+  enabled:              false
   map_topic:            "/lane_map"
   first_map_only:       true
 

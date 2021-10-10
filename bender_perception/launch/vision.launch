@@ -3,7 +3,7 @@
     <arg name="show_output" default="false" />
 
 	<node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">
-        <param name="publish_rate" value="5" />     <!-- default = 10 -->
+        <param name="publish_rate" value="10" />     <!-- default = 10 -->
         <param name="scale" value="1.0" />          <!-- default = 1.0 -->
         <param name="num_colors" value="2" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
 	</node>

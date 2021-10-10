@@ -5,8 +5,8 @@ namespace bitarray_to_laserscan
 
 BitArrayToLaserScan::BitArrayToLaserScan()
   : scan_time_(1./30.)
-  , range_min_(0.45)
-  , range_max_(10.0)
+  , range_min_(1.0)
+  , range_max_(50.0)
   , scan_height_(1)
 {
 }
@@ -74,6 +74,7 @@ sensor_msgs::LaserScanPtr BitArrayToLaserScan::convert_msg(
     // Fill in laserscan message
     sensor_msgs::LaserScanPtr scan_msg(new sensor_msgs::LaserScan());
     scan_msg->header = image_msg->header;
+    scan_msg->header.stamp = ros::Time::now();
     if (output_frame_id_.length() > 0) {
         scan_msg->header.frame_id = output_frame_id_;
     }
@@ -87,7 +88,8 @@ sensor_msgs::LaserScanPtr BitArrayToLaserScan::convert_msg(
 
     // Calculate and fill the ranges
     const uint32_t ranges_size = image_msg->width;
-    scan_msg->ranges.assign(ranges_size, std::numeric_limits<float>::quiet_NaN());
+    scan_msg->ranges.assign(ranges_size, std::numeric_limits<float>::infinity());
+    // scan_msg->intensities.assign(ranges_size, 0.0);
     convert(image_msg, cam_model_, scan_msg);
 
     return scan_msg;
@@ -98,41 +100,66 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
     const sensor_msgs::LaserScanPtr& scan_msg)
 {
     // Use correct principal point from calibration
-    const float center_x = cam_model.cx();
-    const float center_y = cam_model.cy();
+    const int origin_x = image_msg->width / 2;
+    const int origin_y = image_msg->height;
 
     // Combine unit conversion (if necessary) with scaling by focal length for computing (X,Y)
-    const double unit_scaling = 0.001;  // mm to m
+    const double unit_scaling = 12.0;  // mm to m
     const float constant_x = unit_scaling / cam_model.fx();
 
-    const uint8_t* depth_row = reinterpret_cast<const uint8_t*>(&image_msg->data[0]);
+    const uint8_t* this_row = reinterpret_cast<const uint8_t*>(&image_msg->data[0]);
     const int row_step = image_msg->step / sizeof(uint8_t);
 
-    const int offset = (int)(center_y - scan_height_/2);
-    depth_row += offset*row_step; // Offset to center of image
-
-    for(int v = offset; v < offset+scan_height_; ++v, depth_row += row_step) 
+    for (int v=0; v<(int)image_msg->height-100; ++v, this_row+=row_step)
     {
-        for (int u = 0; u < (int)image_msg->width; ++u) // Loop over each pixel in row
+        for (int u=0; u<(int)image_msg->width; ++u) // Loop over each pixel in row
         {
-            const uint8_t depth = depth_row[u];
-
-            double r = depth; // Assign to pass through NaNs and Infs
-            const double th = -atan2((double)(u - center_x) * constant_x, unit_scaling); // Atan2(x, z), but depth divides out
+            const uint8_t pixelval = this_row[u];
+            if (pixelval == 0)
+            {
+                continue;
+            }
+            const double x = -u + origin_x;
+            const double y = -v + origin_y;
+            const double th = atan2(x,y);
+            const double r = hypot(x,y) * constant_x;
             const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
-            // if (depth != 0) // Not NaN or Inf
-            // { 
-            //     // Calculate in XYZ
-            //     double x = (u - center_x) * depth * constant_x;
-            //     double z = depth * 0.001;
-            //     // Calculate actual distance
-            //     r = hypot(x, z);
-            // }
-            if (index >= 0) {
-                scan_msg->ranges[index] = 5.0;
+            // std::cout << "index = " << std::to_string(index) << std::endl;
+            // std::cout << "(u,v) = (" << u << "," << v << "), theta = " << std::to_string(th*180.0/M_PI) << std::endl;
+            if (scan_msg->angle_max >= th && th >= scan_msg->angle_min) {
+                const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
+                scan_msg->ranges[index] = r;
             }
         }
     }
+    
+
+
+    // const int offset = (int)(center_y - scan_height_/2);
+    // depth_row += offset*row_step; // Offset to center of image
+
+    // for(int v = offset; v < offset+scan_height_; ++v, depth_row += row_step) 
+    // {
+    //     for (int u = 0; u < (int)image_msg->width; ++u) // Loop over each pixel in row
+    //     {
+    //         const uint8_t depth = depth_row[u];
+
+    //         double r = depth; // Assign to pass through NaNs and Infs
+    //         const double th = -atan2((double)(u - center_x) * constant_x, unit_scaling); // Atan2(x, z), but depth divides out
+    //         const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
+    //         // if (depth != 0) // Not NaN or Inf
+    //         // { 
+    //         //     // Calculate in XYZ
+    //         //     double x = (u - center_x) * depth * constant_x;
+    //         //     double z = depth * 0.001;
+    //         //     // Calculate actual distance
+    //         //     r = hypot(x, z);
+    //         // }
+    //         if (index >= 0) {
+    //             scan_msg->ranges[index] = 5.0;
+    //         }
+    //     }
+    // }
 }
 
 }
