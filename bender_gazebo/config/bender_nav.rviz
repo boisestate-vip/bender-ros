@@ -194,7 +194,7 @@ Visualization Manager:
       Unreliable: false
       Use Timestamp: false
       Value: true
-    - Alpha: 0.699999988079071
+    - Alpha: 0.10000000149011612
       Class: rviz/Map
       Color Scheme: map
       Draw Behind: false
@@ -387,10 +387,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 19.077232360839844
+      Scale: 15.613544464111328
       Target Frame: <Fixed Frame>
-      X: 1.0681780576705933
-      Y: -1.1912875175476074
+      X: 0.08729379624128342
+      Y: -1.5390534400939941
     Saved: ~
 Window Geometry:
   Displays:
@@ -412,5 +412,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1262
-  X: 2572
+  X: 3846
   Y: 39
