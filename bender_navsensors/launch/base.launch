@@ -1,0 +1,6 @@
+<launch>
+<node pkg="bender_navsensors" name="bender_navsensors_gps" type="gps.py" output="screen"> 
+</node>
+<node pkg="bender_navsensors" name="bender_navsensors_imu" type="imu.py" output="screen">
+</node>
+</launch>
