@@ -1,16 +1,27 @@
 <launch>
 
-    <arg name="show_output" default="false" />
+    <arg name="show_output"   default="false" />
+    <arg name="publish_rate"  default="15"/>
+    <arg name="scale"         default="0.5"/>
+    <arg name="num_colors"    default="2"/>
+    <arg name="input_topic"   default="/logitech_cam_node/image" />
 
 	<node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">
-        <param name="publish_rate" value="5" />     <!-- default = 10 -->
-        <param name="scale" value="1.0" />          <!-- default = 1.0 -->
-        <param name="num_colors" value="2" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
+        <remap to="$(arg input_topic)" from="/bender_camera/image_raw" />
+        <param name="publish_rate" value="$(arg publish_rate)" />     <!-- default = 10 -->
+        <param name="scale" value="$(arg scale)" />          <!-- default = 1.0 -->
+        <param name="num_colors" value="$(arg num_colors)" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
 	</node>
 
      <node name="image_view" if="$(arg show_output)" pkg="image_view" type="image_view">
         <remap from="image" to="/bender_perception/image_quantized"/>
         <param name="autosize" value="true" />
+    </node>
+
+    <node name="image_scan_filter" pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen">
+        <rosparam command="load" file="$(find bender_perception)/config/scan_filter_config.yaml" />
+        <remap from="scan" to="bender_perception/scan_from_image" />
+        <remap from="scan_filtered" to="bender_perception/scan_from_image_filtered" />
     </node>
 
 </launch>

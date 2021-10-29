@@ -9,7 +9,7 @@
     <rosparam file="$(find bender_nav)/param/base_local_planner_params.yaml" command="load" />
 
     <param name="controller_frequency" value="10.0" />
-    <param name="planner_frequency" value="5.0" />    <!-- 0.0 for planning once when new goal is received -->
+    <param name="planner_frequency" value="2.0" />    <!-- 0.0 for planning once when new goal is received -->
     
     <remap from="cmd_vel" to="bender_nav/cmd_vel" />
     <remap from="odom" to="/bender/swerve_controller/odom" />

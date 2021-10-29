@@ -42,6 +42,8 @@ LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string out
 void LaneDetection::init(ros::NodeHandle *nh)
 {
     output_pub_ = it_.advertise(output_topic_, 1);
+    scan_pub_ = nh->advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
+    btl_.set_output_frame("logitech_cam_sensor");
 }
 
 
@@ -77,6 +79,41 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg,
 }
 
 
+void LaneDetection::smooth()
+{
+    /* 
+    stackoverflow.com/questions/42065405
+    smooth the image with alternative closing and opening
+    with an enlarging kernel
+    */
+    Mat morph = img_out_.clone();
+    for (int r = 1; r < 4; r++)
+    {
+        Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(2*r+1, 2*r+1));
+        morphologyEx(morph, morph, CV_MOP_CLOSE, kernel);
+        morphologyEx(morph, morph, CV_MOP_OPEN, kernel);
+    }
+    img_out_ = morph;
+    /* take morphological gradient */
+    // Mat mgrad;
+    // Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+    // morphologyEx(morph, mgrad, CV_MOP_GRADIENT, kernel);
+
+    // Mat ch[3];
+    // /* split the gradient image into channels */
+    // split(mgrad, ch);
+    // /* apply Otsu threshold to each channel */
+    // threshold(ch[0], ch[0], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    // threshold(ch[1], ch[1], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    // threshold(ch[2], ch[2], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
+    // /* merge the channels */
+    // merge(ch, 3, img_out_);
+
+    // threshold(mgrad, mgrad, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    // img_out_ = mgrad;
+}
+
+
 void LaneDetection::quantize()
 {
     // Convert to float & reshape to a [3 x W*H] Mat 
@@ -85,31 +122,44 @@ void LaneDetection::quantize()
     img_out_.convertTo(data, CV_32F);
     data = data.reshape(1, data.total());
     
-    Mat labels, centers;
+    // Mat labels, centers;
+    const int init_method = has_centers_ ? KMEANS_USE_INITIAL_LABELS | KMEANS_PP_CENTERS : KMEANS_PP_CENTERS;
     double compactness = kmeans(
-        data, 
+        data,
         this->num_colors, 
-        labels,
-        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 1.0 ),
-        1, 
-        KMEANS_PP_CENTERS, 
-        centers
+        labels_,
+        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.5 ),
+        2, 
+        init_method,
+        centers_
     );
+    has_centers_ = true;
 
     // reshape both to a single row of Vec3f pixels:
-    centers = centers.reshape(3, centers.rows);
+    centers_ = centers_.reshape(3, centers_.rows);
     data = data.reshape(3, data.rows);
 
     // replace pixel values with their center value:
     Vec3f *p = data.ptr<Vec3f>();
     for (size_t i=0; i<data.rows; i++) {
-        int center_id = labels.at<int>(i);
-        p[i] = centers.at<Vec3f>(center_id);
+        int center_id = labels_.at<int>(i);
+        p[i] = centers_.at<Vec3f>(center_id);
     }
 
     // back to 2d, and uchar:
     img_out_ = data.reshape(3, img_out_.rows);
     img_out_.convertTo(img_out_, CV_8U);
+}
+
+
+void LaneDetection::toBinary()
+{
+    cvtColor(img_out_, img_out_, CV_BGR2GRAY);
+    threshold(img_out_, img_out_, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    bitwise_not(img_out_, img_out_);
+#ifdef HAVE_OPENCV_XIMGPROC
+    // ximgproc::thinning(img_out_, img_out_);
+#endif
 }
 
 
@@ -127,19 +177,27 @@ void LaneDetection::update()
             computeHomography();
             has_homography_ = true;
         }
-
+        int roi_from_top = 100;
+        int roi_from_bot = 80;
+        Range rowrange(roi_from_top, img_src_.size().height-roi_from_bot);
+        Range colrange(Range::all());
+        img_src_(rowrange, colrange).copyTo(img_out_);
         if (scale != 1.0)
         {
-            resize(img_src_, img_out_, Size(), scale, scale);
+            resize(img_out_, img_out_, Size(), scale, scale);
             cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
+            smooth();
             quantize();
             resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale);
         }
         else
         {
-            cvtColor(img_src_, img_out_, COLOR_BGR2HSV);
+            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
+            smooth();
             quantize();
         }
+        toBinary();
+        copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
     } 
     else
@@ -242,7 +300,11 @@ void LaneDetection::publishQuantized()
 {
     if (!img_out_.empty()) 
     {
-        output_msg_ = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_out_).toImageMsg();
+        std::string encoding = typeToString(img_out_.type()).substr(3);
+        output_msg_ = cv_bridge::CvImage(std_msgs::Header(), encoding.c_str(), img_out_).toImageMsg();
         output_pub_.publish(output_msg_);
+        sensor_msgs::CameraInfoConstPtr info_msg( new sensor_msgs::CameraInfo(cam_model_.cameraInfo()) );
+        sensor_msgs::LaserScanPtr scan_msg = btl_.convert_msg(output_msg_, info_msg);
+        scan_pub_.publish(scan_msg);
     }
 }
