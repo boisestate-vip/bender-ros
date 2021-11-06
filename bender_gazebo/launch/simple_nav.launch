@@ -2,6 +2,7 @@
 
     <arg name="groundtruth" default="false"/>
     <arg name="gui" default="true"/>
+    <arg name="rviz" default="true"/>
     <arg name="x" default="-2"/>
     <arg name="y" default="-21.5"/>
     <arg name="yaw" default="3.14"/>
@@ -35,14 +36,14 @@
 
     <!-- Static TF (dead reckoning) -->
     <node name="map_to_base_footprint_tf" unless="$(arg groundtruth)" 
-        pkg="tf" type="static_transform_publisher" 
-        args="$(arg x) $(arg y) 0 $(arg yaw) 0 0 /map /odom 1000" output="screen" />
+        pkg="tf2_ros" type="static_transform_publisher" 
+        args="$(arg x) $(arg y) 0 $(arg yaw) 0 0 map odom" output="screen" />
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
     
     <!-- RViz to visualize robot state -->
-    <node name="$(anon rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_nav.rviz" output="screen"/>
+    <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_nav.rviz" output="screen"/>
 
 
 </launch>
