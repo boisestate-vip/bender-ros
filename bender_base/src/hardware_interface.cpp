@@ -8,7 +8,7 @@ namespace bender_base
 BenderHardware::BenderHardware()
 {
     ros::V_string joint_names = boost::assign::list_of
-        ("wheel_lf_joint")("wheel_rf_joint")("wheel_lh_joint")("wheel_rh_joint")
+        ("wheel_rf_joint")("wheel_rh_joint")("wheel_lf_joint")("wheel_lh_joint")
         ("leg_lf_joint")("leg_rf_joint")("leg_lh_joint")("leg_rh_joint");
 
     for (unsigned int i = 0; i < joint_names.size(); i++)
@@ -94,9 +94,9 @@ void BenderHardware::read()
     for (auto& name : can_node_names)
     {
         const int node_id = canbus_.axis(name).node_id;
-        joints_[node_id].position = canbus_.axis(name).pos_enc_estimate;
+        joints_[node_id].position = canbus_.axis(name).pos_enc_estimate * 2.0 * M_PI;
         joints_[node_id].velocity = canbus_.axis(name).vel_enc_estimate * 2.0 * M_PI / 60.0;
-        joints_[node_id].effort = canbus_.axis(name).idq_first;
+        joints_[node_id].effort = joints_[node_id].command;
     }
 
     // Serial

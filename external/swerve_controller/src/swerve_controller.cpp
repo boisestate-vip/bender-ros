@@ -265,10 +265,10 @@ namespace swerve_controller
         // const double lh_speed = lh_wheel_joint_->getVelocity();
         // const double rh_speed = rh_wheel_joint_->getVelocity();
         // These computations account for L-R wheels oriented in opposite direction
-        const double lf_speed = lf_wheel_joint_->getVelocity();
-        const double rf_speed = rf_wheel_joint_->getVelocity()*-1.0;
-        const double lh_speed = lh_wheel_joint_->getVelocity();
-        const double rh_speed = rh_wheel_joint_->getVelocity()*-1.0;
+        const double lf_speed = lf_wheel_joint_->getVelocity()*-1.0;
+        const double rf_speed = rf_wheel_joint_->getVelocity();
+        const double lh_speed = lh_wheel_joint_->getVelocity()*-1.0;
+        const double rh_speed = rh_wheel_joint_->getVelocity();
         if (std::isnan(lf_speed) || std::isnan(rf_speed) ||
             std::isnan(lh_speed) || std::isnan(rh_speed))
             return;
@@ -361,10 +361,10 @@ namespace swerve_controller
             // rh_speed = sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
 
             // These computations account for L-R wheels oriented in opposite direction
-            lf_speed = sqrt(pow(b, 2) + pow(c, 2)) / wheel_radius_;
-            rf_speed = -sqrt(pow(b, 2) + pow(d, 2)) / wheel_radius_;
-            lh_speed = sqrt(pow(a, 2) + pow(c, 2)) / wheel_radius_;
-            rh_speed = -sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
+            lf_speed = -sqrt(pow(b, 2) + pow(c, 2)) / wheel_radius_;
+            rf_speed = sqrt(pow(b, 2) + pow(d, 2)) / wheel_radius_;
+            lh_speed = -sqrt(pow(a, 2) + pow(c, 2)) / wheel_radius_;
+            rh_speed = sqrt(pow(a, 2) + pow(d, 2)) / wheel_radius_;
 
             lf_steering = atan2(b, c);
             rf_steering = atan2(b, d);
