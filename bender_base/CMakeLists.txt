@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   controller_manager
   hardware_interface
   joint_limits_interface
+  odrive_can_ros
   pluginlib
   roscpp
   rospy

@@ -1,38 +1,3 @@
-/**
- *
- *  \file
- *  \brief      This class is based on jackal_base package for Clearpath's Jackal hardware
- *  \author     Mike Purvis <mpurvis@clearpathrobotics.com>
- *  \author     Wankun Sirichotiyakul <wankunsirichotiyakul@u.boisestate.edu>
- *  \copyright  Copyright (c) 2013, Clearpath Robotics, Inc.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *     * Neither the name of Clearpath Robotics, Inc. nor the
- *       names of its contributors may be used to endorse or promote products
- *       derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL CLEARPATH ROBOTICS, INC. BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Please send comments, questions, or patches to code@clearpathrobotics.com
- *
- */
-
-
 #ifndef BENDER_BASE_HARDWARE_INTERFACE_H
 #define BENDER_BASE_HARDWARE_INTERFACE_H
 
@@ -41,6 +6,9 @@
 #include <hardware_interface/joint_command_interface.h>
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
+#include <socketcan_interface/socketcan.h>
+
+#include <odrive_can_ros/can_simple.hpp>
 
 #include <ros/ros.h>
 #include <urdf/model.h>
@@ -51,13 +19,16 @@
 namespace bender_base
 {
 
+using namespace odrive_can_ros;
+using namespace std::literals::chrono_literals;
+
 class BenderHardware : public hardware_interface::RobotHW 
 {
     public:
         BenderHardware();
         ~BenderHardware();
-        void copyJointsFromHardware();
-        void publishDriveToMCU();
+        void read();
+        void write();
 
     protected:
         void feedbackCallback(const sensor_msgs::JointState::ConstPtr& msg);
@@ -89,6 +60,10 @@ class BenderHardware : public hardware_interface::RobotHW
         std_msgs::Float32MultiArray cmd_msg_;
         sensor_msgs::JointState::ConstPtr feedback_msg_;
         boost::mutex feedback_msg_mutex_;
+
+        // CAN related
+        CANSimple canbus_;
+        std::vector<std::string> can_node_names;
 
 
 }; // class
