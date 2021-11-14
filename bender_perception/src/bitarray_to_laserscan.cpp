@@ -135,7 +135,14 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
             }
         }
     }
-    
+    // for (auto& range : scan_msg->ranges)
+    // {
+    //     if (range == std::numeric_limits<float>::infinity())
+    //     {
+    //         range = 40.0;
+    //     }
+    //     continue;
+    // }
 
 
     // const int offset = (int)(center_y - scan_height_/2);
