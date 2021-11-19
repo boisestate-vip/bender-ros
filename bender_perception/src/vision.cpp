@@ -87,7 +87,7 @@ void LaneDetection::smooth()
     with an enlarging kernel
     */
     Mat morph = img_out_.clone();
-    for (int r = 1; r < 4; r++)
+    for (int r = 1; r < 3; r++)
     {
         Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(2*r+1, 2*r+1));
         morphologyEx(morph, morph, CV_MOP_CLOSE, kernel);
@@ -178,7 +178,7 @@ void LaneDetection::update()
             has_homography_ = true;
         }
         int roi_from_top = 100;
-        int roi_from_bot = 80;
+        int roi_from_bot = 0;
         Range rowrange(roi_from_top, img_src_.size().height-roi_from_bot);
         Range colrange(Range::all());
         img_src_(rowrange, colrange).copyTo(img_out_);
