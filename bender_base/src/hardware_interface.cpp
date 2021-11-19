@@ -30,11 +30,11 @@ BenderHardware::BenderHardware()
     registerInterface(&position_joint_interface_);
     registerInterface(&velocity_joint_interface_);
 
-    feedback_sub_ = nh_.subscribe("feedback", 1, &BenderHardware::feedbackCallback, this);
-    cmd_drive_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("cmd_drive", 1);
+    feedback_sub_ = nh_.subscribe("/bender_teensy_serial/feedback", 1, &BenderHardware::feedbackCallback, this);
+    cmd_drive_pub_ = nh_.advertise<std_msgs::Float32MultiArray>("/bender_teensy_serial/cmd_drive", 1);
 	cmd_msg_.layout.dim.push_back(std_msgs::MultiArrayDimension());
 	cmd_msg_.layout.dim[0].label = "joint_targets";
-	cmd_msg_.layout.dim[0].size = 8;
+	cmd_msg_.layout.dim[0].size = 4;
     cmd_msg_.layout.dim[0].stride = 1;
 
     // CAN setup
@@ -105,9 +105,9 @@ void BenderHardware::read()
     {
 		for (int i = 4; i < 8; i++)
 		{
-			joints_[i].position = feedback_msg_->position[i];
-			joints_[i].velocity = feedback_msg_->velocity[i];
-			joints_[i].effort   = feedback_msg_->effort[i];  
+			joints_[i].position = feedback_msg_->position[i-4];
+			joints_[i].velocity = feedback_msg_->velocity[i-4];
+			joints_[i].effort   = feedback_msg_->effort[i-4];  
 		}
 	}
     
