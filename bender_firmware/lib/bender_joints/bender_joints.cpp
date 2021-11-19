@@ -39,7 +39,7 @@ void GenericJoint::update(unsigned long dt_ms)
 *********************************************************************/
 PositionJoint::PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, uint8_t dirPin,
                              unsigned int encoderPPR, float p, float i, float d) :
-    GenericJoint(p, i, d, -M_PI_2, M_PI_2),
+    GenericJoint(p, i, d, -M_PI, M_PI),
     enc_a_pin_(encAPin),
     enc_b_pin_(encBPin),
     pwm_pin_(pwmPin),
@@ -79,15 +79,15 @@ void PositionJoint::actuate()
 {
     if (enabled_ && effort_ != 0.0) 
     {
-        if (effort_ > 0) 
+        if (effort_ > 0 && state_ < 2*M_PI) 
         { 
             digitalWriteFast(dir_pin_, HIGH); 
-            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,20,255)));
+            analogWrite(pwm_pin_, floorf(map(effort_,0.0f,100.0f,ANALOGWRITE_MIN,ANALOGWRITE_MAX)));
         }
-        else
+        else if (effort_ < 0 && state_ > -2*M_PI)
         {
             digitalWriteFast(dir_pin_, LOW);
-            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,20,255)));
+            analogWrite(pwm_pin_, floorf(map(-effort_,0.0f,100.0f,ANALOGWRITE_MIN,ANALOGWRITE_MAX)));
         }
     }
     else
@@ -99,7 +99,7 @@ void PositionJoint::actuate()
 void PositionJoint::stop()
 {
     effort_ = 0.0;
-    analogWrite(pwm_pin_, 0);
+    analogWrite(pwm_pin_, LOW);
 }
 
 
@@ -193,7 +193,7 @@ void VelocityJoint::actuate()
             digitalWriteFast(zf_dir_pin_, !WHEEL_DIR_PIN_FORWARD);  
         }
         digitalWriteFast(power_pin_, !WHEEL_POWER_PIN_OFF);
-        int pwm_duty_cycle = (int) floorf(map(effort_,0.0f,100.0f,30,255));
+        int pwm_duty_cycle = (int) floorf(map(effort_,0.0f,100.0f,ANALOGWRITE_MIN,ANALOGWRITE_MAX));
         analogWrite(vr_speed_pin_, pwm_duty_cycle);
     }
     else
