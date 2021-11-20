@@ -3,10 +3,8 @@
 #define CMD_RECEIVE_TIMEOUT_MS 200
 #define PLANETARY_PPR 6672
 #define HUB_PPR 45
-#define MAX_LEG_THROTTLE_PERCENT 50
+#define MAX_LEG_THROTTLE_PERCENT 40
 #define MAX_WHEEL_THROTTLE_PERCENT 100
-#define USE_PWM_10BIT	// use analogWrite range 0-1023
-#define PWM_DEADBAND 100
 
 #include <ros.h>
 #include <std_msgs/Float32MultiArray.h>
@@ -18,10 +16,10 @@
 
 // Robot's joints
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 20.0, 1.0, 5.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 20.0, 1.0, 5.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 20.0, 1.0, 5.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 20.0, 1.0, 5.0)  // leg_rh_joint
+	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lf_joint
+	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_rf_joint
+	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lh_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 25.0, 0.1, 10.0)  // leg_rh_joint
 };
 
 // Timers
@@ -112,7 +110,7 @@ void loop()
 	{
 		for (int i=0; i<4; i++)
 		{
-			pos_joints[i].update(since_last_update_us / 1000.0f);
+			pos_joints[i].update(since_last_update_us);
 			pos_joints[i].actuate();
 		}
 		since_last_update_us = 0;

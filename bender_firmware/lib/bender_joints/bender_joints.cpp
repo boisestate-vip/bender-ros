@@ -25,7 +25,7 @@ GenericJoint::GenericJoint(float p, float i, float d,
 void GenericJoint::update(unsigned long dt_ms)
 {
     error_ = clamp(target_, lower_limit_, upper_limit_) - state_;    
-    if (dt_ms <= 100)
+    if (dt_ms <= 10000)
     {
         effort_last_ = effort_; 
         effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
@@ -61,9 +61,14 @@ void PositionJoint::update(unsigned long dt_ms)
                                                   upper_limit_,
                                                   error_);
     
-    if (dt_ms <= 100)
+    if (dt_ms <= 10000)
     {
         effort_last_ = effort_;
+        if (absf(error_) < 0.1f * M_PI / 180)
+        {
+            effort_ = 0.0;
+            return ;
+        }
         effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
                         effort_lower_, effort_upper_);
     }

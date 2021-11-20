@@ -58,7 +58,7 @@ float Pid::computeCommand(float error, unsigned long dt_ms)
     if (dt_ms > 0)
     {
         if (valid_p_error_last_) {
-            error_dot = (error - p_error_last_) / (dt_ms * 1e-3);
+            error_dot = (error - p_error_last_) / (dt_ms * DT_SCALE);
         }
         p_error_last_ = error;
         valid_p_error_last_ = true;
@@ -83,7 +83,7 @@ float Pid::computeCommand(float error, float error_dot, unsigned long dt_ms)
     p_term = gains.p_gain_ * p_error_;
 
     // Calculate the integral of the position error
-    i_error_ += (dt_ms * 1e-3) * p_error_;
+    i_error_ += (dt_ms * DT_SCALE) * p_error_;
 
     // Calculate integral contribution to command
     i_term = gains.i_gain_ * i_error_;
