@@ -3,11 +3,11 @@ TebLocalPlannerROS:
    
   # Trajectory
   teb_autosize: True
-  dt_ref: 0.1
-  dt_hysteresis: 0.01
+  dt_ref: 0.2
+  dt_hysteresis: 0.02
   # max_samples: 300
   min_samples: 3
-  global_plan_overwrite_orientation: false
+  global_plan_overwrite_orientation: True
   allow_init_with_backwards_motion: False
   max_global_plan_lookahead_dist: -0.1
   global_plan_viapoint_sep: -0.1
@@ -18,10 +18,10 @@ TebLocalPlannerROS:
   publish_feedback: False
   
   # Robot
-  max_vel_x: 0.5
+  max_vel_x: 0.7
   max_vel_x_backwards: 0.2
-  max_vel_y: 0.2
-  max_vel_theta: 0.5
+  max_vel_y: 0.4
+  max_vel_theta: 0.707
   acc_lim_x: 5.0
   acc_lim_y: 3.0
   acc_lim_theta: 1.0
@@ -35,17 +35,17 @@ TebLocalPlannerROS:
     # radius: 0.6
 
   # GoalTolerance
-  xy_goal_tolerance: 1.0
-  yaw_goal_tolerance: 0.707
+  xy_goal_tolerance: 0.2
+  yaw_goal_tolerance: 0.2
   free_goal_vel: False
   complete_global_plan: False
     
   # Obstacles
-  min_obstacle_dist: 0.65 # This value must also include our robot radius, since footprint_model is set to "point".
-  inflation_dist: 0.0
+  min_obstacle_dist: 0.5 # This value must also include our robot radius, since footprint_model is set to "point".
+  inflation_dist: 1.0
   include_costmap_obstacles: True
   include_dynamic_obstacles: False
-  costmap_obstacles_behind_robot_dist: 1.0
+  costmap_obstacles_behind_robot_dist: 3.0
   obstacle_poses_affected: 30
   obstacle_proximity_lower_bound: 0.6
   obstacle_proximity_upper_bound: 1.2
@@ -60,23 +60,23 @@ TebLocalPlannerROS:
   optimization_activate: True
   optimization_verbose: False
   penalty_epsilon: 0.1
-  obstacle_cost_exponent: 4
-  weight_max_vel_x: 2
-  weight_max_vel_y: 2
+  obstacle_cost_exponent: 1.0
+  weight_max_vel_x: 1
+  weight_max_vel_y: 1
   weight_max_vel_theta: 1
   weight_acc_lim_x: 1
   weight_acc_lim_y: 0  # If robot is holonomic, set to 0 to speed up computation
   weight_acc_lim_theta: 1
   weight_kinematics_nh: 0.1 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
-  weight_kinematics_forward_drive: 1
+  weight_kinematics_forward_drive: 0.5
   weight_kinematics_turning_radius: 0.0
-  weight_optimaltime: 0.01 # must be > 0
+  weight_optimaltime: 0.1 # must be > 0
   weight_shortest_path: 0
-  weight_obstacle: 100
+  weight_obstacle: 20
   weight_inflation: 0.1
   weight_dynamic_obstacle: 100
   weight_dynamic_obstacle_inflation: 0.4
-  weight_viapoint: 0.2
+  weight_viapoint: 1.0
   weight_adapt_factor: 2
 
   # Homotopy Class Planner

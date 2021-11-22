@@ -47,10 +47,10 @@ POSSIBILITY OF SUCH DAMAGE.
 	<xacro:property name="leg_m" value="1" /> <!-- mass of a thigh leg -->
 	<xacro:property name="leg_r" value="0.025" /> <!-- radius of the leg cylinders -->
 	<xacro:property name="wheel_m" value="5" /> <!-- mass of a single wheel -->
-	<xacro:property name="wheel_r" value="0.15" /> <!-- radius of the wheels -->
+	<xacro:property name="wheel_r" value="0.11" /> <!-- radius of the wheels -->
 	<xacro:property name="wheel_h" value="0.05" /> <!-- thickness of the wheels -->
 	<xacro:property name="wheel_off" value="0.01" /> <!-- thickness of the wheels -->
-	<xacro:property name="joint_damping" value="1" /> <!-- damping of all joints -->
+	<xacro:property name="joint_damping" value="0.1" /> <!-- damping of all joints -->
 	<xacro:property name="camera_mount_height" value="1" /> 
 	<xacro:property name="camera_tilt_angle_deg" value="15" />
 	<xacro:property name="lidar_mount_height" value="0.0" />  
@@ -219,28 +219,28 @@ POSSIBILITY OF SUCH DAMAGE.
 	<joint name="wheel_lf_joint" type="continuous">
 		<parent link="leg_lf"/>
 		<child link="wheel_lf"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>
 	<joint name="wheel_rf_joint" type="continuous">
 		<parent link="leg_rf"/>
 		<child link="wheel_rf"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>
 	<joint name="wheel_lh_joint" type="continuous">
 		<parent link="leg_lh"/>
 		<child link="wheel_lh"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>
 	<joint name="wheel_rh_joint" type="continuous">
 		<parent link="leg_rh"/>
 		<child link="wheel_rh"/>
-		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 ${PI}"/>
+		<origin xyz="0 0 ${-(height + wheel_off) / 2}" rpy="0 0 0"/>
 		<dynamics damping="${joint_damping}"/>
 		<axis xyz="0 1 0"/>
 	</joint>

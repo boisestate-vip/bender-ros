@@ -39,11 +39,11 @@ bender:
     # Low-Level Controllers -------------------------------------
     gazebo_ros_control:
         pid_gains:
-            leg_lf_joint: {p: 50.0, i: 0.5, d: 5}
-            leg_rf_joint: {p: 50.0, i: 0.5, d: 5}
-            leg_lh_joint: {p: 50.0, i: 0.5, d: 5}
-            leg_rh_joint: {p: 50.0, i: 0.5, d: 5}
-            wheel_lf_joint: {p: 50.0, i: 2.0, d: 0.001}
-            wheel_rf_joint: {p: 50.0, i: 2.0, d: 0.001}
-            wheel_lh_joint: {p: 50.0, i: 2.0, d: 0.001}
-            wheel_rh_joint: {p: 50.0, i: 2.0, d: 0.001}
+            leg_lf_joint: {p: 20.0, i: 0.5, d: 5}
+            leg_rf_joint: {p: 20.0, i: 0.5, d: 5}
+            leg_lh_joint: {p: 20.0, i: 0.5, d: 5}
+            leg_rh_joint: {p: 20.0, i: 0.5, d: 5}
+            wheel_lf_joint: {p: 20.0, i: 2.0, d: 0.001}
+            wheel_rf_joint: {p: 20.0, i: 2.0, d: 0.001}
+            wheel_lh_joint: {p: 20.0, i: 2.0, d: 0.001}
+            wheel_rh_joint: {p: 20.0, i: 2.0, d: 0.001}

@@ -5,7 +5,7 @@ namespace bitarray_to_laserscan
 
 BitArrayToLaserScan::BitArrayToLaserScan()
   : scan_time_(1./30.)
-  , range_min_(1.0)
+  , range_min_(0.5)
   , range_max_(50.0)
   , scan_height_(1)
 {
@@ -113,7 +113,7 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
     const uint8_t* this_row = reinterpret_cast<const uint8_t*>(&image_msg->data[0]);
     const int row_step = image_msg->step / sizeof(uint8_t);
 
-    for (int v=0; v<(int)image_msg->height-100; ++v, this_row+=row_step)
+    for (int v=0; v<(int)image_msg->height; ++v, this_row+=row_step)
     {
         for (int u=0; u<(int)image_msg->width; ++u) // Loop over each pixel in row
         {
@@ -129,13 +129,20 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
             const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
             // std::cout << "index = " << std::to_string(index) << std::endl;
             // std::cout << "(u,v) = (" << u << "," << v << "), theta = " << std::to_string(th*180.0/M_PI) << std::endl;
-            if (scan_msg->angle_max >= th && th >= scan_msg->angle_min) {
+            if (scan_msg->angle_max >= th && th >= scan_msg->angle_min && r >= range_min_) {
                 const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
                 scan_msg->ranges[index] = r;
             }
         }
     }
-    
+    // for (auto& range : scan_msg->ranges)
+    // {
+    //     if (range == std::numeric_limits<float>::infinity())
+    //     {
+    //         range = 40.0;
+    //     }
+    //     continue;
+    // }
 
 
     // const int offset = (int)(center_y - scan_height_/2);

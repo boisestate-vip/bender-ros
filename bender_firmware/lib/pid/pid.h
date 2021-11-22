@@ -1,6 +1,8 @@
 #ifndef BENDER_FIRMWARE_PID_H
 #define BENDER_FIRMWARE_PID_H
 
+#define DT_SCALE 0.000001f // microsecond
+
 #include <cmath>
 #include "bender_utils.h"
 

@@ -13,7 +13,7 @@ obstacle_layer:
  combination_method: 1 # "Overwrite" (0), "Maximum" (1) and "Nothing" (99).
  observation_sources: laser_scan_sensor scan_from_image
  scan_from_image: {data_type: LaserScan, topic: /bender_perception/scan_from_image_filtered, marking: true, clearing: true}
- laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: false}
+ laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: true}
 
 inflation_layer:
   enabled:              true

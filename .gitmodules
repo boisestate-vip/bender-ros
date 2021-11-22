@@ -1,0 +1,3 @@
+[submodule "external/odrive_can"]
+	path = external/odrive_can
+	url = https://github.com/swankun/odrive_can.git

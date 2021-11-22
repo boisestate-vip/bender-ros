@@ -1,6 +1,6 @@
 global_costmap:
-  update_frequency: 1.0
-  publish_frequency: 0.5
+  update_frequency: 5.0
+  publish_frequency: 1.0
   rolling_window: false
   plugins:
     - {name: lane_layer,      type: "costmap_2d::StaticLayer"}

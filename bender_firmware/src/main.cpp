@@ -1,3 +1,11 @@
+#define PID_UPDATE_PERIOD_US 200
+#define ROS_PUBLISH_PERIOD_MS 10
+#define CMD_RECEIVE_TIMEOUT_MS 200
+#define PLANETARY_PPR 6672
+#define HUB_PPR 45
+#define MAX_LEG_THROTTLE_PERCENT 40
+#define MAX_WHEEL_THROTTLE_PERCENT 100
+
 #include <ros.h>
 #include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Empty.h>
@@ -6,42 +14,17 @@
 #include "pid.h"
 #include "bender_joints.h"
 
-#define PID_UPDATE_PERIOD_MS 1
-#define ROS_PUBLISH_PERIOD_MS 20
-#define CMD_RECEIVE_TIMEOUT_MS 200
-#define PLANETARY_PPR 6672
-#define HUB_PPR 45
-#define MAX_LEG_THROTTLE_PERCENT 50
-#define MAX_WHEEL_THROTTLE_PERCENT 100
-
-
 // Robot's joints
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 20.0, 5.0, 0.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 20.0, 5.0, 0.0)  // leg_rh_joint
+	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lf_joint
+	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_rf_joint
+	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lh_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 25.0, 0.1, 10.0)  // leg_rh_joint
 };
-VelocityJoint vel_joints[4] = {
-	VelocityJoint(10, 11, 12, 20, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lf_joint
-	VelocityJoint(30, 26, 34, 23, HUB_PPR, 20.0, 0.0, 0.0), // wheel_rf_joint
-	VelocityJoint(14, 13, 15, 21, HUB_PPR, 20.0, 0.0, 0.0), // wheel_lh_joint
-	VelocityJoint(29, 28, 27, 22, HUB_PPR, 20.0, 0.0, 0.0)  // wheel_rh_joint
-};
-/*
- * The following is an unfortunate consequence of Arduino's
- * attachInterrupt function not supporting any way to pass a 
- * pointer or other context to the attached function.
- */
-void velJoint0ISR(void) { vel_joints[0].interruptHandle(); }
-void velJoint1ISR(void) { vel_joints[1].interruptHandle(); }
-void velJoint2ISR(void) { vel_joints[2].interruptHandle(); }
-void velJoint3ISR(void) { vel_joints[3].interruptHandle(); }
-
 
 // Timers
 elapsedMillis since_last_receipt_ms;
-elapsedMillis since_last_update_ms;
+elapsedMicros since_last_update_us;
 elapsedMillis since_last_spin_ms;
 
 
@@ -51,34 +34,29 @@ ros::NodeHandle nh;
 
 // ROS JointState publisher
 char *_jstate_name[] = {
-	"wheel_lf_joint", "wheel_rf_joint", "wheel_lh_joint", "wheel_rh_joint",
 	"leg_lf_joint", "leg_rf_joint", "leg_lh_joint", "leg_rh_joint"
 };
-float _jstate_pos[8] = {0,0,0,0,0,0,0,0};
-float _jstate_vel[8] = {0,0,0,0,0,0,0,0};
-float _jstate_eff[8] = {0,0,0,0,0,0,0,0};
+float _jstate_pos[4] = {0,0,0,0};
+float _jstate_vel[4] = {0,0,0,0};
+float _jstate_eff[4] = {0,0,0,0};
 sensor_msgs::JointState feedback_msg;
-ros::Publisher state_publisher("feedback", &feedback_msg);
+ros::Publisher state_publisher("/bender_teensy_serial/feedback", &feedback_msg);
 
 
 // ROS cmd_drive subscriber
 void updateCmd(const std_msgs::Float32MultiArray &cmd_msg)
 {
 	since_last_receipt_ms = 0;
-	if (cmd_msg.layout.dim[0].size == 8)
+	if (cmd_msg.layout.dim[0].size == 4)
 	{
-		for (unsigned int i=0; i<8; i++)
+		for (unsigned int i=0; i<4; i++)
 		{
 			float target = cmd_msg.data[i];
-			if (i < 4) {
-				vel_joints[i].setTarget(target);
-			} else if (4 <= i && i < 8) {
-				pos_joints[i-4].setTarget(target);
-			}
+			pos_joints[i].setTarget(target);
 		}
 	}
 }
-ros::Subscriber<std_msgs::Float32MultiArray> cmd_subscriber("cmd_drive", updateCmd);
+ros::Subscriber<std_msgs::Float32MultiArray> cmd_subscriber("/bender_teensy_serial/cmd_drive", updateCmd);
 
 
 void setup()
@@ -88,29 +66,28 @@ void setup()
 	feedback_msg.position        = _jstate_pos;
 	feedback_msg.velocity        = _jstate_vel;
 	feedback_msg.effort          = _jstate_eff;
-	feedback_msg.name_length     = 8;
-	feedback_msg.position_length = 8;
-	feedback_msg.velocity_length = 8;
-	feedback_msg.effort_length   = 8;
+	feedback_msg.name_length     = 4;
+	feedback_msg.position_length = 4;
+	feedback_msg.velocity_length = 4;
+	feedback_msg.effort_length   = 4;
 	nh.advertise(state_publisher);
 	nh.subscribe(cmd_subscriber);
 
-	since_last_receipt_ms = 0;
-	since_last_update_ms = 0;
-	since_last_spin_ms = 0;
+#ifdef USE_PWM_10BIT
+	analogWriteFrequency(35, 18000.0f);
+	analogWriteFrequency(36, 18000.0f);
+	analogWriteFrequency(37, 18000.0f);
+	analogWriteFrequency(38, 18000.0f);
+	analogWriteResolution(10);
+#endif
 
-	attachInterrupt(vel_joints[0].getInterruptPin(), velJoint0ISR, RISING);
-	attachInterrupt(vel_joints[1].getInterruptPin(), velJoint1ISR, RISING);
-	attachInterrupt(vel_joints[2].getInterruptPin(), velJoint2ISR, RISING);
-	attachInterrupt(vel_joints[3].getInterruptPin(), velJoint3ISR, RISING);
+	since_last_receipt_ms = 0;
+	since_last_update_us = 0;
+	since_last_spin_ms = 0;
 
 	/** Enable the motors **/
 	for (int i=0; i<4; i++)
 	{
-		vel_joints[i].enable();
-		vel_joints[i].setEffortUpperLimit(MAX_WHEEL_THROTTLE_PERCENT);
-		vel_joints[i].setEffortLowerLimit(0.0F);
-		
 		pos_joints[i].enable();
 		pos_joints[i].setEffortUpperLimit(MAX_LEG_THROTTLE_PERCENT);
 		pos_joints[i].setEffortLowerLimit(-MAX_LEG_THROTTLE_PERCENT);
@@ -125,35 +102,27 @@ void loop()
 	{
 		for (int i=0; i<4; i++)
 		{
-			vel_joints[i].stop();
 			pos_joints[i].stop();
 		}
 	}	
 	/** Update the motor commands at a specifeid rate **/
-	else if (since_last_update_ms >= PID_UPDATE_PERIOD_MS) 
+	else if (since_last_update_us >= PID_UPDATE_PERIOD_US) 
 	{
 		for (int i=0; i<4; i++)
 		{
-			vel_joints[i].update(since_last_update_ms);
-			vel_joints[i].actuate();
-			pos_joints[i].update(since_last_update_ms);
+			pos_joints[i].update(since_last_update_us);
 			pos_joints[i].actuate();
 		}
-		since_last_update_ms = 0;
+		since_last_update_us = 0;
 	}
 
 	/** Publish via rosserial at a specified rate **/
 	if (since_last_spin_ms >= ROS_PUBLISH_PERIOD_MS) 
 	{
-		for (int i=0; i<8; i++)
+		for (int i=0; i<4; i++)
 		{
-			if (i < 4) {
-				vel_joints[i].getState(_jstate_vel[i]);
-				vel_joints[i].getEffort(_jstate_eff[i]);
-			} else if (4 <= i && i < 8) {
-				pos_joints[i-4].getState(_jstate_pos[i]);
-				pos_joints[i-4].getEffort(_jstate_eff[i]);
-			}
+			pos_joints[i].getState(_jstate_pos[i]);
+			pos_joints[i].getEffort(_jstate_eff[i]);
 			feedback_msg.position[i] = _jstate_pos[i];
 			feedback_msg.velocity[i] = _jstate_vel[i];
 			feedback_msg.effort[i]   = _jstate_eff[i];
