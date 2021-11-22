@@ -1,7 +1,7 @@
 <launch>
     <!-- ros_args.launch -->
-    <arg name="rviz" default="true"/>
-    <arg name="teleop" default="rqt" doc="[rqt, joy, none]"/> 
+    <arg name="rviz" default="false"/>
+    <arg name="teleop" default="joy" doc="[rqt, joy, none]"/> 
 
     <include file="$(find bender_description)/launch/description.launch" />
 
@@ -78,6 +78,17 @@
             name    : rqt
             topic   : /bender_teleop/rqt_vel
             timeout : 0.5
+            priority: 100
+        locks:
+        -
+            name    : pause
+            topic   : /bender_nav/pause
+            timeout : 0.0
+            priority: 100
+        -
+            name    : joystick
+            topic   : /bender_teleop/joy_priority
+            timeout : 0.0
             priority: 100
         </rosparam>
     </node>
