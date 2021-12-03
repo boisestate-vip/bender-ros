@@ -2,6 +2,7 @@ global_costmap:
   update_frequency: 5.0
   publish_frequency: 1.0
   rolling_window: false
+  always_send_full_costmap: false
   plugins:
     - {name: lane_layer,      type: "costmap_2d::StaticLayer"}
     # - {name: obstacle_truth,  type: "costmap_2d::StaticLayer"}
