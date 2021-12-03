@@ -1,0 +1,14 @@
+#!/bin/bash
+
+dev_exists=$(ifconfig can0 2>/dev/null | head -n 1 | grep -o 'can0') 
+if [[ -n $dev_exists ]]; then
+    sudo ip link set can0 down
+    sudo ip link set can0 type can bitrate 250000
+    sudo ip link set can0 txqueuelen 1000
+    sudo ip link set can0 up
+    exit 0
+else
+    echo "Device CAN0 not found. Failed to establish communication."
+    exit 1
+fi
+ 
