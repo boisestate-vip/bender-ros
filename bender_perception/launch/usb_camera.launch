@@ -1,7 +1,6 @@
 <launch>
     
-    <arg name="show_raw" default="false" />
-    <arg name="show_output" default="false" />
+    <arg name="rviz" default="true" />
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" required="true" output="screen" >
         <param name="video_device" value="/dev/video0" />
@@ -10,13 +9,9 @@
         <remap from="/usb_cam/image_raw" to="/bender_camera/image_raw" />
     </node>
 
-    <node name="raw_image_view" if="$(arg show_raw)" pkg="image_view" type="image_view">
-        <remap from="image" to="/bender_camera/image_raw"/>
-        <param name="autosize" value="true" />
-    </node>
+    <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" 
+        respawn="false" args="-d $(find bender_perception)/config/debug.rviz" output="screen"/>
 
-    <include file="$(find bender_perception)/launch/vision.launch">
-        <arg name="show_output" value="$(arg show_output)" />
-    </include>
+    <include file="$(find bender_perception)/launch/vision.launch" />
 
 </launch>
