@@ -11,7 +11,7 @@ These ROS packages are tested on ROS Noetic. The following commands will:
 ```
 CATKIN_WS=$HOME/projects/bender/ros
 mkdir -p $CATKIN_WS/src && cd $CATKIN_WS/src 
-git clone https://github.com/boisestate-vip/bender-ros.git
+git clone --recursive https://github.com/boisestate-vip/bender-ros.git
 cd $CATKIN_WS
 rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 cd $CATKIN_WS/src/bender-ros/bender_gazebo/models && ./install_models.sh
