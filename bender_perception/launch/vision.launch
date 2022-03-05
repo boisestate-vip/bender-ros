@@ -2,7 +2,7 @@
 
     <arg name="show_output"   default="false" />
     <arg name="publish_rate"  default="15"/>
-    <arg name="scale"         default="0.5"/>
+    <arg name="scale"         default="1"/>
     <arg name="num_colors"    default="2"/>
 
 	<node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">

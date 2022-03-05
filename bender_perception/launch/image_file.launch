@@ -1,0 +1,18 @@
+<launch>
+    
+    <arg name="rviz" default="true" />
+    <arg name="file" default="$(find rviz)/images/splash.png" />
+
+    <node name="image_publisher" pkg="image_publisher" type="image_publisher" 
+        args="$(arg file)" required="true" output="screen" >
+        <remap from="/image_publisher/image_raw" to="/bender_camera/image_raw" />
+    </node>
+
+    <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" 
+        respawn="false" args="-d $(find bender_perception)/config/debug.rviz" output="screen"/>
+
+    <include file="$(find bender_perception)/launch/vision.launch">
+        <arg name="num_colors" value="8" />
+    </include>
+
+</launch>

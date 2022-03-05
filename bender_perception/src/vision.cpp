@@ -128,7 +128,7 @@ void LaneDetection::quantize()
         data,
         this->num_colors, 
         labels_,
-        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.5 ),
+        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.1 ),
         2, 
         init_method,
         centers_
@@ -185,16 +185,16 @@ void LaneDetection::update()
         if (scale != 1.0)
         {
             resize(img_out_, img_out_, Size(), scale, scale);
-            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-            smooth();
+            cvtColor(img_out_, img_out_, COLOR_BGR2HLS_FULL);
             quantize();
+            smooth();
             resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale);
         }
         else
         {
-            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-            smooth();
+            cvtColor(img_out_, img_out_, COLOR_BGR2HLS_FULL);
             quantize();
+            smooth();
         }
         // toBinary();
         // copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
