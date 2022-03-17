@@ -39,7 +39,7 @@
       <sensor type="camera" name="camera1">
         <visualize>false</visualize>
         <update_rate>10.0</update_rate>
-        <camera name="logitech_c910_camera">
+        <camera name="${name}">
           <horizontal_fov>1.257</horizontal_fov>
           <image>
             <width>640</width>
@@ -56,8 +56,8 @@
           <alwaysOn>true</alwaysOn>
           <updateRate>10.0</updateRate>
           <cameraName>${name}</cameraName>
-          <imageTopicName>/${name}_node/image</imageTopicName>
-          <cameraInfoTopicName>/${name}_node/camera_info</cameraInfoTopicName>
+          <imageTopicName>/${name}/image_raw</imageTopicName>
+          <cameraInfoTopicName>/${name}/camera_info</cameraInfoTopicName>
           <frameName>${name}</frameName>
           <hackBaseline>0.07</hackBaseline>
           <distortionK1>0.0</distortionK1>

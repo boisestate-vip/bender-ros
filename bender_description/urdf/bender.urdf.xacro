@@ -336,7 +336,7 @@ POSSIBILITY OF SUCH DAMAGE.
 	</link>
 
 	<!-- SENSORS: -->
-	<xacro:logitech_c910 name="logitech_cam" connected_to="base_link">
+	<xacro:logitech_c910 name="bender_camera" connected_to="base_link">
 		<origin xyz="${-body_l/2} 0 ${body_h/2 + camera_mount_height}" 
 			    rpy="0 ${camera_tilt_angle_deg*DEG2RAD} 0" />
     </xacro:logitech_c910>

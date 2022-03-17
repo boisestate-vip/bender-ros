@@ -49,6 +49,11 @@ class LaneDetection
         void readImage();
 
         /*
+         * Gamma correction for better contrast
+         */
+        void gammaCorrection();
+
+        /*
          * Smooth the image to some degree by applying alternative morphological
          * closing and opening operations with an enlarging structuring element
          */
