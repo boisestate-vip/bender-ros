@@ -196,9 +196,9 @@ void LaneDetection::update()
             smooth();
             quantize();
         }
-        toBinary();
-        copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
-        projectToGrid();
+        // toBinary();
+        // copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
+        // projectToGrid();
     } 
     else
     {

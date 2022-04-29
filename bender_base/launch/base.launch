@@ -55,8 +55,11 @@
                 scale_angular:
                     yaw: 1.0
                 enable_turbo_button: 6      # Left trigger
-                scale_linear_turbo: 2.5
-                scale_angular_turbo: 2.0
+                scale_linear_turbo:
+                    x: 2.0
+                    y: 2.0
+                scale_angular_turbo:
+                    yaw: 1.57
             </rosparam>
         </node>
     </group>
