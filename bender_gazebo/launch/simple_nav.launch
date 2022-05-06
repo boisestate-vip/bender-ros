@@ -41,6 +41,9 @@
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
+	
+    <!----- Launch navsensor ------>
+    <include file="$(find bender_navsensors)/launch/navsensors.launch" />
     
     <!-- RViz to visualize robot state -->
     <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_nav.rviz" output="screen"/>
