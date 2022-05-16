@@ -3,7 +3,5 @@
 
     <node name="bender_navsensors" pkg="bender_navsensors" type="bender_navsensors" required="true" output="screen" >
     </node>
-    <node name="bender_gps_distance" pkg="bender_navsensors" type="bender_navsensors" required="true" output="screen" >
-    </node>
 </launch>
 
