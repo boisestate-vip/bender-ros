@@ -6,10 +6,11 @@
 #include <std_msgs/Float64.h>
 
 mavros_msgs::State state;
-double lat, long;
+double lat, longi;
 double init_lat, init_long;
 double x_dist, y_dist;
 bool init;
+int coord_conv_factor = 111139;
 
 void get_state(const mavros_msgs::State::ConstPtr& msg)
 {
@@ -19,17 +20,19 @@ void get_state(const mavros_msgs::State::ConstPtr& msg)
 void get_gps(const sensor_msgs::NavSatFix::ConstPtr& msg)
 {
       lat = *msg.latitude.data;
-      long = *msg.longitude.data;
+      longi = *msg.longitude.data;
 
       if (!init)
       {
           init_lat = lat;
-          init_long = long;
+          init_long = longi;
           init = true;
           return;
       }
 
       // Math here to turn current lat/long and initial value into meters, save into x_dist and y_dist
+	x_dist = (abs(lat) - abs(init_lat)) * coord_conv_factor;;
+	y_dist = (abs(longi) - abs(init_long)) * coord_conv_factor;
 }      
 
 int main (int argc, char **argv)
