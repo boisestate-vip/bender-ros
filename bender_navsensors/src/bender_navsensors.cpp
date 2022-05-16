@@ -8,6 +8,7 @@
 mavros_msgs::State state;
 double lat, longi;
 double init_lat, init_long;
+double total_distance_meters;
 double x_dist, y_dist;
 bool init;
 int coord_conv_factor = 111139;
@@ -31,8 +32,9 @@ void get_gps(const sensor_msgs::NavSatFix::ConstPtr& msg)
       }
 
       // Math here to turn current lat/long and initial value into meters, save into x_dist and y_dist
-	x_dist = (abs(lat) - abs(init_lat)) * coord_conv_factor;;
+	x_dist = (abs(lat) - abs(init_lat)) * coord_conv_factor;
 	y_dist = (abs(longi) - abs(init_long)) * coord_conv_factor;
+	total_distance_meters = sqrt((pow(lat - init_lat, 2)) + pow(longi - init_long, 2))) * coord_conv_factor;
 }      
 
 int main (int argc, char **argv)
@@ -52,6 +54,8 @@ int main (int argc, char **argv)
     ros::Publisher conn_pub = nh.advertise<std_msgs::Bool>("bender_navsensors/state/connected", 10);
         ros::Publisher x_pub = nh.advertise<std_msgs::Float64>("bender_navsensors/position/x", 10);
         ros::Publisher y_pub = nh.advertise<std_msgs::Float64>("bender_navsensors/position/y", 10);
+	ros::Publisher dist_pub = nh.advertise<std_msgs::Float64>("bender_navsensors/position/dist", 10);
+
 
         ros::Rate loop_rate(20);
 
@@ -62,6 +66,7 @@ int main (int argc, char **argv)
     std_msgs::Bool conn;
         std_msgs::Float64 x_msg;
         std_msgs::Float64 y_msg;
+	std_msgs::Float64 dist_msg;
 	
 	while (ros::ok())
       {
@@ -69,11 +74,14 @@ int main (int argc, char **argv)
        conn.data = state.connected;
                   x_msg.data = x_dist;
                   y_msg.data = y_dist;
+		  dist_msg.data = total_distance_meters;
  
           armed_pub.publish(armed);
           conn_pub.publish(conn);
                   x_pub.publish(x_msg);
                   y_pub.publish(y_msg);
+		  dist_pub.publish(dist_msg);
+		  
           if (!armed.data)
           {
               arming.call(arm);
