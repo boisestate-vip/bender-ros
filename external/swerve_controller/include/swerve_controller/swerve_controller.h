@@ -168,6 +168,10 @@ namespace swerve_controller
         bool getPhysicalParams(ros::NodeHandle &controller_nh);
 
         void setOdomPubFields(ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh);
+        
+        double combineData(double &odom, double &imu, double &gps);
+        
+        double combineData(double &odom, double &imu);
     };
 
     PLUGINLIB_EXPORT_CLASS(swerve_controller::SwerveController,
