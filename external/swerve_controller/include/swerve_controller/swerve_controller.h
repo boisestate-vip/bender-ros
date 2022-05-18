@@ -167,6 +167,8 @@ namespace swerve_controller
         
         void gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg);
         
+        void imuCB(const sensor_msgs::Imu::ConstPtr& msg);
+        
         void updateOdometry(const ros::Time &time);
 
         void updateCommand(const ros::Time &time, const ros::Duration &period);
