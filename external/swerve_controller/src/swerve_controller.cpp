@@ -36,6 +36,7 @@
 
 #include <swerve_controller/swerve_controller.h>
 #include <string>
+#include <sensor_msgs/Imu.h>
 
 namespace swerve_controller
 {
@@ -242,14 +243,22 @@ namespace swerve_controller
         
     }
 
+    // combine odometry and gps data with a given weight. weight will be a max of 1 and the other value will be weighted with the compliment of the provided weight
     double SwerveController::combineData(double &odom, double &gps, double &odomWeight){
         return ((odomWeight * odom) + ((1 - odomWeight) * gps));        
     }
     
-    void SwerverController::gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg){
+    // handle call back data from px4 imu
+    void SwerveController::imuCB(const sensor_msgs::Imu::ConstPtr& msg){
+        
+    }
+    
+    // call back for gps x position data
+    void SwerveController::gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg){
         gps_pose_x.data = gpsMsg->data;        
     }
     
+    // call back for gps y position data
     void SwerverController::gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg){
         gps_pose_y.data = gpsMsg->data;        
     }
