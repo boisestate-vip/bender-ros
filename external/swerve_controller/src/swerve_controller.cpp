@@ -247,11 +247,11 @@ namespace swerve_controller
     }
     
     void SwerverController::gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg){
-        gps_pose_x = gpsMsg->data;        
+        gps_pose_x.data = gpsMsg->data;        
     }
     
     void SwerverController::gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg){
-        gps_pose_y = gpsMsg->data;        
+        gps_pose_y.data = gpsMsg->data;        
     }
     
     void SwerveController::update(const ros::Time &time, const ros::Duration &period)
