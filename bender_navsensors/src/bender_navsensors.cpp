@@ -11,7 +11,7 @@ double init_lat, init_long;
 double total_distance_meters;
 double x_dist, y_dist;
 bool init;
-int coord_conv_factor = 111139;
+const int coord_conv_factor = 111139;
 
 void get_state(const mavros_msgs::State::ConstPtr& msg)
 {
