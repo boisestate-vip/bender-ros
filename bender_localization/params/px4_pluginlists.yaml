@@ -4,5 +4,5 @@ plugin_whitelist:
   - 'sys_*'
   - local_position
   - global_position
-  - imu_pub
+  - imu
   - command
