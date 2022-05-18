@@ -155,8 +155,18 @@ namespace swerve_controller
         CommandTwist last0_cmd_;
         SpeedLimiter limiter_lin_;
         SpeedLimiter limiter_ang_;
+        
+        // gps message
+        std_msgs::Float32 gps_pose_x;
+        std_msgs::Float32 gps_pose_y;
+
 
     private:
+    
+        void gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg);
+        
+        void gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg);
+        
         void updateOdometry(const ros::Time &time);
 
         void updateCommand(const ros::Time &time, const ros::Duration &period);
