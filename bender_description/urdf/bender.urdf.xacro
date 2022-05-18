@@ -41,13 +41,13 @@ POSSIBILITY OF SUCH DAMAGE.
 	<xacro:property name="height" value="0.5" /> <!-- height of the body -->
 
 	<xacro:property name="body_m" value="25.0" /> <!-- mass of the body structure -->
-	<xacro:property name="body_l" value="1.2" /> <!-- length of the body structure -->
-	<xacro:property name="body_w" value="0.8" /> <!-- width of the body structure -->
+	<xacro:property name="body_l" value="0.673" /> <!-- length of the body structure -->
+	<xacro:property name="body_w" value="0.635" /> <!-- width of the body structure -->
 	<xacro:property name="body_h" value="0.2" /> <!-- thickness of the body structure -->
 	<xacro:property name="leg_m" value="1" /> <!-- mass of a thigh leg -->
 	<xacro:property name="leg_r" value="0.025" /> <!-- radius of the leg cylinders -->
 	<xacro:property name="wheel_m" value="5" /> <!-- mass of a single wheel -->
-	<xacro:property name="wheel_r" value="0.11" /> <!-- radius of the wheels -->
+	<xacro:property name="wheel_r" value="0.102" /> <!-- radius of the wheels -->
 	<xacro:property name="wheel_h" value="0.05" /> <!-- thickness of the wheels -->
 	<xacro:property name="wheel_off" value="0.01" /> <!-- thickness of the wheels -->
 	<xacro:property name="joint_damping" value="0.1" /> <!-- damping of all joints -->

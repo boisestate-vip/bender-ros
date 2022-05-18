@@ -95,7 +95,7 @@ void BenderHardware::read()
     {
         const int node_id = canbus_.axis(name).node_id;
         joints_[node_id].position = canbus_.axis(name).pos_enc_estimate * 2.0 * M_PI;
-        joints_[node_id].velocity = canbus_.axis(name).vel_enc_estimate * 2.0 * M_PI / 60.0;
+        joints_[node_id].velocity = canbus_.axis(name).vel_enc_estimate * 2.0 * M_PI;
         joints_[node_id].effort = joints_[node_id].command;
     }
 
