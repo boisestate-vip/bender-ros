@@ -234,16 +234,24 @@ namespace swerve_controller
         sub_command_ = controller_nh.subscribe("cmd_vel", 1,
                                                &SwerveController::cmdVelCallback, this);
         // subscribe to gps x and y position
-        ros::Subscriber x_listen = nh.subscribe("bender_navsensors/position/x", 10, this);
-        ros::Subscriber y_listen = nh.subscribe("bender_navsensors/position/y", 10, this);
+        ros::Subscriber x_listen = nh.subscribe("bender_navsensors/position/x", 10, gpsCBX);
+        ros::Subscriber y_listen = nh.subscribe("bender_navsensors/position/y", 10, gpsCBY);
         return true;
         
         
         
     }
 
-    double combineData(double &odom, double &gps, double &odomWeight){
+    double SwerveController::combineData(double &odom, double &gps, double &odomWeight){
         return ((odomWeight * odom) + ((1 - odomWeight) * gps));        
+    }
+    
+    void SwerverController::gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg){
+        gps_pose_x = gpsMsg->data;        
+    }
+    
+    void SwerverController::gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg){
+        gps_pose_y = gpsMsg->data;        
     }
     
     void SwerveController::update(const ros::Time &time, const ros::Duration &period)
@@ -308,8 +316,8 @@ namespace swerve_controller
             if (odom_pub_->trylock())
             {
                 odom_pub_->msg_.header.stamp = time;
-                odom_pub_->msg_.pose.pose.position.x = combineData(odometry_.getX(), x_listen, 0.5);
-                odom_pub_->msg_.pose.pose.position.y = combineData(odometry_.getY(), y_listen, 0.5);
+                odom_pub_->msg_.pose.pose.position.x = combineData(odometry_.getX(), gps_pose_x, 0.5);
+                odom_pub_->msg_.pose.pose.position.y = combineData(odometry_.getY(), gps_pose_y, 0.5);
                 odom_pub_->msg_.pose.pose.orientation = orientation;
                 odom_pub_->msg_.twist.twist.linear.x = odometry_.getLinearX();
                 odom_pub_->msg_.twist.twist.linear.y = odometry_.getLinearY();
