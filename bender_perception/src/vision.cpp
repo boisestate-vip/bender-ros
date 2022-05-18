@@ -43,7 +43,7 @@ void LaneDetection::init(ros::NodeHandle *nh)
 {
     output_pub_ = it_.advertise(output_topic_, 1);
     scan_pub_ = nh->advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
-    btl_.set_output_frame("logitech_cam_sensor");
+    btl_.set_output_frame("bender_camera");
 }
 
 
@@ -79,6 +79,19 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg,
 }
 
 
+void LaneDetection::gammaCorrection()
+{
+    const double gamma = 5.0;
+    Mat lookUpTable(1, 256, CV_8U);
+    uchar* p = lookUpTable.ptr();
+    for (int i = 0; i < 256; ++i)
+    {
+        p[i] = saturate_cast<uchar>(pow(i / 255.0, gamma) * 255.0);
+    }
+    LUT(img_out_, lookUpTable, img_out_);
+}
+
+
 void LaneDetection::smooth()
 {
     /* 
@@ -94,23 +107,6 @@ void LaneDetection::smooth()
         morphologyEx(morph, morph, CV_MOP_OPEN, kernel);
     }
     img_out_ = morph;
-    /* take morphological gradient */
-    // Mat mgrad;
-    // Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
-    // morphologyEx(morph, mgrad, CV_MOP_GRADIENT, kernel);
-
-    // Mat ch[3];
-    // /* split the gradient image into channels */
-    // split(mgrad, ch);
-    // /* apply Otsu threshold to each channel */
-    // threshold(ch[0], ch[0], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    // threshold(ch[1], ch[1], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    // threshold(ch[2], ch[2], 0, 255, CV_THRESH_BINARY | CV_THRESH_OTSU);
-    // /* merge the channels */
-    // merge(ch, 3, img_out_);
-
-    // threshold(mgrad, mgrad, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    // img_out_ = mgrad;
 }
 
 
@@ -128,8 +124,8 @@ void LaneDetection::quantize()
         data,
         this->num_colors, 
         labels_,
-        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.5 ),
-        2, 
+        TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 20, 0.05 ),
+        4, 
         init_method,
         centers_
     );
@@ -155,7 +151,11 @@ void LaneDetection::quantize()
 void LaneDetection::toBinary()
 {
     cvtColor(img_out_, img_out_, CV_BGR2GRAY);
-    threshold(img_out_, img_out_, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    // threshold(img_out_, img_out_, 0, 255, THRESH_BINARY | THRESH_OTSU);
+    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 7, 3);
+    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 9, 2.5);
+    adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
+    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 11, 2);
     bitwise_not(img_out_, img_out_);
 #ifdef HAVE_OPENCV_XIMGPROC
     // ximgproc::thinning(img_out_, img_out_);
@@ -177,28 +177,20 @@ void LaneDetection::update()
             computeHomography();
             has_homography_ = true;
         }
-        int roi_from_top = 100;
-        int roi_from_bot = 0;
+        int roi_from_top = 160;
+        int roi_from_bot = 60;
         Range rowrange(roi_from_top, img_src_.size().height-roi_from_bot);
         Range colrange(Range::all());
         img_src_(rowrange, colrange).copyTo(img_out_);
-        if (scale != 1.0)
-        {
-            resize(img_out_, img_out_, Size(), scale, scale);
-            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-            smooth();
-            quantize();
-            resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale);
-        }
-        else
-        {
-            cvtColor(img_out_, img_out_, COLOR_BGR2HSV);
-            smooth();
-            quantize();
-        }
-        // toBinary();
-        // copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
-        // projectToGrid();
+        if (scale != 1.0) { resize(img_out_, img_out_, Size(), scale, scale); }
+        cvtColor(img_out_, img_out_, COLOR_BGR2HLS);
+        gammaCorrection();
+        // quantize();
+        if (scale != 1.0) { resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale); }
+        smooth();
+        toBinary();
+        copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
+        projectToGrid();
     } 
     else
     {

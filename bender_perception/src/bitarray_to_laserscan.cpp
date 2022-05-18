@@ -135,41 +135,6 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
             }
         }
     }
-    // for (auto& range : scan_msg->ranges)
-    // {
-    //     if (range == std::numeric_limits<float>::infinity())
-    //     {
-    //         range = 40.0;
-    //     }
-    //     continue;
-    // }
-
-
-    // const int offset = (int)(center_y - scan_height_/2);
-    // depth_row += offset*row_step; // Offset to center of image
-
-    // for(int v = offset; v < offset+scan_height_; ++v, depth_row += row_step) 
-    // {
-    //     for (int u = 0; u < (int)image_msg->width; ++u) // Loop over each pixel in row
-    //     {
-    //         const uint8_t depth = depth_row[u];
-
-    //         double r = depth; // Assign to pass through NaNs and Infs
-    //         const double th = -atan2((double)(u - center_x) * constant_x, unit_scaling); // Atan2(x, z), but depth divides out
-    //         const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
-    //         // if (depth != 0) // Not NaN or Inf
-    //         // { 
-    //         //     // Calculate in XYZ
-    //         //     double x = (u - center_x) * depth * constant_x;
-    //         //     double z = depth * 0.001;
-    //         //     // Calculate actual distance
-    //         //     r = hypot(x, z);
-    //         // }
-    //         if (index >= 0) {
-    //             scan_msg->ranges[index] = 5.0;
-    //         }
-    //     }
-    // }
 }
 
 }
