@@ -1,0 +1,16 @@
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    eth0:
+      # dhcp4: yes
+      dhcp4: no
+      addresses: [10.41.0.1/24]
+  wifis:
+    wlan0:
+      dhcp4: true
+      optional: true
+      access-points:
+        "RPi-f866":
+          password: "robotseverywhere"
+          mode: ap
