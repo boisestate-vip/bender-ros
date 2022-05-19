@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+BASH_ENV=$HOME/.bashrc
+@reboot sleep 5 && tmux new -d -s ros-session $HOME/ros/startup.sh
+
