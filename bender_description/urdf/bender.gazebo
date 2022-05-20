@@ -51,4 +51,15 @@
 		</plugin>
 	</gazebo>
 
+	<gazebo>
+		<plugin name="imu" filename="libhector_gazebo_ros_imu.so">
+			<updateRate>30.0</updateRate>
+			<robotNamespace>/bender</robotNamespace>
+			<bodyName>base_footprint</bodyName>
+			<frameId>base_link</frameId>
+			<topicName>/mavros/imu/data</topicName>
+		</plugin>
+    </gazebo>
+
+
 </robot>
