@@ -103,9 +103,17 @@ void BenderHardware::read()
     boost::mutex::scoped_lock feedback_msg_lock(feedback_msg_mutex_, boost::try_to_lock);
     if (feedback_msg_ && feedback_msg_lock)
     {
-		for (int i = 4; i < 8; i++)
+		if (!steering_joints_homed_)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                steering_joints_home_[i] = feedback_msg_->position[i]; 
+            }
+            steering_joints_homed_ = true;
+        }
+        for (int i = 4; i < 8; i++)
 		{
-			joints_[i].position = feedback_msg_->position[i-4];
+            joints_[i].position = feedback_msg_->position[i-4] - steering_joints_home_[i-4];
 			joints_[i].velocity = feedback_msg_->velocity[i-4];
 			joints_[i].effort   = feedback_msg_->effort[i-4];  
 		}
@@ -127,7 +135,11 @@ void BenderHardware::write()
     cmd_msg_.data.clear();
 	for (int i = 4; i < 8; i++)
 	{
-		cmd_msg_.data.push_back( (float) joints_[i].command );
+        if (steering_joints_homed_) {
+            cmd_msg_.data.push_back( (float) joints_[i].command + steering_joints_home_[i-4]);
+        } else {
+            cmd_msg_.data.push_back( (float) joints_[i].command);
+        }
 	}
 	cmd_drive_pub_.publish(cmd_msg_);
 }
