@@ -8,6 +8,13 @@
         <param name="angle_compensate"    type="bool"   value="true"/>
         <remap from="/scan" to="/bender_sensors/lidar/scan"/>
     </node>
+    
+    <!-- Empty map -->
+    <node name="empty_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
+        <param name="frame_id" value="map"/>
+        <remap from="/map" to="/empty_map" />
+        <remap from="/map_metadata" to="/empty_map_metadata" />
+	</node>
 
     <!-- Static TF (dead reckoning) -->
     <node name="map_to_base_footprint_tf" 

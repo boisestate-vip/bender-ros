@@ -1,5 +1,6 @@
 <launch>
-	<arg name="fcu_url" default="/dev/ttyACM0:57600" />
+
+    <arg name="fcu_url" default="/dev/ttyACM1:57600" />
 	<arg name="gcs_url" default="" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
@@ -7,6 +8,7 @@
 	<arg name="fcu_protocol" default="v2.0" />
 	<arg name="respawn_mavros" default="false" />
 
+    <!-- PX4 stuff -->
 	<include file="$(find mavros)/launch/node.launch">
 		<arg name="pluginlists_yaml" value="$(find bender_localization)/params/px4_pluginlists.yaml" />
 		<arg name="config_yaml" value="$(find bender_localization)/params/px4_config.yaml" />
@@ -19,6 +21,5 @@
 		<arg name="fcu_protocol" value="$(arg fcu_protocol)" />
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
-
-    <node pkg="rosservice" type="rosservice" name="px4_arm" args="call --wait /mavros/cmd/arming 'value: true'" />
+  <node pkg="rosservice" type="rosservice" name="px4_arm" args="call --wait /mavros/cmd/arming 'value: true'" />
 </launch>

@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find bender_localization)/launch/px4_bringup.launch" />
+    <include file="$(find bender_localization)/launch/localization_local.launch" />
+    <include file="$(find bender_localization)/launch/localization_global.launch" />
+</launch>
