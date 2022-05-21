@@ -1,30 +1,30 @@
 base_local_planner: "teb_local_planner/TebLocalPlannerROS"
 TebLocalPlannerROS:
    
+  odom_topic: /odometry/filtered
+  
   # Trajectory
-  teb_autosize: True
-  dt_ref: 0.2
-  dt_hysteresis: 0.02
+  dt_ref: 0.3
+  dt_hysteresis: 0.03
   # max_samples: 300
-  min_samples: 3
-  global_plan_overwrite_orientation: True
-  allow_init_with_backwards_motion: False
+  min_samples: 4
+  global_plan_overwrite_orientation: true
+  allow_init_with_backwards_motion: false
   max_global_plan_lookahead_dist: -0.1
   global_plan_viapoint_sep: -0.1
-  # global_plan_viapoint_sep: 3.0  # small positive value seems to reduce strafing
   global_plan_prune_distance: 1
-  exact_arc_length: False
-  feasibility_check_no_poses: 1
-  publish_feedback: False
+  exact_arc_length: false
+  feasibility_check_no_poses: 4
+  publish_feedback: false
   
   # Robot
-  max_vel_x: 0.7
-  max_vel_x_backwards: 0.2
-  max_vel_y: 0.4
-  max_vel_theta: 0.707
-  acc_lim_x: 5.0
-  acc_lim_y: 3.0
-  acc_lim_theta: 1.0
+  max_vel_x: 0.3
+  max_vel_x_backwards: 0.3
+  max_vel_y: 0.3
+  max_vel_theta: 0.7
+  acc_lim_x: 2.0
+  acc_lim_y: 2.0
+  acc_lim_theta: 3.14
   min_turning_radius: 0.0 # omni-drive robot (can turn on place!)
 
   footprint_model:
@@ -36,43 +36,38 @@ TebLocalPlannerROS:
 
   # GoalTolerance
   xy_goal_tolerance: 0.2
-  yaw_goal_tolerance: 0.2
-  free_goal_vel: False
-  complete_global_plan: False
+  yaw_goal_tolerance: 0.4
+  free_goal_vel: false
     
   # Obstacles
   min_obstacle_dist: 0.5 # This value must also include our robot radius, since footprint_model is set to "point".
-  inflation_dist: 1.0
-  include_costmap_obstacles: True
-  include_dynamic_obstacles: False
+  inflation_dist: 0.6
+  include_costmap_obstacles: true
+  include_dynamic_obstacles: false
   costmap_obstacles_behind_robot_dist: 3.0
   obstacle_poses_affected: 30
-  obstacle_proximity_lower_bound: 0.6
-  obstacle_proximity_upper_bound: 1.2
-  obstacle_proximity_ratio_max_vel: 0.2
   costmap_converter_plugin: ""
-  costmap_converter_spin_thread: True
+  costmap_converter_spin_thread: true
   costmap_converter_rate: 5
 
   # Optimization
-  no_inner_iterations: 4
+  no_inner_iterations: 5
   no_outer_iterations: 4
-  optimization_activate: True
-  optimization_verbose: False
+  optimization_activate: true
+  optimization_verbose: false
   penalty_epsilon: 0.1
   obstacle_cost_exponent: 1.0
-  weight_max_vel_x: 1
-  weight_max_vel_y: 1
-  weight_max_vel_theta: 1
-  weight_acc_lim_x: 1
-  weight_acc_lim_y: 0  # If robot is holonomic, set to 0 to speed up computation
-  weight_acc_lim_theta: 1
+  weight_max_vel_x: 2.0
+  weight_max_vel_y: 2.0
+  weight_max_vel_theta: 1.0
+  weight_acc_lim_x: 1.0
+  weight_acc_lim_y: 0.0  # If robot is holonomic, set to 0 to speed up computation
+  weight_acc_lim_theta: 1.0
   weight_kinematics_nh: 0.1 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
-  weight_kinematics_forward_drive: 0.5
+  weight_kinematics_forward_drive: 1.0
   weight_kinematics_turning_radius: 0.0
   weight_optimaltime: 0.1 # must be > 0
-  weight_shortest_path: 0
-  weight_obstacle: 20
+  weight_obstacle: 50
   weight_inflation: 0.1
   weight_dynamic_obstacle: 100
   weight_dynamic_obstacle_inflation: 0.4
@@ -80,13 +75,12 @@ TebLocalPlannerROS:
   weight_adapt_factor: 2
 
   # Homotopy Class Planner
-  enable_homotopy_class_planning: False # CPU HOGGER
-  enable_multithreading: True
+  enable_homotopy_class_planning: true # CPU HOGGER
+  enable_multithreading: true
   max_number_classes: 4
   selection_cost_hysteresis: 1.0
-  selection_prefer_initial_plan: 0.9
-  selection_obst_cost_scale: 1.0
-  selection_alternative_time_cost: False
+  selection_obst_cost_scale: 100.0
+  selection_alternative_time_cost: false
 
   roadmap_graph_no_samples: 15
   roadmap_graph_area_width: 5
@@ -95,16 +89,16 @@ TebLocalPlannerROS:
   h_signature_threshold: 0.1
   obstacle_heading_threshold: 0.45
   switching_blocking_period: 0.0
-  viapoints_all_candidates: True
-  delete_detours_backwards: True
+  viapoints_all_candidates: true
+  delete_detours_backwards: true
   max_ratio_detours_duration_best_duration: 3.0
-  visualize_hc_graph: False
-  visualize_with_time_as_z_axis_scale: False
+  visualize_hc_graph: false
+  visualize_with_time_as_z_axis_scale: false
 
   # Recovery
-  shrink_horizon_backup: True
+  shrink_horizon_backup: true
   shrink_horizon_min_duration: 10
-  oscillation_recovery: True
+  oscillation_recovery: true
   oscillation_v_eps: 0.1
   oscillation_omega_eps: 0.1
   oscillation_recovery_min_duration: 10

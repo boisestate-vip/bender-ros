@@ -2,7 +2,7 @@ footprint: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
 global_frame: map
 robot_base_frame: base_footprint
 
-transform_tolerance: 0.5
+transform_tolerance: 1.0
 
 obstacle_layer:
  enabled: true

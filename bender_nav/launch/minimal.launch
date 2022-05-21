@@ -1,14 +1,5 @@
 <launch>
 
-    <node name="rplidarNode" pkg="rplidar_ros"  type="rplidarNode" output="screen">
-        <param name="serial_port"         type="string" value="/dev/ttyUSB0"/>
-        <param name="serial_baudrate"     type="int"    value="115200"/><!--A1/A2 -->
-        <param name="frame_id"            type="string" value="rplidar"/>
-        <param name="inverted"            type="bool"   value="false"/>
-        <param name="angle_compensate"    type="bool"   value="true"/>
-        <remap from="/scan" to="/bender_sensors/lidar/scan"/>
-    </node>
-    
     <!-- Empty map -->
     <node name="empty_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
         <param name="frame_id" value="map"/>
@@ -16,10 +7,11 @@
         <remap from="/map_metadata" to="/empty_map_metadata" />
 	</node>
 
-    <!-- Static TF (dead reckoning) -->
-    <node name="map_to_base_footprint_tf" 
+    <node name="map_to_base_footprint_tf"
         pkg="tf2_ros" type="static_transform_publisher" 
         args="0 0 0 0 0 0 map odom" output="screen" />
+
+    <node name="rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_nav)/config/hardware-nav.rviz" output="screen"/>
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />
