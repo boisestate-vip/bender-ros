@@ -11,10 +11,10 @@
     <include file="$(find bender_gazebo)/launch/empty_world.launch">
         <arg name="gui" value="$(arg gui)" />
         <arg name="rviz" value="false" />
-        <arg name="world_name" value="$(find bender_gazebo)/worlds/parking_garage.world"/> 
+        <!-- <arg name="world_name" value="$(find bender_gazebo)/worlds/parking_garage.world"/>  -->
         <arg name="x"     value="$(arg x)"/>
         <arg name="y"     value="$(arg y)"/>
-        <arg name="z"     value="40.0"/>
+        <arg name="z"     value="0.0"/>
         <arg name="roll"  value="0"/>
         <arg name="pitch" value="0"/>
         <arg name="yaw"   value="$(arg yaw)"/>
