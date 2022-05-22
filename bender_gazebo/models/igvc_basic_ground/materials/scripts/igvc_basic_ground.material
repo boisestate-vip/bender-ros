@@ -10,7 +10,7 @@ material igvc_basic_ground/Image
 
             texture_unit
             {
-                texture IGVC_basic.png
+                texture IGVC_basic_asphalt.png
                 filtering trilinear
             }
         }
