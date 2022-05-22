@@ -150,15 +150,14 @@ TrajectoryPlannerROS:
 TebLocalPlannerROS: 
   # Trajectory
   teb_autosize: true
-  dt_ref: 0.1
+  dt_ref: 0.25
   dt_hysteresis: 0.01
-  min_samples: 3
   global_plan_overwrite_orientation: true
   allow_init_with_backwards_motion: true
   max_global_plan_lookahead_dist: 3.0
   force_reinit_new_goal_dist: 1.0
   force_reinit_new_goal_angular: 0.78
-  feasibility_check_no_poses: 4
+  feasibility_check_no_poses: 5
   feasibility_check_lookahead_distance: -1.0
   exact_arc_length: false
   publish_feedback: false
@@ -181,8 +180,8 @@ TebLocalPlannerROS:
   max_vel_x: 0.7
   max_vel_x_backwards: 0.3
   max_vel_theta: 0.785
-  acc_lim_x: 2.5
-  acc_lim_theta: 3.14
+  acc_lim_x: 0.5
+  acc_lim_theta: 0.5
   is_footprint_dynamic: false
   use_proportional_saturation: false
   transform_tolerance: 0.5
@@ -191,14 +190,14 @@ TebLocalPlannerROS:
   cmd_angle_instead_rotvel: false
   max_vel_y: 0.3
   max_vel_trans: 0.0
-  acc_lim_y: 2.5
+  acc_lim_y: 0.5
 
   # GoalTolerance
   xy_goal_tolerance: 0.15
   yaw_goal_tolerance: 0.174
   free_goal_vel: false
   trans_stopped_vel: 0.02
-  theta_stopped_vel: 0.02
+  theta_stopped_vel: 0.01
 
   # Obstacles
   min_obstacle_dist: 0.5 # This value must also include our robot radius, since footprint_model is set to "point".
@@ -222,17 +221,18 @@ TebLocalPlannerROS:
   weight_max_vel_y: 2.0
   weight_max_vel_theta: 1.0
   weight_acc_lim_x: 1.0
-  weight_acc_lim_y: 0.0  # If robot is holonomic, set to 0 to speed up computation
+  weight_acc_lim_y: 1.0  # If robot is holonomic, set to 0 to speed up computation
   weight_acc_lim_theta: 1.0
-  weight_kinematics_nh: 0.1 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
-  weight_kinematics_forward_drive: 100.0
+  weight_kinematics_nh: 0.5 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
+  weight_kinematics_forward_drive: 2.0
   weight_kinematics_turning_radius: 0.0
-  weight_optimaltime: 10.0 # must be > 0
-  weight_shortest_path: 5.0
+  weight_optimaltime: 5.0 # must be > 0
+  weight_shortest_path: 3.0
   weight_obstacle: 50
   weight_inflation: 0.1
   weight_dynamic_obstacle: 100
   weight_dynamic_obstacle_inflation: 0.4
+  weight_velocity_obstacle_ratio: 10.0
   weight_viapoint: 1.0
   weight_adapt_factor: 2
 

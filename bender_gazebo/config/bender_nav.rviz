@@ -4,6 +4,7 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /RobotModel1
         - /GlobalPath1
         - /odom_filtered_local1
         - /odom_filtered_local1/Shape1
@@ -75,7 +76,7 @@ Visualization Manager:
           Show Trail: false
         base_link:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         bender_camera:
@@ -89,22 +90,22 @@ Visualization Manager:
           Show Trail: false
         leg_lf:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_lh:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_rf:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_rh:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         rplidar:
@@ -492,7 +493,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 60.600196838378906
+      Scale: 91.04828643798828
       Target Frame: base_footprint
       X: 0
       Y: 0
