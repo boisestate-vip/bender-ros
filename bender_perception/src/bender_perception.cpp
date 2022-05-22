@@ -24,7 +24,7 @@ int main (int argc, char **argv)
     }
 
     /* Image processing class */
-    LaneDetection ld(&nh, "/bender_camera/image_raw");
+    LaneDetection ld(nh, "/bender_camera/image_raw");
     ld.scale = scale;
     ld.num_colors = num_colors;
 

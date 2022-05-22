@@ -1,49 +1,54 @@
 #include <bender_perception/vision.h>
 
 
-LaneDetection::LaneDetection(ros::NodeHandle *nh, int device_id) :
+LaneDetection::LaneDetection(ros::NodeHandle &nh, int device_id) :
     device_id_(device_id),
     input_topic_(""),
-    it_(*nh),
+    it_(nh),
     tf_listener_(tf_buffer_)
 {
     // Starts capture device
     cam_capture_.open(device_id_);
     if (!cam_capture_.isOpened()) {
         ROS_ERROR("Cannot open camera ID %d", device_id_);
-        nh->shutdown();
+        nh.shutdown();
     }
 
     // Read image and store it to img_src_
     cam_capture_.read(img_src_);
     if (img_src_.empty()) {
         ROS_ERROR("Cannot read from camera ID %d", device_id_);
-        nh->shutdown();
+        nh.shutdown();
     } 
     init(nh);
 
 }
 
 
-LaneDetection::LaneDetection(ros::NodeHandle *nh, string input_topic, string output_topic) :
+LaneDetection::LaneDetection(ros::NodeHandle &nh, string input_topic, string output_topic) :
     device_id_(UINT8_MAX),
     input_topic_(input_topic),
     output_topic_(output_topic),
-    it_(*nh),
+    it_(nh),
     tf_listener_(tf_buffer_)
 {
     // Subscribe to input image
-    std::string topic = nh->resolveName(input_topic_);
+    std::string topic = nh.resolveName(input_topic_);
     input_sub_ = it_.subscribeCamera(topic, 1, &LaneDetection::readImage, this);
     init(nh);
 }
 
 
-void LaneDetection::init(ros::NodeHandle *nh)
+void LaneDetection::init(ros::NodeHandle &nh)
 {
     output_pub_ = it_.advertise(output_topic_, 1);
-    scan_pub_ = nh->advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
+    scan_pub_ = nh.advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
     btl_.set_output_frame("bender_camera");
+
+    dynamic_recfg_server_ = std::make_shared<dynamic_reconfigure::Server<VisionConfig>>(nh);
+    dynamic_reconfigure::Server<VisionConfig>::CallbackType cb = std::bind(
+        &LaneDetection::reconfigureCB, this, std::placeholders::_1, std::placeholders::_2);
+    dynamic_recfg_server_->setCallback(cb);
 }
 
 
@@ -79,6 +84,22 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg,
 }
 
 
+void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
+{
+    ROS_INFO("Reconfigure Request: %d %f %s %s %d", 
+        config.int_param, config.double_param, 
+        config.str_param.c_str(), 
+        config.bool_param?"True":"False", 
+        config.size);
+}
+
+
+void LaneDetection::applyThreshold()
+{
+    inRange(img_src_, Scalar(0, 0, 0), Scalar(255, 255, 255), img_src_);
+}
+
+
 void LaneDetection::gammaCorrection()
 {
     const double gamma = 5.0;
@@ -100,7 +121,7 @@ void LaneDetection::smooth()
     with an enlarging kernel
     */
     Mat morph = img_out_.clone();
-    for (int r = 1; r < 3; r++)
+    for (int r = 1; r < 5; r++)
     {
         Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(2*r+1, 2*r+1));
         morphologyEx(morph, morph, CV_MOP_CLOSE, kernel);
@@ -186,9 +207,9 @@ void LaneDetection::update()
         cvtColor(img_out_, img_out_, COLOR_BGR2HLS);
         gammaCorrection();
         // quantize();
-        if (scale != 1.0) { resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale); }
         smooth();
         toBinary();
+        if (scale != 1.0) { resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale); }
         copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
     } 

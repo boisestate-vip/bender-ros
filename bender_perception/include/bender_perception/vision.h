@@ -2,19 +2,26 @@
 #define BENDER_PERCEPTION_VISION_H
 
 #include <ros/ros.h>
+
+#include <dynamic_reconfigure/server.h>
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
-#include <opencv2/opencv.hpp>
-#include <opencv2/ximgproc.hpp>
+
 #include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_geometry/pinhole_camera_model.h>
 #include <tf2_ros/transform_listener.h>
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/ximgproc.hpp>
+
 #include <bender_perception/bitarray_to_laserscan.h>
+#include <bender_perception/BenderPerceptionConfig.h>
 
 using namespace cv;
 using namespace std;
+
+typedef bender_perception::BenderPerceptionConfig VisionConfig;
 
 class LaneDetection
 {
@@ -22,13 +29,13 @@ class LaneDetection
         /*
          * Constructor for reading from USB Camera
          */
-        LaneDetection(ros::NodeHandle *nh, int device_id=0);
+        LaneDetection(ros::NodeHandle &nh, int device_id=0);
 
 
         /*
          * Constructor for reading from rostopic `input_topic_`
          */
-        LaneDetection(ros::NodeHandle *nh, string input_topic, string output_topic="/bender_perception/image_quantized");
+        LaneDetection(ros::NodeHandle &nh, string input_topic, string output_topic="/bender_perception/image_quantized");
 
 
         /*
@@ -47,6 +54,11 @@ class LaneDetection
          * Update image source by reading USB camera input
          */
         void readImage();
+
+        /*
+         * Apply color threshold to get rid of objects that are not roads
+         */
+        void applyThreshold();
 
         /*
          * Gamma correction for better contrast
@@ -111,8 +123,12 @@ class LaneDetection
          */
         int num_colors = 2;
 
-    private:
+    protected:
+        void reconfigureCB(VisionConfig& config, uint32_t level);
 
+    private:
+        std::shared_ptr<dynamic_reconfigure::Server<VisionConfig>> dynamic_recfg_server_;
+        
         VideoCapture cam_capture_;
         const uint8_t device_id_;
         const string wname_ = "bender_perception_vision";
@@ -138,7 +154,7 @@ class LaneDetection
         bool has_homography_ = false;
         Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters
 
-        void init(ros::NodeHandle *nh);
+        void init(ros::NodeHandle &nh);
 
         bitarray_to_laserscan::BitArrayToLaserScan btl_;
         ros::Publisher scan_pub_;

@@ -3,6 +3,7 @@ project(bender_perception)
 
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
+  dynamic_reconfigure
   image_transport
   image_geometry
   nav_msgs
@@ -16,6 +17,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(OpenCV REQUIRED COMPONENTS
   opencv_ximgproc
+)
+
+generate_dynamic_reconfigure_options(
+  cfg/BenderPerception.cfg
 )
 
 catkin_package(
@@ -39,6 +44,7 @@ add_library(bender_perception_lib
   src/lidar.cpp
   src/bitarray_to_laserscan.cpp
 )
+add_dependencies(bender_perception_lib ${PROJECT_NAME}_gencfg)
 add_dependencies(bender_perception_lib 
   ${${PROJECT_NAME}_EXPORTED_TARGETS} 
   ${catkin_EXPORTED_TARGETS}
