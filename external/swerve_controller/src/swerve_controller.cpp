@@ -377,6 +377,15 @@ namespace swerve_controller
             rh_steering = atan2(a, d);
         }
 
+        // Guarantee minimum angle difference to next steer angle by using previous steer angle
+        if (enable_min_steering_difference_)
+        {
+            minSteeringDifference(lf_steering, lf_steering_last_, lf_speed);
+            minSteeringDifference(rf_steering, rf_steering_last_, rf_speed);
+            minSteeringDifference(lh_steering, lh_steering_last_, lh_speed);
+            minSteeringDifference(rh_steering, rh_steering_last_, rh_speed);
+        }
+
         // Invert wheel speed or brake if steering angle exceeds desired limits
         if (!clipSteeringAngle(lf_steering, lf_speed) ||
             !clipSteeringAngle(rf_steering, rf_speed) ||
@@ -386,14 +395,6 @@ namespace swerve_controller
             ROS_WARN("Braking because clipped steering angle was impossible to reach");
             brake();
             return;
-        }
-
-        // Guarantee minimum angle difference to next steer angle by using previous steer angle
-        if (enable_min_steering_difference_){
-            minSteeringDifference(lf_steering, lf_steering_last, lf_speed);
-            minSteeringDifference(rf_steering, rf_steering_last, rf_speed);
-            minSteeringDifference(lh_steering, lh_steering_last, lh_speed);
-            minSteeringDifference(rh_steering, rh_steering_last, rh_speed);
         }
 
         // Set wheels velocities
@@ -414,10 +415,10 @@ namespace swerve_controller
             rh_steering_joint_->setCommand(rh_steering);
         }
 
-        lf_steering_last = lf_steering;
-        rf_steering_last = rf_steering;
-        lh_steering_last = lh_steering;
-        rh_steering_last = rh_steering;
+        lf_steering_last_ = lf_steering;
+        rf_steering_last_ = rf_steering;
+        lh_steering_last_ = lh_steering;
+        rh_steering_last_ = rh_steering;
     }
 
     void SwerveController::brake()
@@ -429,6 +430,10 @@ namespace swerve_controller
             rf_wheel_joint_->setCommand(0.0);
             lh_wheel_joint_->setCommand(0.0);
             rh_wheel_joint_->setCommand(0.0);
+            // lf_steering_joint_->setCommand(0.0);
+            // rf_steering_joint_->setCommand(0.0);
+            // lh_steering_joint_->setCommand(0.0);
+            // rh_steering_joint_->setCommand(0.0);
         }
     }
 
@@ -467,20 +472,22 @@ namespace swerve_controller
 
     void SwerveController::minSteeringDifference(double &steering, double &previous_steering, double &speed)
     {
-        double polarSteering = 0;
+        double equiv_steering = 0;
         if (steering > 0)
         {
-            polarSteering = steering - M_PI;
+            equiv_steering = steering - M_PI;
         }
         else
         {
-            polarSteering = steering + M_PI;
+            equiv_steering = steering + M_PI;
         }
 
         // Take whichever is closer, the computed angle or its polar opposite angle
-        if (std::abs(previous_steering - steering) > std::abs(previous_steering - polarSteering))
+        double dist1 = fabs(angles::shortest_angular_distance(previous_steering, steering));
+        double dist2 = fabs(angles::shortest_angular_distance(previous_steering, equiv_steering));
+        if (dist1 > dist2)
         {
-            steering = polarSteering;
+            steering = equiv_steering;
             speed = -speed;
         }
     }

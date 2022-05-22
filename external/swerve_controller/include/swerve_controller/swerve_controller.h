@@ -50,6 +50,7 @@
 #include <nav_msgs/Odometry.h>
 #include <tf/tfMessage.h>
 #include <tf/transform_datatypes.h>
+#include <angles/angles.h>
 
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_publisher.h>
@@ -159,10 +160,7 @@ namespace swerve_controller
         SpeedLimiter limiter_lin_;
         SpeedLimiter limiter_ang_;
 
-        double lf_steering_last;
-        double rf_steering_last;
-        double lh_steering_last;
-        double rh_steering_last;
+        double lf_steering_last_, rf_steering_last_, lh_steering_last_, rh_steering_last_;
 
     private:
         void updateOdometry(const ros::Time &time);

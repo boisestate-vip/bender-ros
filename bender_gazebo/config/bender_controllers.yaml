@@ -19,8 +19,8 @@ bender:
         rh_steering: "leg_rh_joint"
 
         # Range of motion of steering motors
-        min_steering_angle: -1.58
-        max_steering_angle: 1.58
+        max_steering_angle: 6.284
+        min_steering_angle: -6.284
 
         # Other
         publish_rate: 50
@@ -38,13 +38,13 @@ bender:
         # wheel_base: 1.2
 
     # Low-Level Controllers -------------------------------------
-    gazebo_ros_control:
-        pid_gains:
-            leg_lf_joint: {p: 20.0, i: 0.5, d: 5}
-            leg_rf_joint: {p: 20.0, i: 0.5, d: 5}
-            leg_lh_joint: {p: 20.0, i: 0.5, d: 5}
-            leg_rh_joint: {p: 20.0, i: 0.5, d: 5}
-            wheel_lf_joint: {p: 20.0, i: 2.0, d: 0.001}
-            wheel_rf_joint: {p: 20.0, i: 2.0, d: 0.001}
-            wheel_lh_joint: {p: 20.0, i: 2.0, d: 0.001}
-            wheel_rh_joint: {p: 20.0, i: 2.0, d: 0.001}
+    # gazebo_ros_control:
+    #     pid_gains:
+    #         leg_lf_joint: {p: 20.0, i: 0.5, d: 5}
+    #         leg_rf_joint: {p: 20.0, i: 0.5, d: 5}
+    #         leg_lh_joint: {p: 20.0, i: 0.5, d: 5}
+    #         leg_rh_joint: {p: 20.0, i: 0.5, d: 5}
+    #         wheel_lf_joint: {p: 20.0, i: 2.0, d: 0.001}
+    #         wheel_rf_joint: {p: 20.0, i: 2.0, d: 0.001}
+    #         wheel_lh_joint: {p: 20.0, i: 2.0, d: 0.001}
+    #         wheel_rh_joint: {p: 20.0, i: 2.0, d: 0.001}
