@@ -39,7 +39,7 @@
     <group if="$(eval teleop == 'joy')">
         <node pkg="joy" type="joy_node" name="joy_node">
             <param name="dev" value="/dev/input/js0"/>
-            <param name="deadzone" value="0.05"/>
+            <param name="deadzone" value="0.025"/>
             <param name="autorepeat_rate" value="10"/>
         </node>
         <node pkg="teleop_twist_joy" name="logitech_f710" type="teleop_node">
@@ -50,18 +50,18 @@
                     x: 1
                     y: 0
                 scale_linear:
-                    x: 0.5
-                    y: 0.5                  # Set to zero to disable Y velocity (non-holonomic)
+                    x: 0.2
+                    y: 0.1                  # Set to zero to disable Y velocity (non-holonomic)
                 axis_angular:               # Yaw Rotation - Right Stick
                     yaw: 2
                 scale_angular:
-                    yaw: 1.0
+                    yaw: 0.1
                 enable_turbo_button: 6      # Left trigger
                 scale_linear_turbo:
-                    x: 2.0
-                    y: 2.0
+                    x: 0.5
+                    y: 0.25
                 scale_angular_turbo:
-                    yaw: 1.57
+                    yaw: 0.2
             </rosparam>
         </node>
     </group>
@@ -97,5 +97,9 @@
             priority: 100
         </rosparam>
     </node>
+
+    <!-- <include file="$(find bender_localization)/launch/px4_bringup.launch" /> -->
+    <!-- <include file="$(find bender_localization)/launch/localization_local.launch" /> -->
+    <!-- <include file="$(find bender_localization)/launch/localization_global.launch" /> -->
 
 </launch>

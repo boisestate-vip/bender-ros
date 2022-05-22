@@ -3,9 +3,19 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /RobotModel1
+        - /GlobalPath1
+        - /odom_filtered_local1
+        - /odom_filtered_local1/Shape1
+        - /odom_filtered_local1/Covariance1/Position1
+        - /Imu1/Box properties1
+        - /Imu1/Axes properties1
+        - /Imu1/Acceleration properties1
+        - /odom_wheel1
+        - /odom_wheel1/Shape1
       Splitter Ratio: 0.5
-    Tree Height: 146
+    Tree Height: 526
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -66,7 +76,7 @@ Visualization Manager:
           Show Trail: false
         base_link:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         bender_camera:
@@ -80,22 +90,22 @@ Visualization Manager:
           Show Trail: false
         leg_lf:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_lh:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_rf:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         leg_rh:
           Alpha: 0.699999988079071
-          Show Axes: true
+          Show Axes: false
           Show Trail: false
           Value: true
         rplidar:
@@ -170,12 +180,12 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: map
       Draw Behind: false
-      Enabled: false
+      Enabled: true
       Name: GlobalMap
       Topic: /bender_nav/global_costmap/costmap
       Unreliable: false
       Use Timestamp: false
-      Value: false
+      Value: true
     - Alpha: 0.699999988079071
       Class: rviz/Map
       Color Scheme: map
@@ -211,8 +221,8 @@ Visualization Manager:
       Class: rviz/Path
       Color: 25; 255; 0
       Enabled: true
-      Head Diameter: 0.30000001192092896
-      Head Length: 0.20000000298023224
+      Head Diameter: 0.05000000074505806
+      Head Length: 0.10000000149011612
       Length: 0.30000001192092896
       Line Style: Lines
       Line Width: 0.029999999329447746
@@ -221,11 +231,11 @@ Visualization Manager:
         X: 0
         Y: 0
         Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
+      Pose Color: 25; 255; 255
+      Pose Style: Arrows
       Queue Size: 10
       Radius: 0.029999999329447746
-      Shaft Diameter: 0.10000000149011612
+      Shaft Diameter: 0.05000000074505806
       Shaft Length: 0.10000000149011612
       Topic: /bender_nav/TebLocalPlannerROS/global_plan
       Unreliable: false
@@ -352,6 +362,100 @@ Visualization Manager:
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: false
+        Position:
+          Alpha: 0.10000000149011612
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
+      Enabled: true
+      Keep: 5
+      Name: odom_filtered_local
+      Position Tolerance: 0.10000000149011612
+      Queue Size: 10
+      Shape:
+        Alpha: 0.5
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 255; 25; 0
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 0.5
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /odometry/filtered
+      Unreliable: false
+      Value: true
+    - Acceleration properties:
+        Acc. vector alpha: 1
+        Acc. vector color: 255; 0; 0
+        Acc. vector scale: 1
+        Derotate acceleration: true
+        Enable acceleration: false
+      Axes properties:
+        Axes scale: 1
+        Enable axes: true
+      Box properties:
+        Box alpha: 0.30000001192092896
+        Box color: 255; 0; 0
+        Enable box: true
+        x_scale: 1
+        y_scale: 1
+        z_scale: 1
+      Class: rviz_imu_plugin/Imu
+      Enabled: true
+      Name: Imu
+      Queue Size: 10
+      Topic: /mavros/imu/data
+      Unreliable: false
+      Value: true
+      fixed_frame_orientation: true
+    - Angle Tolerance: 0.10000000149011612
+      Class: rviz/Odometry
+      Covariance:
+        Orientation:
+          Alpha: 0.5
+          Color: 255; 255; 127
+          Color Style: Unique
+          Frame: Local
+          Offset: 1
+          Scale: 1
+          Value: true
+        Position:
+          Alpha: 0.30000001192092896
+          Color: 204; 51; 204
+          Scale: 1
+          Value: true
+        Value: false
+      Enabled: true
+      Keep: 5
+      Name: odom_wheel
+      Position Tolerance: 0.10000000149011612
+      Queue Size: 10
+      Shape:
+        Alpha: 0.5
+        Axes Length: 1
+        Axes Radius: 0.10000000149011612
+        Color: 85; 255; 127
+        Head Length: 0.30000001192092896
+        Head Radius: 0.10000000149011612
+        Shaft Length: 0.5
+        Shaft Radius: 0.05000000074505806
+        Value: Arrow
+      Topic: /bender/swerve_controller/odom
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 97; 120; 134
@@ -389,7 +493,7 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 37.34672164916992
+      Scale: 91.04828643798828
       Target Frame: base_footprint
       X: 0
       Y: 0
@@ -397,10 +501,10 @@ Visualization Manager:
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 688
+  Height: 1389
   Hide Left Dock: false
   Hide Right Dock: true
-  QMainWindow State: 000000ff00000000fd00000004000000000000015600000216fc0200000009fb0000001200530065006c0065006300740069006f006e000000003b0000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b0000011b000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000e00520061007700200049006d0067010000015c000000760000001600fffffffb0000001a005100750061006e00740069007a0065006400200049006d006701000001d8000000790000001600ffffff000000010000014f000004d3fc0200000004fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000003b0000035f0000005c00fffffffb0000000a0056006900650077007300000003a00000016e000000a000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a5000001690000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004ee0000003efc0100000002fb0000000800540069006d00650100000000000004ee0000024400fffffffb0000000800540069006d00650100000000000004500000000000000000000003920000021600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000156000004d3fc0200000009fb0000001200530065006c0065006300740069006f006e000000003b0000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003b00000297000000c700fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000e00520061007700200049006d006701000002d8000001140000001600fffffffb0000001a005100750061006e00740069007a0065006400200049006d006701000003f20000011c0000001600ffffff000000010000014f000004d3fc0200000004fb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000003b000003770000005c00fffffffb0000000a00560069006500770073000000003b000004d3000000a000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000003a5000001690000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004ee0000003efc0100000002fb0000000800540069006d00650100000000000004ee0000024400fffffffb0000000800540069006d0065010000000000000450000000000000000000000392000004d300000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Quantized Img:
     collapsed: false
   Raw Img:
@@ -410,7 +514,7 @@ Window Geometry:
   Time:
     collapsed: false
   Tool Properties:
-    collapsed: true
+    collapsed: false
   Views:
     collapsed: true
   Width: 1262

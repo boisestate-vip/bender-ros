@@ -56,6 +56,9 @@ class BenderHardware : public hardware_interface::RobotHW
         }
         joints_[8];
 
+        double steering_joints_home_[4];
+        bool steering_joints_homed_ = false;
+
         // This pointer is set from the ROS thread.
         std_msgs::Float32MultiArray cmd_msg_;
         sensor_msgs::JointState::ConstPtr feedback_msg_;

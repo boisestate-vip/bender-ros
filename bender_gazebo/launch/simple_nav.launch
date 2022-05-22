@@ -33,11 +33,19 @@
         <remap from="/map" to="/obstacle_map" />
         <remap from="/map_metadata" to="/obstacle_map_metadata" />
 	</node>
+    <node name="empty_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
+        <param name="frame_id" value="map"/>
+        <remap from="/map" to="/empty_map" />
+        <remap from="/map_metadata" to="/empty_map_metadata" />
+	</node>
 
     <!-- Static TF (dead reckoning) -->
     <node name="map_to_base_footprint_tf" unless="$(arg groundtruth)" 
         pkg="tf2_ros" type="static_transform_publisher" 
         args="$(arg x) $(arg y) 0 $(arg yaw) 0 0 map odom" output="screen" />
+
+    <!-- Launch ekf -->
+    <include file="$(find bender_localization)/launch/localization_local.launch" />
 
     <!-- Launch move_base -->
     <include file="$(find bender_nav)/launch/move_base.launch" />

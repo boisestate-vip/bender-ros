@@ -1,0 +1,47 @@
+<launch>
+
+    <arg name="groundtruth" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="rviz" default="true"/>
+    <arg name="x" default="10"/>
+    <arg name="y" default="0"/>
+    <arg name="yaw" default="0"/>
+    <arg name="teleop" default="rqt" doc="[rqt, joy, none]"/> 
+
+    <include file="$(find bender_gazebo)/launch/empty_world.launch">
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="rviz" value="false" />
+        <!-- <arg name="world_name" value="$(find bender_gazebo)/worlds/parking_garage.world"/>  -->
+        <arg name="x"     value="$(arg x)"/>
+        <arg name="y"     value="$(arg y)"/>
+        <arg name="z"     value="0.0"/>
+        <arg name="roll"  value="0"/>
+        <arg name="pitch" value="0"/>
+        <arg name="yaw"   value="$(arg yaw)"/>
+        <arg name="groundtruth" value="$(arg groundtruth)"/>
+        <arg name="teleop" value="$(arg teleop)"/>
+    </include>
+
+    <!-- Load known map -->
+    <node name="empty_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
+        <param name="frame_id" value="map"/>
+        <remap from="/map" to="/empty_map" />
+        <remap from="/map_metadata" to="/empty_map_metadata" />
+	</node>
+
+    <!-- Static TF (dead reckoning) -->
+    <node name="map_to_base_footprint_tf" unless="$(arg groundtruth)" 
+        pkg="tf2_ros" type="static_transform_publisher" 
+        args="0 $(arg y) 0 $(arg yaw) 0 0 map odom" output="screen" />
+
+    <!-- Launch ekf -->
+    <include file="$(find bender_localization)/launch/localization_local.launch" />
+
+    <!-- Launch move_base -->
+    <include file="$(find bender_nav)/launch/move_base.launch" />
+   
+    <!-- RViz to visualize robot state -->
+    <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" respawn="false" args="-d $(find bender_gazebo)/config/bender_nav.rviz" output="screen"/>
+
+
+</launch>

@@ -35,7 +35,7 @@
     <!-- Convert joint states to TF transforms -->
 	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
         respawn="false" output="screen">
-	    <rosparam param="publish_frequency">10</rosparam>
+	    <rosparam param="publish_frequency">30</rosparam>
         <remap from="robot_description" to="/bender/robot_description" />
 		<remap from="/joint_states" to="/bender/joint_states" />
 	</node>
