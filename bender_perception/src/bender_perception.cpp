@@ -17,11 +17,18 @@ int main (int argc, char **argv)
     
     /* Spin */
     ros::Rate rate(publish_rate);
+    int skip_publish = 0;
     while (nh.ok())
     {
         ld.update();
         // ld.displayOutput();
-        ld.publishQuantized();
+        if (skip_publish > 20)
+        {
+            ld.publishQuantized();
+        } else 
+        {
+            skip_publish++;
+        }
 
         ros::spinOnce();
         rate.sleep();

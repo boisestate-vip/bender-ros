@@ -58,7 +58,9 @@ void LaneDetection::init(ros::NodeHandle &nh)
     vision_nh.param("color1_thresh_ub", params.color_thresh_ub[0], params.color_thresh_ub[0]);
     vision_nh.param("color2_thresh_ub", params.color_thresh_ub[1], params.color_thresh_ub[1]);
     vision_nh.param("color3_thresh_ub", params.color_thresh_ub[2], params.color_thresh_ub[2]);
+    vision_nh.param("projection_distance", params.projection_distance, params.projection_distance);
     vision_nh.param("threshold_adaptive", params.threshold_adaptive, params.threshold_adaptive);
+    vision_nh.param("threshold_lock", params.threshold_lock, params.threshold_lock);
     vision_nh.param("adaptive_threshold_method", params.adaptive_type, params.adaptive_type);
     vision_nh.param("adaptive_threshold_mean_subtract", params.adaptive_mean_subtract, params.adaptive_mean_subtract);
     vision_nh.param("adaptive_threshold_block_size", params.adaptive_block_size, params.adaptive_block_size);
@@ -138,7 +140,13 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     params.color_thresh_ub[0] = config.color1_thresh_ub;
     params.color_thresh_ub[1] = config.color2_thresh_ub;
     params.color_thresh_ub[2] = config.color3_thresh_ub;
+    if (config.projection_distance != params.projection_distance)
+    {
+        computeHomography();
+    }
+    params.projection_distance = config.projection_distance;
     params.threshold_adaptive = config.threshold_adaptive;
+    params.threshold_lock = config.threshold_lock;
     params.adaptive_type = config.adaptive_threshold_method;
     params.adaptive_block_size = config.adaptive_threshold_block_size;
     params.adaptive_mean_subtract = config.adaptive_threshold_mean_subtract;
@@ -244,9 +252,18 @@ void LaneDetection::toBinary()
         );
     } else 
     {
-        threshold(img_out_, img_out_, 0, 255, static_cast<ThresholdTypes>(params.threshold_type));
+        if (!params.threshold_lock || params.threshold_lock != 255) 
+        {
+            threshold_val_ = threshold(img_out_, img_out_, 0, 255, static_cast<ThresholdTypes>(params.threshold_type));
+        } else if ((params.threshold_type == THRESH_BINARY) || (params.threshold_type == THRESH_BINARY_INV))
+        {
+            threshold(img_out_, img_out_, threshold_val_, 255, static_cast<ThresholdTypes>(params.threshold_type));
+        } else
+        {
+            threshold(img_out_, img_out_, threshold_val_, 255, THRESH_BINARY);
+        }
+            
     }
-    bitwise_not(img_out_, img_out_);
 #ifdef HAVE_OPENCV_XIMGPROC
     // ximgproc::thinning(img_out_, img_out_);
 #endif
@@ -286,8 +303,8 @@ void LaneDetection::update()
         gammaCorrection();
         // applyColorThreshold();
         // quantize();
-        smooth();
         toBinary();
+        smooth();
         if (params.scale != 1.0) {
             resize(img_out_, img_out_, Size(), 1.0/params.scale, 1.0/params.scale);
         }
@@ -303,15 +320,15 @@ void LaneDetection::update()
 
 void LaneDetection::computeHomography()
 {
-    Size image_size = img_src_.size();
-    double w = (double)image_size.width;
-    double h = (double)image_size.height;
+    const Size image_size = img_src_.size();
+    const double w = image_size.width;
+    const double h = image_size.height;
 
     // TODO: Load these from a yaml file
-    double alpha = (15-90) * M_PI / 180.0;
-    double beta = 0;
-    double gamma = 0; 
-    double dist = 0.6;
+    const double alpha = (15-90) * M_PI / 180.0;
+    const double beta = 0;
+    const double gamma = 0; 
+    const double dist = params.projection_distance; // 0.6;
 
     // Projecion matrix 2D -> 3D
     Matx43d A1(

@@ -121,7 +121,9 @@ class LaneDetection
             int roi_from_bot = 60;
             int color_thresh_lb[3] = {0, 0, 0};
             int color_thresh_ub[3] = {255, 255, 255};
+            double projection_distance = 0.6;
             bool threshold_adaptive = true;
+            bool threshold_lock = false;
             int adaptive_type = ADAPTIVE_THRESH_GAUSSIAN_C;
             int adaptive_block_size = 11;
             double adaptive_mean_subtract = 2.0;
@@ -157,6 +159,7 @@ class LaneDetection
         Mat img_out_;
         Mat labels_, centers_;
         bool has_centers_ = false;
+        double threshold_val_ = 255;
         
         bool has_homography_ = false;
         Matx33d H_;     // Homography matrix computed from extrinsic and intrinsic parameters
