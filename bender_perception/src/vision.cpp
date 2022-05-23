@@ -225,7 +225,7 @@ void LaneDetection::quantize()
 
 void LaneDetection::toBinary()
 {
-    // cvtColor(img_out_, img_out_, COLOR_BGR2GRAY);
+    cvtColor(img_out_, img_out_, COLOR_BGR2GRAY);
     if (params.threshold_adaptive)
     {
         adaptiveThreshold(img_out_, img_out_, 255, 
