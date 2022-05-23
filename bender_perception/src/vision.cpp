@@ -228,12 +228,20 @@ void LaneDetection::toBinary()
     cvtColor(img_out_, img_out_, COLOR_BGR2GRAY);
     if (params.threshold_adaptive)
     {
+        int threshold_type = params.threshold_type;
+        if ((threshold_type != THRESH_BINARY) || (threshold_type != THRESH_BINARY_INV))
+        {
+            ROS_WARN_ONCE("Parameter threshold_type is not valid for adaptiveThreshold method. Use either THRESH_BINARY or THRESH_BINARY_INV.");
+            threshold_type = static_cast<int>(THRESH_BINARY);
+        }
+        int block_size = params.adaptive_block_size;
+        block_size += ((block_size % 2) == 0) ? 1 : 0;
         adaptiveThreshold(img_out_, img_out_, 255, 
-        static_cast<AdaptiveThresholdTypes>(params.adaptive_type), 
-        static_cast<ThresholdTypes>(params.threshold_type), 
-        params.adaptive_block_size, 
-        params.adaptive_mean_subtract
-    );
+            static_cast<AdaptiveThresholdTypes>(params.adaptive_type), 
+            static_cast<ThresholdTypes>(threshold_type), 
+            block_size, 
+            params.adaptive_mean_subtract
+        );
     } else 
     {
         threshold(img_out_, img_out_, 0, 255, static_cast<ThresholdTypes>(params.threshold_type));
