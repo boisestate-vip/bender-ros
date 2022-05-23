@@ -58,7 +58,7 @@ class LaneDetection
         /*
          * Apply color threshold to get rid of objects that are not roads
          */
-        void applyThreshold();
+        void applyColorThreshold();
 
         /*
          * Gamma correction for better contrast
@@ -112,23 +112,30 @@ class LaneDetection
         void publishQuantized();
 
         
-        /*
-         * Variable for scaling the image size, must be between 0 and 1
-         */
-        float scale;
-
-
-        /*
-         * The `k` in the k-means algorithm
-         */
-        int num_colors = 2;
+        struct Params {
+            double scale = 1;
+            double gamma = 5.0;
+            int num_colors = 2;
+            int smooth_kernel_size = 5;
+            int roi_from_top = 160;
+            int roi_from_bot = 60;
+            int color_thresh_lb[3] = {0, 0, 0};
+            int color_thresh_ub[3] = {255, 255, 255};
+            bool threshold_adaptive = true;
+            int adaptive_type = ADAPTIVE_THRESH_GAUSSIAN_C;
+            int adaptive_block_size = 11;
+            double adaptive_mean_subtract = 2.0;
+            int threshold_type = THRESH_BINARY;
+            int color_type = COLOR_BGR2HLS;
+        } params;
 
     protected:
         void reconfigureCB(VisionConfig& config, uint32_t level);
 
     private:
         std::shared_ptr<dynamic_reconfigure::Server<VisionConfig>> dynamic_recfg_server_;
-        
+        boost::mutex config_mutex_;
+
         VideoCapture cam_capture_;
         const uint8_t device_id_;
         const string wname_ = "bender_perception_vision";

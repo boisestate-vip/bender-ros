@@ -45,10 +45,47 @@ void LaneDetection::init(ros::NodeHandle &nh)
     scan_pub_ = nh.advertise<sensor_msgs::LaserScan>("scan_from_image", 1);
     btl_.set_output_frame("bender_camera");
 
-    dynamic_recfg_server_ = std::make_shared<dynamic_reconfigure::Server<VisionConfig>>(nh);
+    ros::NodeHandle vision_nh(nh, "vision");
+    vision_nh.param("scale", params.scale, params.scale);
+    vision_nh.param("gamma", params.gamma, params.gamma);
+    vision_nh.param("num_colors", params.num_colors, params.num_colors);
+    vision_nh.param("smooth_kernel_size", params.smooth_kernel_size, params.smooth_kernel_size);
+    vision_nh.param("roi_from_top", params.roi_from_top, params.roi_from_top);
+    vision_nh.param("roi_from_bot", params.roi_from_bot, params.roi_from_bot);
+    vision_nh.param("color1_thresh_lb", params.color_thresh_lb[0], params.color_thresh_lb[0]);
+    vision_nh.param("color2_thresh_lb", params.color_thresh_lb[1], params.color_thresh_lb[1]);
+    vision_nh.param("color3_thresh_lb", params.color_thresh_lb[2], params.color_thresh_lb[2]);
+    vision_nh.param("color1_thresh_ub", params.color_thresh_ub[0], params.color_thresh_ub[0]);
+    vision_nh.param("color2_thresh_ub", params.color_thresh_ub[1], params.color_thresh_ub[1]);
+    vision_nh.param("color3_thresh_ub", params.color_thresh_ub[2], params.color_thresh_ub[2]);
+    vision_nh.param("threshold_adaptive", params.threshold_adaptive, params.threshold_adaptive);
+    vision_nh.param("adaptive_threshold_method", params.adaptive_type, params.adaptive_type);
+    vision_nh.param("adaptive_threshold_mean_subtract", params.adaptive_mean_subtract, params.adaptive_mean_subtract);
+    vision_nh.param("adaptive_threshold_block_size", params.adaptive_block_size, params.adaptive_block_size);
+    vision_nh.param("threshold_type", params.threshold_type, params.threshold_type);
+    vision_nh.param("color_conversion", params.color_type, params.color_type);
+
+    if (!(params.scale > 0.0 && params.scale <= 1.0)) 
+    {
+        ROS_WARN("The parameter `scale' must be in the range (0,1]. Got %.1f, ignoring and using `scale' = 1.0", params.scale);
+        params.scale = 1.0;
+    }
+    if (!(params.gamma > 0 && params.gamma <= 100)) 
+    {
+        ROS_WARN("The parameter `gamma' must be in the range (0,100]. Got %d, ignoring and using `gamma' = 5.0", params.num_colors);
+        params.gamma = 5.0;
+    }
+    if (!(params.num_colors > 1 && params.num_colors <= 255)) 
+    {
+        ROS_WARN("The parameter `num_colors' must be in the range [2,255]. Got %d, ignoring and using `num_colors' = 2", params.num_colors);
+        params.num_colors = 2;
+    }
+
+    dynamic_recfg_server_ = std::make_shared<dynamic_reconfigure::Server<VisionConfig>>(vision_nh);
     dynamic_reconfigure::Server<VisionConfig>::CallbackType cb = std::bind(
         &LaneDetection::reconfigureCB, this, std::placeholders::_1, std::placeholders::_2);
     dynamic_recfg_server_->setCallback(cb);
+
 }
 
 
@@ -86,28 +123,45 @@ void LaneDetection::readImage(const sensor_msgs::ImageConstPtr &img_msg,
 
 void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
 {
-    ROS_INFO("Reconfigure Request: %d %f %s %s %d", 
-        config.int_param, config.double_param, 
-        config.str_param.c_str(), 
-        config.bool_param?"True":"False", 
-        config.size);
+    // Lock this to prevent parameters changing mid-cycle
+    boost::mutex::scoped_lock l(config_mutex_);
+
+    params.scale = config.scale;
+    params.gamma = config.gamma;
+    params.num_colors = config.num_colors;
+    params.smooth_kernel_size = config.smooth_kernel_size;
+    params.roi_from_top = config.roi_from_top;
+    params.roi_from_bot = config.roi_from_bot;
+    params.color_thresh_lb[0] = config.color1_thresh_lb;
+    params.color_thresh_lb[1] = config.color2_thresh_lb;
+    params.color_thresh_lb[2] = config.color3_thresh_lb;
+    params.color_thresh_ub[0] = config.color1_thresh_ub;
+    params.color_thresh_ub[1] = config.color2_thresh_ub;
+    params.color_thresh_ub[2] = config.color3_thresh_ub;
+    params.threshold_adaptive = config.threshold_adaptive;
+    params.adaptive_type = config.adaptive_threshold_method;
+    params.adaptive_block_size = config.adaptive_threshold_block_size;
+    params.adaptive_mean_subtract = config.adaptive_threshold_mean_subtract;
+    params.threshold_type = config.threshold_type;
+    params.color_type = config.color_conversion;
 }
 
 
-void LaneDetection::applyThreshold()
+void LaneDetection::applyColorThreshold()
 {
-    inRange(img_src_, Scalar(0, 0, 0), Scalar(255, 255, 255), img_src_);
+    const auto lb = Scalar(params.color_thresh_lb[0], params.color_thresh_lb[1], params.color_thresh_lb[2]);
+    const auto ub = Scalar(params.color_thresh_ub[0], params.color_thresh_ub[1], params.color_thresh_ub[2]);
+    inRange(img_out_, lb, ub, img_out_);
 }
 
 
 void LaneDetection::gammaCorrection()
 {
-    const double gamma = 5.0;
     Mat lookUpTable(1, 256, CV_8U);
     uchar* p = lookUpTable.ptr();
     for (int i = 0; i < 256; ++i)
     {
-        p[i] = saturate_cast<uchar>(pow(i / 255.0, gamma) * 255.0);
+        p[i] = saturate_cast<uchar>(pow(i / 255.0, params.gamma) * 255.0);
     }
     LUT(img_out_, lookUpTable, img_out_);
 }
@@ -121,7 +175,7 @@ void LaneDetection::smooth()
     with an enlarging kernel
     */
     Mat morph = img_out_.clone();
-    for (int r = 1; r < 5; r++)
+    for (int r = 1; r < params.smooth_kernel_size; r++)
     {
         Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(2*r+1, 2*r+1));
         morphologyEx(morph, morph, CV_MOP_CLOSE, kernel);
@@ -143,7 +197,7 @@ void LaneDetection::quantize()
     const int init_method = has_centers_ ? KMEANS_USE_INITIAL_LABELS | KMEANS_PP_CENTERS : KMEANS_PP_CENTERS;
     double compactness = kmeans(
         data,
-        this->num_colors, 
+        this->params.num_colors, 
         labels_,
         TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 20, 0.05 ),
         4, 
@@ -171,12 +225,19 @@ void LaneDetection::quantize()
 
 void LaneDetection::toBinary()
 {
-    cvtColor(img_out_, img_out_, CV_BGR2GRAY);
-    // threshold(img_out_, img_out_, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 7, 3);
-    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 9, 2.5);
-    adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 11, 2);
-    // adaptiveThreshold(img_out_, img_out_, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 11, 2);
+    // cvtColor(img_out_, img_out_, COLOR_BGR2GRAY);
+    if (params.threshold_adaptive)
+    {
+        adaptiveThreshold(img_out_, img_out_, 255, 
+        static_cast<AdaptiveThresholdTypes>(params.adaptive_type), 
+        static_cast<ThresholdTypes>(params.threshold_type), 
+        params.adaptive_block_size, 
+        params.adaptive_mean_subtract
+    );
+    } else 
+    {
+        threshold(img_out_, img_out_, 0, 255, static_cast<ThresholdTypes>(params.threshold_type));
+    }
     bitwise_not(img_out_, img_out_);
 #ifdef HAVE_OPENCV_XIMGPROC
     // ximgproc::thinning(img_out_, img_out_);
@@ -193,24 +254,36 @@ void LaneDetection::update()
     
     if (!img_src_.empty())
     {
+        // Lock this to prevent parameters changing mid-cycle
+        boost::mutex::scoped_lock l(config_mutex_);
+
+        // If Homography wasn't already computed, do it once and remember it
         if (!has_homography_)
         {
             computeHomography();
             has_homography_ = true;
         }
-        int roi_from_top = 160;
-        int roi_from_bot = 60;
-        Range rowrange(roi_from_top, img_src_.size().height-roi_from_bot);
+
+        // Crop to ROI
+        Range rowrange(params.roi_from_top, img_src_.size().height-params.roi_from_bot);
         Range colrange(Range::all());
         img_src_(rowrange, colrange).copyTo(img_out_);
-        if (scale != 1.0) { resize(img_out_, img_out_, Size(), scale, scale); }
-        cvtColor(img_out_, img_out_, COLOR_BGR2HLS);
+
+
+        if (params.scale != 1.0) 
+        { 
+            resize(img_out_, img_out_, Size(), params.scale, params.scale); 
+        }
+        cvtColor(img_out_, img_out_, static_cast<ColorConversionCodes>(params.color_type));
         gammaCorrection();
+        // applyColorThreshold();
         // quantize();
         smooth();
         toBinary();
-        if (scale != 1.0) { resize(img_out_, img_out_, Size(), 1.0/scale, 1.0/scale); }
-        copyMakeBorder(img_out_, img_out_, roi_from_top, roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
+        if (params.scale != 1.0) {
+            resize(img_out_, img_out_, Size(), 1.0/params.scale, 1.0/params.scale);
+        }
+        copyMakeBorder(img_out_, img_out_, params.roi_from_top, params.roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
     } 
     else
