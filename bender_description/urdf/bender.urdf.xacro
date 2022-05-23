@@ -37,7 +37,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 	<!-- Constants for robot dimensions -->
 	<xacro:property name="PI" value="3.1415926535897931"/>
-	<xacro:property name="DEG2RAD" value="0.017453292519943295"/>
 	<xacro:property name="height" value="0.5" /> <!-- height of the body -->
 
 	<xacro:property name="body_m" value="25.0" /> <!-- mass of the body structure -->
@@ -336,9 +335,9 @@ POSSIBILITY OF SUCH DAMAGE.
 	</link>
 
 	<!-- SENSORS: -->
-	<xacro:logitech_c910 name="bender_camera" connected_to="base_link">
+	<xacro:logitech_c910 name="bender_camera" connected_to="base_link" tilt_degrees="${camera_tilt_angle_deg}">
 		<origin xyz="${-body_l/2} 0 ${body_h/2 + camera_mount_height}" 
-			    rpy="0 ${camera_tilt_angle_deg*DEG2RAD} 0" />
+			    rpy="0 0 0" />
     </xacro:logitech_c910>
 	<xacro:rplidar name="rplidar" connected_to="base_link">
 		<origin xyz="${body_l/2} 0 ${body_h/2 + lidar_mount_height}" 

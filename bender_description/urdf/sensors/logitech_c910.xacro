@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
 
-  <xacro:macro name="logitech_c910" params="name:='' connected_to:='' *origin">
+  <xacro:macro name="logitech_c910" params="name:='' connected_to:='' tilt_degrees:='0' *origin">
+  <xacro:property name="DEG2RAD" value="0.017453292519943295"/>
 
     <xacro:unless value="${connected_to == ''}">
       <joint name="${name}_joint" type="fixed">
@@ -31,7 +32,7 @@
     <joint name="${name}_sensor_joint" type="fixed">
       <parent link="${name}"/>
       <child link="${name}_sensor"/>
-      <origin xyz="0.005 0 0" rpy="0 0 0" />
+      <origin xyz="0.005 0 0" rpy="0 ${tilt_degrees*DEG2RAD} 0" />
     </joint>
 
     <!-- Gazebo sensor plugin -->
@@ -47,7 +48,7 @@
             <format>R8G8B8</format>
           </image>
           <clip>
-            <near>0.02</near>
+            <near>0.03</near>
             <far>300</far>
           </clip>
         </camera>

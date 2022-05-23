@@ -6,9 +6,7 @@
     <arg name="num_colors"    default="2"/>
 
 	<node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">
-        <param name="publish_rate" value="$(arg publish_rate)" />     <!-- default = 10 -->
-        <param name="scale" value="$(arg scale)" />          <!-- default = 1.0 -->
-        <param name="num_colors" value="$(arg num_colors)" />       <!-- default = 2, do not exceed 8 or computer will struggle -->
+        <rosparam file="$(find bender_perception)/config/bender_vision.yaml" command="load" />
 	</node>
 
      <node name="image_view" if="$(arg show_output)" pkg="image_view" type="image_view">
