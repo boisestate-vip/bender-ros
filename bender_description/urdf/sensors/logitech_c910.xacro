@@ -57,8 +57,8 @@
           <alwaysOn>true</alwaysOn>
           <updateRate>10.0</updateRate>
           <cameraName>${name}</cameraName>
-          <imageTopicName>/${name}/image_raw</imageTopicName>
-          <cameraInfoTopicName>/${name}/camera_info</cameraInfoTopicName>
+          <imageTopicName>image_rect_color</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
           <frameName>${name}</frameName>
           <hackBaseline>0.07</hackBaseline>
           <distortionK1>0.0</distortionK1>

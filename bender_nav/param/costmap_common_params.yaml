@@ -2,7 +2,7 @@ footprint: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
 global_frame: map
 robot_base_frame: base_footprint
 
-transform_tolerance: 1.0
+transform_tolerance: 2.0
 
 obstacle_layer:
  enabled: true
@@ -11,8 +11,8 @@ obstacle_layer:
  track_unknown_space: true
  footprint_clearing_enabled: true
  combination_method: 1 # "Overwrite" (0), "Maximum" (1) and "Nothing" (99).
- observation_sources: laser_scan_sensor
-#  scan_from_image: {data_type: LaserScan, topic: /bender_perception/scan_from_image_filtered, marking: true, clearing: true}
+ observation_sources: laser_scan_sensor scan_from_image
+ scan_from_image: {data_type: LaserScan, topic: /bender_perception/scan_from_image_filtered, marking: true, clearing: true}
  laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: true}
 
 inflation_layer:

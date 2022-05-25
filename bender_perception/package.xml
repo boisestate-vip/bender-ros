@@ -13,9 +13,12 @@
   <build_depend>tf2_sensor_msgs</build_depend>
   <build_depend>costmap_2d</build_depend>
 
+  <depend>camera_calibration</depend>
   <depend>cv_bridge</depend>
   <depend>dynamic_reconfigure</depend>
+  <depend>flir_camera_driver</depend>
   <depend>image_geometry</depend>
+  <depend>image_pipeline</depend>
   <depend>image_transport</depend>
   <depend>laser_filters</depend>
   <depend>nav_msgs</depend>
