@@ -6,7 +6,7 @@
     <include file="$(find bender_description)/launch/description.launch" />
 
     <node pkg="bender_base" required="true" type="node" name="bender_base_node" output="screen">
-	<param name="port" value="/dev/ttyACM0" />
+	<param name="port" value="/dev/ttyACM2" />
     </node>
 
     <!-- Load the control parameters -->
@@ -50,18 +50,18 @@
                     x: 1
                     y: 0
                 scale_linear:
-                    x: 0.2
-                    y: 0.1                  # Set to zero to disable Y velocity (non-holonomic)
+                    x: 0.3
+                    y: 0.2                  # Set to zero to disable Y velocity (non-holonomic)
                 axis_angular:               # Yaw Rotation - Right Stick
                     yaw: 2
                 scale_angular:
-                    yaw: 0.1
+                    yaw: 0.4
                 enable_turbo_button: 6      # Left trigger
                 scale_linear_turbo:
-                    x: 0.5
-                    y: 0.25
+                    x: 0.7
+                    y: 0.5
                 scale_angular_turbo:
-                    yaw: 0.2
+                    yaw: 0.7
             </rosparam>
         </node>
     </group>
