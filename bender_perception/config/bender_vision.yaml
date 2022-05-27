@@ -9,11 +9,11 @@ vision:
   roi_from_top: 160
   roi_from_bot: 30
   color1_thresh_lb: 0
-  color2_thresh_lb: 0
+  color2_thresh_lb: 20
   color3_thresh_lb: 0
   color1_thresh_ub: 255
   color2_thresh_ub: 255
-  color3_thresh_ub: 255
+  color3_thresh_ub: 50
   projection_distance: 1.345
   threshold_adaptive: false
   threshold_lock: true

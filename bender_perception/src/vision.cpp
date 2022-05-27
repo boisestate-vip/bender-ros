@@ -165,7 +165,11 @@ void LaneDetection::applyColorThreshold()
 {
     const auto lb = Scalar(params.color_thresh_lb[0], params.color_thresh_lb[1], params.color_thresh_lb[2]);
     const auto ub = Scalar(params.color_thresh_ub[0], params.color_thresh_ub[1], params.color_thresh_ub[2]);
-    inRange(img_out_, lb, ub, img_out_);
+    Mat mask = Mat::zeros(img_out_.size(), CV_8U);
+    Mat dst = Mat::zeros(img_out_.size(), CV_8UC3);
+    inRange(img_out_, lb, ub, mask);
+    bitwise_and(img_out_, img_out_, dst, mask);
+    img_out_ = dst;
 }
 
 
@@ -307,7 +311,7 @@ void LaneDetection::update()
         }
         cvtColor(img_out_, img_out_, static_cast<ColorConversionCodes>(params.color_type));
         gammaCorrection();
-        // applyColorThreshold();
+        applyColorThreshold();
         // quantize();
         toBinary();
         smooth();
