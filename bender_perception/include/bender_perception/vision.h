@@ -116,6 +116,7 @@ class LaneDetection
             double scale = 1;
             double laser_dist_scale_x = 1.0;
             double laser_dist_scale_y = 1.0;
+            double laser_dist_offset = 0.0;
             double gamma = 5.0;
             int num_colors = 2;
             int smooth_kernel_size = 5;

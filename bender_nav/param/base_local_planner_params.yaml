@@ -189,7 +189,7 @@ TebLocalPlannerROS:
   wheelbase: 0.0
   cmd_angle_instead_rotvel: false
   max_vel_y: 0.3
-  max_vel_trans: 0.0
+  max_vel_trans: 0.7
   acc_lim_y: 0.5
 
   # GoalTolerance
@@ -237,7 +237,7 @@ TebLocalPlannerROS:
   weight_adapt_factor: 2
 
   # Homotopy Class Planner
-  enable_homotopy_class_planning: true # CPU HOGGER
+  enable_homotopy_class_planning: false # CPU HOGGER
   enable_multithreading: true
   max_number_classes: 4
   max_number_plans_in_current_class: 4

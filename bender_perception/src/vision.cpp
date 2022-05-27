@@ -133,7 +133,8 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     params.scale = config.scale;
     params.laser_dist_scale_x = config.laser_dist_scale_x;
     params.laser_dist_scale_y = config.laser_dist_scale_y;
-    btl_.set_dist_scale(params.laser_dist_scale_x, params.laser_dist_scale_y);
+    params.laser_dist_offset = config.laser_dist_offset;
+    btl_.set_dist_scale(params.laser_dist_scale_x);
     params.gamma = config.gamma;
     params.num_colors = config.num_colors;
     params.smooth_kernel_size = config.smooth_kernel_size;
@@ -315,6 +316,11 @@ void LaneDetection::update()
         }
         copyMakeBorder(img_out_, img_out_, params.roi_from_top, params.roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
+
+        /*
+        img_src_(Range::all(), Range::all()).copyTo(img_out_);
+        projectToGrid();
+        */
     } 
     else
     {
@@ -333,7 +339,7 @@ void LaneDetection::computeHomography()
     const double alpha = (15-90) * M_PI / 180.0;
     const double beta = 0;
     const double gamma = 0; 
-    const double dist = params.projection_distance; // 0.6;
+    const double dist = params.projection_distance;
 
     // Projecion matrix 2D -> 3D
     Matx43d A1(
@@ -370,14 +376,14 @@ void LaneDetection::computeHomography()
     Matx44d T(
         1, 0, 0, 0,  
         0, 1, 0, 0,  
-        0, 0, 1, dist*cam_model_.fx(),  
+        0, 0, 1, cam_model_.fx()/dist,
         0, 0, 0, 1
     ); 
     
     // K - intrinsic matrix 
     Matx34d K(
-        cam_model_.fx(), 0, w/2, 0,
-        0, cam_model_.fy(), h/2, 0,
+        cam_model_.fx(), 0, cam_model_.cx(), 0,
+        0, cam_model_.fy(), cam_model_.cy(), 0,
         0, 0, 1, 0
     ); 
 

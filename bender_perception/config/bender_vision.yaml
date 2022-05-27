@@ -1,7 +1,8 @@
 vision:
   scale: 1.0
-  laser_dist_scale_x: 1.0
+  laser_dist_scale_x: 8.0
   laser_dist_scale_y: 1.0
+  laser_dist_offset: 0.673
   gamma: 5.0
   num_colors: 2
   smooth_kernel_size: 3
@@ -13,7 +14,7 @@ vision:
   color1_thresh_ub: 255
   color2_thresh_ub: 255
   color3_thresh_ub: 255
-  projection_distance: 1.0
+  projection_distance: 1.345
   threshold_adaptive: false
   threshold_lock: true
   adaptive_threshold_method: 1 # 0=ADAPTIVE_THRESH_MEAN_C; 1=ADAPTIVE_THRESH_GAUSSIAN_C
