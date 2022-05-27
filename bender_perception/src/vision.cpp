@@ -47,6 +47,8 @@ void LaneDetection::init(ros::NodeHandle &nh)
 
     ros::NodeHandle vision_nh(nh, "vision");
     vision_nh.param("scale", params.scale, params.scale);
+    vision_nh.param("laser_dist_scale_x", params.laser_dist_scale_x, params.laser_dist_scale_x);
+    vision_nh.param("laser_dist_scale_y", params.laser_dist_scale_y, params.laser_dist_scale_y);
     vision_nh.param("gamma", params.gamma, params.gamma);
     vision_nh.param("num_colors", params.num_colors, params.num_colors);
     vision_nh.param("smooth_kernel_size", params.smooth_kernel_size, params.smooth_kernel_size);
@@ -129,6 +131,9 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     boost::mutex::scoped_lock l(config_mutex_);
 
     params.scale = config.scale;
+    params.laser_dist_scale_x = config.laser_dist_scale_x;
+    params.laser_dist_scale_y = config.laser_dist_scale_y;
+    btl_.set_dist_scale(params.laser_dist_scale_x, params.laser_dist_scale_y);
     params.gamma = config.gamma;
     params.num_colors = config.num_colors;
     params.smooth_kernel_size = config.smooth_kernel_size;
@@ -142,9 +147,9 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     params.color_thresh_ub[2] = config.color3_thresh_ub;
     if (config.projection_distance != params.projection_distance)
     {
+        params.projection_distance = config.projection_distance;
         computeHomography();
     }
-    params.projection_distance = config.projection_distance;
     params.threshold_adaptive = config.threshold_adaptive;
     params.threshold_lock = config.threshold_lock;
     params.adaptive_type = config.adaptive_threshold_method;

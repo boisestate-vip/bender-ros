@@ -8,6 +8,8 @@ BitArrayToLaserScan::BitArrayToLaserScan()
   , range_min_(0.5)
   , range_max_(50.0)
   , scan_height_(1)
+  , dist_scale_x_(1.0)
+  , dist_scale_y_(1.0)
 {
 }
 
@@ -29,6 +31,12 @@ void BitArrayToLaserScan::set_range_limits(const float range_min, const float ra
 void BitArrayToLaserScan::set_scan_height(const int scan_height)
 {
     scan_height_ = scan_height;
+}
+
+void BitArrayToLaserScan::set_dist_scale(const double dist_scale_x, const double dist_scale_y)
+{
+    dist_scale_x_ = dist_scale_x;
+    dist_scale_y_ = dist_scale_y;
 }
 
 void BitArrayToLaserScan::set_output_frame(const std::string& output_frame_id)
@@ -107,8 +115,8 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
     const int origin_y = image_msg->height;
 
     // Combine unit conversion (if necessary) with scaling by focal length for computing (X,Y)
-    const double unit_scaling = 12.0;  // mm to m
-    const float constant_x = unit_scaling / cam_model.fx();
+    const double unit_scaling = 1.0/1000.0;  // mm to m
+    const float constant_x = cam_model.fx() * unit_scaling;
 
     const uint8_t* this_row = reinterpret_cast<const uint8_t*>(&image_msg->data[0]);
     const int row_step = image_msg->step / sizeof(uint8_t);
@@ -122,10 +130,10 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
             {
                 continue;
             }
-            const double x = -u + origin_x;
-            const double y = -v + origin_y;
+            const double x = (-u + origin_x)/cam_model.fx() * dist_scale_x_;
+            const double y = (-v + origin_y)/cam_model.fy() * dist_scale_y_;
             const double th = atan2(x,y);
-            const double r = hypot(x,y) * constant_x;
+            const double r = hypot(x,y);
             const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
             // std::cout << "index = " << std::to_string(index) << std::endl;
             // std::cout << "(u,v) = (" << u << "," << v << "), theta = " << std::to_string(th*180.0/M_PI) << std::endl;

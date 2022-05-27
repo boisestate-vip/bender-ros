@@ -66,6 +66,8 @@ class BitArrayToLaserScan
 		 */
 		void set_scan_height(const int scan_height);
 
+		void set_dist_scale(const double dist_scale_x, const double dist_scale_y);
+
 		/**
 		 * Sets the frame_id for the output LaserScan.
 		 *
@@ -83,6 +85,7 @@ class BitArrayToLaserScan
 		double range_min_;
 		double range_max_;
 		int scan_height_;
+		double dist_scale_x_, dist_scale_y_;
 		
 		std::string output_frame_id_;
 		
