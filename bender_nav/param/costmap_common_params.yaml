@@ -1,4 +1,6 @@
-footprint: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
+# footprint: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
+robot_radius: 0.33
+footprint_padding: 0.1
 global_frame: map
 robot_base_frame: base_footprint
 
@@ -6,19 +8,29 @@ transform_tolerance: 2.0
 
 obstacle_layer:
  enabled: true
- obstacle_range: 5.0
- raytrace_range: 6.0
  track_unknown_space: true
  footprint_clearing_enabled: true
  combination_method: 1 # "Overwrite" (0), "Maximum" (1) and "Nothing" (99).
  observation_sources: laser_scan_sensor scan_from_image
- scan_from_image: {data_type: LaserScan, topic: /bender_perception/scan_from_image_filtered, marking: true, clearing: true}
- laser_scan_sensor: {data_type: LaserScan, topic: /bender_sensors/lidar/scan, marking: true, clearing: true}
+ scan_from_image: 
+    data_type: LaserScan 
+    topic: /bender_perception/scan_from_image_filtered 
+    marking: true 
+    clearing: true
+    obstacle_range: 5.0
+    raytrace_range: 5.0
+ laser_scan_sensor: 
+    data_type: LaserScan
+    topic: /bender_sensors/lidar/scan
+    marking: true
+    clearing: true
+    obstacle_range: 5.0
+    raytrace_range: 3.0
 
 inflation_layer:
   enabled:              true
-  cost_scaling_factor:  10.0  # exponential rate at which the obstacle cost drops off (default: 10)
-  inflation_radius:     1.2  # max. distance from an obstacle at which costs are incurred for planning paths.
+  cost_scaling_factor:  15.0  # exponential rate at which the obstacle cost drops off (default: 10)
+  inflation_radius:     0.5  # max. distance from an obstacle at which costs are incurred for planning paths.
 
 empty_layer:
   enabled:              true

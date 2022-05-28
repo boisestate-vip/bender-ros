@@ -3,7 +3,7 @@ vision:
   laser_dist_scale_x: 8.0
   laser_dist_scale_y: 1.0
   laser_dist_offset: 0.673
-  gamma: 5.0
+  gamma: 8.0
   num_colors: 2
   smooth_kernel_size: 3
   roi_from_top: 160

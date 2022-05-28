@@ -6,7 +6,7 @@ TrajectoryPlannerROS:
   acc_lim_y: 2.5
   acc_lim_theta: 3.2
   max_vel_x: 0.7
-  min_vel_x: 0.1
+  min_vel_x: -0.7
   max_vel_theta: 1.0
   min_vel_theta: -1.0
   min_in_place_vel_theta: 0.4
@@ -157,7 +157,7 @@ TebLocalPlannerROS:
   max_global_plan_lookahead_dist: 3.0
   force_reinit_new_goal_dist: 1.0
   force_reinit_new_goal_angular: 0.78
-  feasibility_check_no_poses: 5
+  feasibility_check_no_poses: 0
   feasibility_check_lookahead_distance: -1.0
   exact_arc_length: false
   publish_feedback: false
@@ -166,7 +166,7 @@ TebLocalPlannerROS:
   visualize_with_time_as_z_axis_scale: false
 
   # ViaPoints
-  global_plan_viapoint_sep: -0.1
+  global_plan_viapoint_sep: 1.0
   global_plan_prune_distance: 1.0
   via_points_ordered: false
   
@@ -177,7 +177,7 @@ TebLocalPlannerROS:
     # vertices: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
     # type: "circular"
     # radius: 0.6
-  max_vel_x: 0.7
+  max_vel_x: 0.6
   max_vel_x_backwards: 0.3
   max_vel_theta: 0.785
   acc_lim_x: 0.5
@@ -189,7 +189,7 @@ TebLocalPlannerROS:
   wheelbase: 0.0
   cmd_angle_instead_rotvel: false
   max_vel_y: 0.3
-  max_vel_trans: 0.7
+  max_vel_trans: 0.6
   acc_lim_y: 0.5
 
   # GoalTolerance
@@ -200,8 +200,8 @@ TebLocalPlannerROS:
   theta_stopped_vel: 0.01
 
   # Obstacles
-  min_obstacle_dist: 0.5 # This value must also include our robot radius, since footprint_model is set to "point".
-  inflation_dist: 0.6
+  min_obstacle_dist: 0.45 # This value must also include our robot radius, since footprint_model is set to "point".
+  inflation_dist: 1.0
   include_costmap_obstacles: true
   include_dynamic_obstacles: false
   costmap_obstacles_behind_robot_dist: 3.0

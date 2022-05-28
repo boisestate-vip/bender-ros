@@ -5,4 +5,4 @@ scan_filter_chain:
     filter_type: 0
     max_range: 20.0
     max_range_difference: 0.2
-    filter_window: 5
+    filter_window: 10
