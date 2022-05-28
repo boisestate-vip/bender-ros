@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Status1
+        - /LaserScan1
       Splitter Ratio: 0.5
     Tree Height: 334
   - Class: rviz/Selection
@@ -78,14 +79,14 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
+        Max Value: 0
+        Min Value: 0
         Value: true
       Axis: Z
       Channel Name: intensity
       Class: rviz/LaserScan
-      Color: 255; 255; 255
-      Color Transformer: Intensity
+      Color: 239; 41; 41
+      Color Transformer: FlatColor
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
@@ -96,7 +97,7 @@ Visualization Manager:
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.009999999776482582
+      Size (m): 0.029999999329447746
       Style: Flat Squares
       Topic: /bender_perception/scan_from_image_filtered
       Unreliable: false

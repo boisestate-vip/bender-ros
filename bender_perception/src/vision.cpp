@@ -135,6 +135,7 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     params.laser_dist_scale_y = config.laser_dist_scale_y;
     params.laser_dist_offset = config.laser_dist_offset;
     btl_.set_dist_scale(params.laser_dist_scale_x);
+    btl_.set_dist_offset(params.laser_dist_offset);
     params.gamma = config.gamma;
     params.num_colors = config.num_colors;
     params.smooth_kernel_size = config.smooth_kernel_size;

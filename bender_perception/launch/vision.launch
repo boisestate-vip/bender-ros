@@ -6,7 +6,7 @@
     <arg name="num_colors"    default="2"/>
 
 	<node name="bender_perception" pkg="bender_perception" type="bender_perception" required="true" output="screen">
-        <rosparam file="$(find bender_perception)/config/bender_vision.yaml" command="load" />
+        <rosparam file="$(find bender_perception)/config/bender_vision_usb_camera.yaml" command="load" />
         <remap from="image" to="/bender_camera/image_rect_color"/>
 	</node>
 

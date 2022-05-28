@@ -5,7 +5,7 @@ namespace bitarray_to_laserscan
 
 BitArrayToLaserScan::BitArrayToLaserScan()
   : scan_time_(1./30.)
-  , range_min_(0.5)
+  , range_min_(0.25)
   , range_max_(50.0)
   , scan_height_(1)
   , dist_scale_(1.0)
