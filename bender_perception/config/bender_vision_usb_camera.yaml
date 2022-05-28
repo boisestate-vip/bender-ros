@@ -1,5 +1,6 @@
 vision:
   scale: 1.0
+  blur_intensity: 5
   laser_dist_scale_x: 6.0 # 8.0
   laser_dist_scale_y: 1.0
   laser_dist_offset: 1.346 # 0.673
@@ -22,7 +23,9 @@ vision:
   adaptive_threshold_block_size: 11
   threshold_type: 8 # 0=THRESH_BINARY; 8=THRESH_BINARY|THRESH_OTSU; 16=THRESH_BINARY|THRESH_TRIANGLE; 1=THRESH_BINARY_INV; 9=THRESH_BINARY_INV|THRESH_OTSU; 17=THRESH_BINARY_INV|THRESH_TRIANGLE;
   color_conversion: 52 # 40=COLOR_BGR2HSV; 44=COLOR_BGR2Lab; 52=COLOR_BGR2HLS; 82=COLOR_BGR2YUV
-
+  dilation_size: 4
+  erosion_size: 4
+  
   # scale: 1.0
   # gamma: 4.0
   # num_colors: 2

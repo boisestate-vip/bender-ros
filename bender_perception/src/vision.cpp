@@ -47,6 +47,7 @@ void LaneDetection::init(ros::NodeHandle &nh)
 
     ros::NodeHandle vision_nh(nh, "vision");
     vision_nh.param("scale", params.scale, params.scale);
+    vision_nh.param("blur_intensity", params.blur_intensity, params.blur_intensity);
     vision_nh.param("laser_dist_scale_x", params.laser_dist_scale_x, params.laser_dist_scale_x);
     vision_nh.param("laser_dist_scale_y", params.laser_dist_scale_y, params.laser_dist_scale_y);
     vision_nh.param("gamma", params.gamma, params.gamma);
@@ -68,6 +69,8 @@ void LaneDetection::init(ros::NodeHandle &nh)
     vision_nh.param("adaptive_threshold_block_size", params.adaptive_block_size, params.adaptive_block_size);
     vision_nh.param("threshold_type", params.threshold_type, params.threshold_type);
     vision_nh.param("color_conversion", params.color_type, params.color_type);
+    vision_nh.param("dilation_size", params.dilation_size, params.dilation_size);
+    vision_nh.param("erosion_size", params.erosion_size, params.erosion_size);
 
     if (!(params.scale > 0.0 && params.scale <= 1.0)) 
     {
@@ -131,6 +134,7 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     boost::mutex::scoped_lock l(config_mutex_);
 
     params.scale = config.scale;
+    params.blur_intensity = config.blur_intensity;
     params.laser_dist_scale_x = config.laser_dist_scale_x;
     params.laser_dist_scale_y = config.laser_dist_scale_y;
     params.laser_dist_offset = config.laser_dist_offset;
@@ -159,6 +163,8 @@ void LaneDetection::reconfigureCB(VisionConfig& config, uint32_t level)
     params.adaptive_mean_subtract = config.adaptive_threshold_mean_subtract;
     params.threshold_type = config.threshold_type;
     params.color_type = config.color_conversion;
+    params.dilation_size = config.dilation_size;
+    params.erosion_size = config.erosion_size;
 }
 
 
@@ -193,6 +199,10 @@ void LaneDetection::smooth()
     smooth the image with alternative closing and opening
     with an enlarging kernel
     */
+    if (params.smooth_kernel_size == 0) 
+    {
+        return;
+    }
     Mat morph = img_out_.clone();
     for (int r = 1; r < params.smooth_kernel_size; r++)
     {
@@ -275,6 +285,24 @@ void LaneDetection::toBinary()
         }
             
     }
+
+    if (params.dilation_size != 0)
+    {
+        Mat element = getStructuringElement( MORPH_ELLIPSE,
+            Size( 2*params.dilation_size + 1, 2*params.dilation_size+1 ),
+            Point( params.dilation_size, params.dilation_size ) 
+        );
+        dilate(img_out_, img_out_, element);
+    }
+    if (params.erosion_size != 0)
+    {
+        Mat element = getStructuringElement( MORPH_ELLIPSE,
+            Size( 2*params.erosion_size + 1, 2*params.erosion_size+1 ),
+            Point( params.erosion_size, params.erosion_size ) 
+        );
+        erode(img_out_, img_out_, element);
+    }
+
 #ifdef HAVE_OPENCV_XIMGPROC
     // ximgproc::thinning(img_out_, img_out_);
 #endif
@@ -310,6 +338,10 @@ void LaneDetection::update()
         { 
             resize(img_out_, img_out_, Size(), params.scale, params.scale); 
         }
+        if (params.blur_intensity != 0)
+        {
+            GaussianBlur(img_out_, img_out_, Size(2*params.blur_intensity+1, 2*params.blur_intensity+1), 0, 0);
+        }
         cvtColor(img_out_, img_out_, static_cast<ColorConversionCodes>(params.color_type));
         gammaCorrection();
         applyColorThreshold();
@@ -321,6 +353,7 @@ void LaneDetection::update()
         }
         copyMakeBorder(img_out_, img_out_, params.roi_from_top, params.roi_from_bot, 0, 0, BORDER_CONSTANT, 0);
         projectToGrid();
+        // generateContours();
 
         /*
         img_src_(Range::all(), Range::all()).copyTo(img_out_);
@@ -434,4 +467,50 @@ void LaneDetection::publishQuantized()
         sensor_msgs::LaserScanPtr scan_msg = btl_.convert_msg(output_msg_, info_msg);
         scan_pub_.publish(scan_msg);
     }
+}
+
+void LaneDetection::generateContours()
+{
+    vector<vector<Point>> contours;
+    vector<Vec4i> hierarchy;
+    findContours(img_out_, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
+
+    if ( contours.size() == 0 )
+    {
+        return;
+    }
+
+    /*
+    Mat dst = Mat::zeros(img_out_.size(), CV_8UC3);
+    for( size_t i = 0; i< contours.size(); i++ )
+    {
+        Scalar color = Scalar( rand()&255, rand()&255, rand()&255 );
+        drawContours( dst, contours, (int)i, color, 2, LINE_8, hierarchy, 0 );
+    }
+    */
+
+    // iterate through all the top-level contours,
+    int idx = 0, largestComp = 0;
+    double maxArea = 0;
+    Mat dst = Mat::zeros(img_out_.size(), CV_8U);
+    // for( ; idx >= 0; idx = hierarchy[idx][0] )
+    // {
+    //     const vector<Point>& c = contours[idx];
+    //     double area = fabs(contourArea(Mat(c)));
+    //     if( area > maxArea )
+    //     {
+    //         maxArea = area;
+    //         largestComp = idx;
+    //     }
+    // }
+    // drawContours( dst, contours, largestComp, Scalar(255), FILLED, LINE_8, hierarchy );
+    std::sort(contours.begin(), contours.end(), [](const vector<Point>& c1, const vector<Point>& c2){
+        return contourArea(c1, false) < contourArea(c2, false);
+    });
+    for (int i=contours.size()-1; i>=0; i--)
+    {
+        drawContours( dst, contours, i, Scalar(255), FILLED, LINE_8 );
+    }
+    
+    img_out_ = dst;
 }
