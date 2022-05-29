@@ -64,7 +64,7 @@ void PositionJoint::update(unsigned long dt_ms)
     if (dt_ms <= 10000)
     {
         effort_last_ = effort_;
-        if (absf(error_) < 0.1f * M_PI / 180)
+        if (absf(error_) < 1.0f * M_PI / 180)
         {
             effort_ = 0.0;
             return ;
