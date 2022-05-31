@@ -39,7 +39,7 @@
     <gazebo reference="${name}_sensor">
       <sensor type="camera" name="camera1">
         <visualize>false</visualize>
-        <update_rate>10.0</update_rate>
+        <update_rate>30.0</update_rate>
         <camera name="${name}">
           <horizontal_fov>1.257</horizontal_fov>
           <image>
@@ -57,8 +57,8 @@
           <alwaysOn>true</alwaysOn>
           <updateRate>10.0</updateRate>
           <cameraName>${name}</cameraName>
-          <imageTopicName>/${name}/image_raw</imageTopicName>
-          <cameraInfoTopicName>/${name}/camera_info</cameraInfoTopicName>
+          <imageTopicName>image_rect_color</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
           <frameName>${name}</frameName>
           <hackBaseline>0.07</hackBaseline>
           <distortionK1>0.0</distortionK1>

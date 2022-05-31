@@ -111,9 +111,19 @@ class LaneDetection
          */
         void publishQuantized();
 
+
+        /*
+         * Generate contours over the detected lane
+         */
+        void generateContours();
+
         
         struct Params {
             double scale = 1;
+            int blur_intensity = 5;
+            double laser_dist_scale_x = 1.0;
+            double laser_dist_scale_y = 1.0;
+            double laser_dist_offset = 0.0;
             double gamma = 5.0;
             int num_colors = 2;
             int smooth_kernel_size = 5;
@@ -129,6 +139,8 @@ class LaneDetection
             double adaptive_mean_subtract = 2.0;
             int threshold_type = THRESH_BINARY;
             int color_type = COLOR_BGR2HLS;
+            int dilation_size = 4;
+            int erosion_size = 4;
         } params;
 
     protected:

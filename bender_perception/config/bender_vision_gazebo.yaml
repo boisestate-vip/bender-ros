@@ -1,0 +1,49 @@
+vision:
+  scale: 1.0
+  blur_intensity: 5
+  laser_dist_scale_x: 8.0
+  laser_dist_scale_y: 1.0
+  laser_dist_offset: 0.673
+  gamma: 8.0
+  num_colors: 2
+  smooth_kernel_size: 3
+  roi_from_top: 160
+  roi_from_bot: 30
+  color1_thresh_lb: 0
+  color2_thresh_lb: 20
+  color3_thresh_lb: 0
+  color1_thresh_ub: 255
+  color2_thresh_ub: 255
+  color3_thresh_ub: 50
+  projection_distance: 1.345
+  threshold_adaptive: false
+  threshold_lock: true
+  adaptive_threshold_method: 1 # 0=ADAPTIVE_THRESH_MEAN_C; 1=ADAPTIVE_THRESH_GAUSSIAN_C
+  adaptive_threshold_mean_subtract: 2.0
+  adaptive_threshold_block_size: 11
+  threshold_type: 8 # 0=THRESH_BINARY; 8=THRESH_BINARY|THRESH_OTSU; 16=THRESH_BINARY|THRESH_TRIANGLE; 1=THRESH_BINARY_INV; 9=THRESH_BINARY_INV|THRESH_OTSU; 17=THRESH_BINARY_INV|THRESH_TRIANGLE;
+  color_conversion: 52 # 40=COLOR_BGR2HSV; 44=COLOR_BGR2Lab; 52=COLOR_BGR2HLS; 82=COLOR_BGR2YUV
+  dilation_size: 4
+  erosion_size: 4
+  
+  # scale: 1.0
+  # gamma: 4.0
+  # num_colors: 2
+  # smooth_kernel_size: 5
+  # roi_from_top: 160
+  # roi_from_bot: 30
+  # color1_thresh_lb: 0
+  # color2_thresh_lb: 0
+  # color3_thresh_lb: 0
+  # color1_thresh_ub: 255
+  # color2_thresh_ub: 255
+  # color3_thresh_ub: 255
+  # projection_distance: 0.625
+  # threshold_adaptive: false
+  # threshold_lock: true
+  # adaptive_threshold_method: 1 # 0=ADAPTIVE_THRESH_MEAN_C; 1=ADAPTIVE_THRESH_GAUSSIAN_C
+  # adaptive_threshold_mean_subtract: -2.5
+  # adaptive_threshold_block_size: 13
+  # threshold_type: 1 # 0=THRESH_BINARY; 8=THRESH_BINARY|THRESH_OTSU; 16=THRESH_BINARY|THRESH_TRIANGLE; 1=THRESH_BINARY_INV; 9=THRESH_BINARY_INV|THRESH_OTSU; 17=THRESH_BINARY_INV|THRESH_TRIANGLE;
+  # color_conversion: 52 # 40=COLOR_BGR2HSV; 44=COLOR_BGR2Lab; 52=COLOR_BGR2HLS; 82=COLOR_BGR2YUV
+  

@@ -5,9 +5,11 @@ namespace bitarray_to_laserscan
 
 BitArrayToLaserScan::BitArrayToLaserScan()
   : scan_time_(1./30.)
-  , range_min_(0.5)
+  , range_min_(0.25)
   , range_max_(50.0)
   , scan_height_(1)
+  , dist_scale_(1.0)
+  , dist_offset_(0.0)
 {
 }
 
@@ -29,6 +31,16 @@ void BitArrayToLaserScan::set_range_limits(const float range_min, const float ra
 void BitArrayToLaserScan::set_scan_height(const int scan_height)
 {
     scan_height_ = scan_height;
+}
+
+void BitArrayToLaserScan::set_dist_scale(const double dist_scale)
+{
+    dist_scale_ = dist_scale;
+}
+
+void BitArrayToLaserScan::set_dist_offset(const double dist_offset)
+{
+    dist_offset_ = dist_offset;
 }
 
 void BitArrayToLaserScan::set_output_frame(const std::string& output_frame_id)
@@ -107,8 +119,8 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
     const int origin_y = image_msg->height;
 
     // Combine unit conversion (if necessary) with scaling by focal length for computing (X,Y)
-    const double unit_scaling = 12.0;  // mm to m
-    const float constant_x = unit_scaling / cam_model.fx();
+    const double unit_scaling = 1.0;  // mm to m
+    const float constant_x = dist_scale_ * unit_scaling / cam_model.fx();
 
     const uint8_t* this_row = reinterpret_cast<const uint8_t*>(&image_msg->data[0]);
     const int row_step = image_msg->step / sizeof(uint8_t);
@@ -122,10 +134,10 @@ void BitArrayToLaserScan::convert(const sensor_msgs::ImageConstPtr& image_msg,
             {
                 continue;
             }
-            const double x = -u + origin_x;
-            const double y = -v + origin_y;
+            const double x = (-u + origin_x) * dist_scale_ * unit_scaling / cam_model.fx();
+            const double y = (-v + origin_y) * dist_scale_ * unit_scaling / cam_model.fy() + dist_offset_;
             const double th = atan2(x,y);
-            const double r = hypot(x,y) * constant_x;
+            const double r = hypot(x,y);
             const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
             // std::cout << "index = " << std::to_string(index) << std::endl;
             // std::cout << "(u,v) = (" << u << "," << v << "), theta = " << std::to_string(th*180.0/M_PI) << std::endl;

@@ -1,6 +1,6 @@
 image_width: 640
-image_height: 360
-framerate: 10
+image_height: 480
+framerate: 24
 
 pixel_format: "yuyv"
 io_method: "mmap"

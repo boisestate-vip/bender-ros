@@ -1,9 +1,9 @@
 #define PID_UPDATE_PERIOD_US 200
 #define ROS_PUBLISH_PERIOD_MS 10
 #define CMD_RECEIVE_TIMEOUT_MS 200
-#define PLANETARY_PPR 6672
+#define PLANETARY_PPR 9072 // 6672
 #define HUB_PPR 45
-#define MAX_LEG_THROTTLE_PERCENT 40
+#define MAX_LEG_THROTTLE_PERCENT 50
 #define MAX_WHEEL_THROTTLE_PERCENT 100
 
 #include <ros.h>
@@ -16,10 +16,10 @@
 
 // Robot's joints
 PositionJoint pos_joints[4] = {
-	PositionJoint(2, 3, 35, 32, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lf_joint
-	PositionJoint(8, 9, 38, 19, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_rf_joint
-	PositionJoint(4, 5, 36, 17, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lh_joint
-	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 25.0, 0.1, 10.0)  // leg_rh_joint
+	PositionJoint(4, 5, 10, 11, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lf_joint
+	PositionJoint(6, 7, 37, 18, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_rf_joint
+	PositionJoint(0, 1, 28, 29, PLANETARY_PPR, 25.0, 0.1, 10.0), // leg_lh_joint
+	PositionJoint(8, 9, 14, 19, PLANETARY_PPR, 25.0, 0.1, 10.0)  // leg_rh_joint
 };
 
 // Timers

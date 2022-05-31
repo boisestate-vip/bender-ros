@@ -10,7 +10,7 @@ int main (int argc, char **argv)
     int publish_rate; nh.param("publish_rate", publish_rate, 10);
 
     /* Image processing class */
-    LaneDetection ld(nh, "/bender_camera/image_raw");
+    LaneDetection ld(nh, "/image");
     
     /* Lidar processing class */
     BarrelDetection bd(&nh);

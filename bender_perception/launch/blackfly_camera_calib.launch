@@ -1,0 +1,11 @@
+<launch>
+
+    <arg name="camera_name"               default="bender_camera" />
+    
+    <node pkg="camera_calibration" type="cameracalibrator.py" name="camera_calibration"
+          args="--size 7x7 --square 19.4 --camera_name=$(arg camera_name)">
+        <remap from="image" to="$(arg camera_name)/image_color"/>
+        <remap from="camera/set_camera_info" to="$(arg camera_name)/set_camera_info"/>
+    </node>
+
+</launch>

@@ -198,7 +198,7 @@ Visualization Manager:
       Value: false
     - Alpha: 0.699999988079071
       Class: rviz/Map
-      Color Scheme: map
+      Color Scheme: costmap
       Draw Behind: false
       Enabled: true
       Name: LocalMap
@@ -284,7 +284,7 @@ Visualization Manager:
       Value: true
     - Class: rviz/Image
       Enabled: true
-      Image Topic: /bender_camera/image_raw
+      Image Topic: /bender_camera/image_rect_color
       Max Value: 1
       Median window: 5
       Min Value: 0
@@ -493,10 +493,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 91.04828643798828
+      Scale: 27.689912796020508
       Target Frame: base_footprint
-      X: 0
-      Y: 0
+      X: 10.044745445251465
+      Y: 7.587323188781738
     Saved: ~
 Window Geometry:
   Displays:
