@@ -74,10 +74,6 @@ void setup()
 	nh.subscribe(cmd_subscriber);
 
 #ifdef USE_PWM_10BIT
-	analogWriteFrequency(35, 18000.0f);
-	analogWriteFrequency(36, 18000.0f);
-	analogWriteFrequency(37, 18000.0f);
-	analogWriteFrequency(38, 18000.0f);
 	analogWriteResolution(10);
 #endif
 

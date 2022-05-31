@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
   // Background thread for the controls callback.
   ros::NodeHandle controller_nh("/bender");
   controller_manager::ControllerManager cm(&bender, controller_nh);
-  boost::thread(boost::bind(controlThread, ros::Rate(50), &bender, &cm));
+  boost::thread(boost::bind(controlThread, ros::Rate(100), &bender, &cm));
 
   // Create diagnostic updater, to update itself on the ROS thread.
   // bender_base::BenderDiagnosticUpdater bender_diagnostic_updater;

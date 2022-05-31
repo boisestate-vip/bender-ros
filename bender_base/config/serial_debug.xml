@@ -1,35 +1,36 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
- <tabbed_widget name="Main Window" parent="main_window">
-  <Tab containers="1" tab_name="tab1">
+ <tabbed_widget parent="main_window" name="Main Window">
+  <Tab tab_name="tab1" containers="1">
    <Container>
-    <DockSplitter orientation="-" sizes="0.250271;0.250271;0.249187;0.250271" count="4">
+    <DockSplitter count="4" orientation="-" sizes="0.250276;0.250276;0.249173;0.250276">
      <DockArea name="...">
-      <plot mode="TimeSeries" style="Lines" flip_y="false" flip_x="false">
-       <range top="0.100000" bottom="-0.100000" left="0.889527" right="10.889445"/>
+      <plot style="Lines" flip_y="false" mode="TimeSeries" flip_x="false">
+       <range left="0.000000" bottom="-0.965854" right="21.132487" top="0.024267"/>
        <limitY/>
        <curve name="/bender_teensy_serial/feedback/leg_lf_joint/position" color="#1f77b4"/>
+       <curve name="/bender_teensy_serial/cmd_drive/data.0" color="#1f77b4"/>
       </plot>
      </DockArea>
      <DockArea name="...">
-      <plot mode="TimeSeries" style="Lines" flip_y="false" flip_x="false">
-       <range top="0.100000" bottom="-0.100000" left="0.886367" right="10.889445"/>
+      <plot style="Lines" flip_y="false" mode="TimeSeries" flip_x="false">
+       <range left="0.000000" bottom="-0.022882" right="21.132487" top="0.967239"/>
        <limitY/>
        <curve name="/bender_teensy_serial/feedback/leg_lh_joint/position" color="#d62728"/>
        <curve name="/bender_teensy_serial/cmd_drive/data.1" color="#1f77b4"/>
       </plot>
      </DockArea>
      <DockArea name="...">
-      <plot mode="TimeSeries" style="Lines" flip_y="false" flip_x="false">
-       <range top="0.100000" bottom="-0.100000" left="0.886367" right="10.889445"/>
+      <plot style="Lines" flip_y="false" mode="TimeSeries" flip_x="false">
+       <range left="0.000000" bottom="-0.022882" right="21.132487" top="0.967239"/>
        <limitY/>
        <curve name="/bender_teensy_serial/feedback/leg_rf_joint/position" color="#1ac938"/>
        <curve name="/bender_teensy_serial/cmd_drive/data.2" color="#d62728"/>
       </plot>
      </DockArea>
      <DockArea name="...">
-      <plot mode="TimeSeries" style="Lines" flip_y="false" flip_x="false">
-       <range top="0.100000" bottom="-0.100000" left="0.886367" right="10.889445"/>
+      <plot style="Lines" flip_y="false" mode="TimeSeries" flip_x="false">
+       <range left="0.000000" bottom="-0.966546" right="21.132487" top="0.023574"/>
        <limitY/>
        <curve name="/bender_teensy_serial/feedback/leg_rh_joint/position" color="#ff7f0e"/>
        <curve name="/bender_teensy_serial/cmd_drive/data.3" color="#1ac938"/>
@@ -45,7 +46,7 @@
  <!-- - - - - - - - - - - - - - - -->
  <Plugins>
   <plugin ID="DataLoad CSV">
-   <default time_axis="" delimiter="0"/>
+   <default delimiter="0" time_axis=""/>
   </plugin>
   <plugin ID="DataLoad ROS bags">
    <use_header_stamp value="false"/>

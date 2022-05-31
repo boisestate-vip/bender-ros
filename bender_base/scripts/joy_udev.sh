@@ -1,10 +1,4 @@
 #!/bin/bash
 
-sudo sh -c 'echo "KERNEL==\"js?\", MODE==\"0666\", SYMLINK+=\"js_f710\"" > /etc/udev/rules.d/10-all-js-f710.rules'
-sudo chmod +x /etc/udev/rules.d/10-all-js-f710.rules
-sudo service udev restart
-sudo udevadm control --reload-rules
-sudo service udev restart
-sudo udevadm trigger
-exit
-$SHELL
+echo 'KERNEL=="js*", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", SYMLINK+="js_f710"' | sudo tee /etc/udev/rules.d/10-logitech-js-f710.rules
+sudo udevadm control --reload-rules && sudo udevadm trigger

@@ -1,3 +1,6 @@
+#!/bin/bash
+
+cat >/tmp/00-teensy.rules <<EOF
 # UDEV Rules for Teensy boards, http://www.pjrc.com/teensy/
 #
 # The latest version of this file may be found at:
@@ -37,3 +40,6 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="1fc9", ATTRS{idProduct}=="013*", MODE:="066
 # rule.  Changing ModemManager's filter policy from "strict" to "default"
 # may also help.  But if you don't use a modem, completely removing
 # the troublesome ModemManager is the most effective solution.
+EOF
+
+sudo mv /tmp/00-teensy.rules /etc/udev/rules.d/00-teensy.rules

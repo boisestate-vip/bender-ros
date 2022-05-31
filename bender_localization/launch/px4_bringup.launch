@@ -1,6 +1,6 @@
 <launch>
 
-    <arg name="fcu_url" default="/dev/ttyACM1:57600" />
+    <arg name="fcu_url" default="/dev/ttyPixhawk:115200" />
 	<arg name="gcs_url" default="" />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
