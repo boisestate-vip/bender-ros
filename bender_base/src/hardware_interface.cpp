@@ -125,11 +125,15 @@ void BenderHardware::read()
 void BenderHardware::write()
 {
 	// CAN Bus
-     for (auto& name : can_node_names)
+    for (auto& name : can_node_names)
     {
         const int node_id = canbus_.axis(name).node_id;
-        const float cmd = joints_[node_id].command / 2.0 / M_PI;
-        canbus_.set_input_vel(canbus_.axis(name), cmd);
+        float wheel_cmd = 0.0;
+        // if (abs(joints_[node_id+4].position) - abs(joints_[node_id+4].command) <= 15*M_PI/180.0)
+        {
+            wheel_cmd = joints_[node_id].command / 2.0 / M_PI;
+        }
+        canbus_.set_input_vel(canbus_.axis(name), wheel_cmd);
     }
     
     cmd_msg_.data.clear();

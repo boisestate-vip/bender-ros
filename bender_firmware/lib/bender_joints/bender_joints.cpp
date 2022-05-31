@@ -49,6 +49,7 @@ PositionJoint::PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, u
 { 
     pinMode(pwm_pin_, OUTPUT);
     pinMode(dir_pin_, OUTPUT);
+    analogWriteFrequency(pwm_pin_, 18000.0f);
 }
 
 void PositionJoint::update(unsigned long dt_ms)

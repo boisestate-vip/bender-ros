@@ -61,7 +61,7 @@
                     x: 1.5
                     y: 1.0
                 scale_angular_turbo:
-                    yaw: 0.8
+                    yaw: 0.785
             </rosparam>
         </node>
     </group>
