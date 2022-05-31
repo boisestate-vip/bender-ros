@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="26ac", ATTRS{idProduct}=="0011", SYMLINK+="ttyPixhawk", RUN+="/bin/stty -F /dev/ttyPixhawk 115200 raw -echo"

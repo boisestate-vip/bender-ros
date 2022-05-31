@@ -1,1 +1,0 @@
-KERNEL=="js?", MODE=="0666", SYMLINK+="js_f710"

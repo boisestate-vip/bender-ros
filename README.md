@@ -7,7 +7,7 @@ These ROS packages are tested on ROS Noetic. The following commands will:
 1) Clone this repo 
 2) Install ROS dependencies to build and run the packages in this repository
 3) Install Gazebo models
-4) Install `udev` rule for Logitech F710 joystick
+4) Install `udev` rule for Logitech F710 joystick, PX4, Teensy, and logitech webcam
 ```
 CATKIN_WS=$HOME/projects/bender/ros
 mkdir -p $CATKIN_WS/src && cd $CATKIN_WS/src 
@@ -15,7 +15,9 @@ git clone --recursive https://github.com/boisestate-vip/bender-ros.git
 cd $CATKIN_WS
 rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 cd $CATKIN_WS/src/bender-ros/bender_gazebo/models && ./install_models.sh
-cd $CATKIN_WS/src/bender-ros/bender_base/scripts && ./joy_udev.sh
+cd $CATKIN_WS/src/bender-ros/bender_base/scripts && ./joy_udev.sh && ./teensy_udev.sh
+cd $CATKIN_WS/src/bender-ros/bender_perception/scripts && ./logitech_webcam_udev.sh
+cd $CATKIN_WS/src/bender-ros/bender_localization/scripts && ./px4_udev.sh
 cd $CATKIN_WS
 catkin build
 ```

@@ -1,0 +1,1 @@
+KERNEL=="js*", ATTRS{idVendor}=="1d6b", ATTRS{idProduct}=="0002", SYMLINK+="js_f710"
