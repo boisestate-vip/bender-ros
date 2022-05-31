@@ -5,10 +5,9 @@
 
     <include file="$(find bender_description)/launch/description.launch" />
 
-    <node pkg="bender_base" required="true" type="node" name="bender_base_node" output="log">
+    <node pkg="bender_base" required="true" type="node" name="bender_base_node" output="screen">
         <param name="port" value="/dev/ttyTeensy" />
     </node>
-    <node pkg="rosserial_python" type="message_info_service.py" name="rosserial_message_info" />
 
     <!-- Load the control parameters -->
     <rosparam file="$(find bender_base)/config/bender_controllers.yaml" command="load"/>
@@ -99,10 +98,8 @@
         </rosparam>
     </node>
 
-    <include file="$(find bender_localization)/launch/px4_bringup.launch">
-        <arg name="log_output" value="log" />
-    </include>
-    <include file="$(find bender_localization)/launch/localization_local.launch" />
+    <include file="$(find bender_localization)/launch/px4_bringup.launch" />
+    <!-- <include file="$(find bender_localization)/launch/localization_local.launch" /> -->
     <!-- <include file="$(find bender_localization)/launch/localization_global.launch" /> -->
 
 </launch>

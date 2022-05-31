@@ -73,6 +73,7 @@ BenderHardware::BenderHardware()
     for (auto& name : can_node_names)
     {
         canbus_.clear_errors(canbus_.axis(name));
+        canbus_.set_input_vel(canbus_.axis(name), 0.0f);
         canbus_.set_axis_requested_state(canbus_.axis(name), AxisState::AXIS_STATE_CLOSED_LOOP_CONTROL);
     }
 }
@@ -135,7 +136,6 @@ void BenderHardware::write()
         }
         canbus_.set_input_vel(canbus_.axis(name), wheel_cmd);
     }
-    
     cmd_msg_.data.clear();
 	for (int i = 4; i < 8; i++)
 	{

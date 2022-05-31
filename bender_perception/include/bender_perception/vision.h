@@ -59,6 +59,7 @@ class LaneDetection
          * Apply color threshold to get rid of objects that are not roads
          */
         void applyColorThreshold();
+        void autoThreshold();
 
         /*
          * Gamma correction for better contrast

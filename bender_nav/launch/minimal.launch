@@ -1,5 +1,10 @@
 <launch>
 
+    <include file="$(find bender_perception)/launch/usb_camera.launch">
+        <arg name="rviz" value="false" />
+    </include>
+    <node name="rqt_gui_vision" pkg="rqt_gui" type="rqt_gui" args="--perspective-file $(find bender_perception)/config/rqt_gui.perspective" output="screen" />
+
     <!-- Empty map -->
     <node name="empty_map_server" pkg="map_server" type="map_server" args="$(find bender_gazebo)/maps/empty_box.yaml" output="screen">
         <param name="frame_id" value="map"/>

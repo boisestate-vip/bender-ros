@@ -180,6 +180,65 @@ void LaneDetection::applyColorThreshold()
 }
 
 
+void LaneDetection::autoThreshold()
+{
+    // Determine the mean of L in the resulting image, This will tell us how btight the image is and help set the threshold for low_L
+    int low_L = 0;
+    int low_S = 0;
+    int low_H = 0;
+    int high_L = 255;
+    int high_S = 255; 
+    int high_H = 180;
+    const auto result = mean(img_out_);
+    low_L = int(result(1));
+    
+    //perform an HLS threshold on the image, only keeps values between the ranges. Outputs a binary file
+    Mat hls_threshold;
+    inRange(img_out_, Scalar(low_H, low_L, low_S), Scalar(high_H, high_L, high_S), hls_threshold); 
+    
+    // Determine if the threshold was too low due to the image being overexposed. If so increase low_l, until the white is only about 7% of image
+    int numberWhite = countNonZero(hls_threshold);
+    while (numberWhite > 20000) {
+        low_L = low_L + 5;
+        inRange(img_out_, Scalar(low_H, low_L, low_S), Scalar(high_H, high_L, high_S), hls_threshold);
+        numberWhite = countNonZero(hls_threshold);
+    }
+        
+    // Dialate the image to fill in gaps
+    Mat dilation_dst;
+    Mat element = getStructuringElement(MORPH_RECT, Size(5, 5), Point(-1, 1));
+    dilate(hls_threshold, dilation_dst, element);
+        
+        
+    //find contours in the image
+    vector<vector<Point> > contours;
+	findContours(dilation_dst, contours, RETR_EXTERNAL, CHAIN_APPROX_NONE);
+
+        
+    // filter the contours by area, too small or too big get tossed
+	vector<vector<Point> > goodcontours;
+	double minArea = 1500;
+	double maxArea = 100000;
+	for (size_t i = 0; i < contours.size(); i++)
+	{
+		double area = cv::contourArea(contours[i]);
+		if (area >= minArea && area <= maxArea) 
+		{
+			goodcontours.push_back(contours.at(i));
+		}
+	}
+        
+    // creat a new image of these contours
+    Mat draw_countours = Mat::zeros(hls_threshold.size(), CV_8UC1);
+    for (size_t i = 0; i < goodcontours.size(); i++)
+	{
+
+		drawContours(draw_countours, goodcontours, (int)i, 255, 3, LINE_8);
+	}
+    draw_countours.copyTo(img_out_);
+}
+
+
 void LaneDetection::gammaCorrection()
 {
     Mat lookUpTable(1, 256, CV_8U);
@@ -344,10 +403,16 @@ void LaneDetection::update()
         }
         cvtColor(img_out_, img_out_, static_cast<ColorConversionCodes>(params.color_type));
         gammaCorrection();
+
+        // Method 1
         applyColorThreshold();
-        // quantize();
         toBinary();
         smooth();
+
+        // Method 2
+        // autoThreshold();
+
+
         if (params.scale != 1.0) {
             resize(img_out_, img_out_, Size(), 1.0/params.scale, 1.0/params.scale);
         }
