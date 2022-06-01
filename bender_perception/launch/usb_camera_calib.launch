@@ -3,7 +3,7 @@
     <arg name="camera_name"               default="bender_camera" />
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" required="true" output="screen" >
-        <param name="video_device" value="/dev/video2" />
+        <param name="video_device" value="/dev/videoLogitech" />
         <param name="camera_info_url" value="file://$(find bender_perception)/config/camera_info/usb_camera_info.yaml" />
         <rosparam command="load" file="$(find bender_perception)/config/usb_camera_params.yaml" />
         <remap from="usb_cam/image_raw" to="/bender_camera/image_color" />
@@ -11,7 +11,7 @@
     </node>
     
     <node pkg="camera_calibration" type="cameracalibrator.py" name="camera_calibration"
-          args="--size 7x7 --square 19.4 --camera_name=$(arg camera_name)">
+          args="--size 8x6 --square 0.026 --camera_name=$(arg camera_name)">
         <remap from="image" to="$(arg camera_name)/image_color"/>
         <remap from="camera/set_camera_info" to="$(arg camera_name)/set_camera_info"/>
     </node>

@@ -1,6 +1,6 @@
-image_width: 640
+image_width: 848
 image_height: 480
-framerate: 24
+framerate: 25
 
 pixel_format: "yuyv"
 io_method: "mmap"
@@ -8,19 +8,50 @@ io_method: "mmap"
 camera_name: "bender_camera"
 camera_frame_id: "bender_camera"
 
-autofocus: true
-autoexposure: true
+autofocus: false
+autoexposure: false
 auto_white_balance: true
-exposure: 1000 # (logitech c920) min=3 max=2047 step=1 default=250 
-white_balance: 4000 # (logitech c920) min=2000 max=6500 step=1 default=4000
+exposure: 600
+white_balance: 6000 
 
 # Following params take values in 0-255, -1 means "leave alone"
-brightness: -1  
-contrast: -1
-saturation: -1
+brightness: 128 
+contrast: 180
+saturation: 180
 sharpness: -1
-focus: -1
+focus: 0
 gain: -1
 
 # Fore more info regarding these parameters, see the following
 # https://www.kurokesu.com/main/2016/01/16/manual-usb-camera-settings-in-linux/
+
+
+# OUTPUT FROM `v4l2-ctl -Ld /dev/videoLogitech` with Logitech c930e
+# User Controls
+
+#                      brightness 0x00980900 (int)    : min=0 max=255 step=1 default=128 value=128
+#                        contrast 0x00980901 (int)    : min=0 max=255 step=1 default=128 value=128
+#                      saturation 0x00980902 (int)    : min=0 max=255 step=1 default=128 value=128
+#         white_balance_automatic 0x0098090c (bool)   : default=1 value=1
+#                            gain 0x00980913 (int)    : min=0 max=255 step=1 default=0 value=255
+#            power_line_frequency 0x00980918 (menu)   : min=0 max=2 default=2 value=2
+#                                 0: Disabled
+#                                 1: 50 Hz
+#                                 2: 60 Hz
+#       white_balance_temperature 0x0098091a (int)    : min=2000 max=7500 step=1 default=4000 value=3041 flags=inactive
+#                       sharpness 0x0098091b (int)    : min=0 max=255 step=1 default=128 value=128
+#          backlight_compensation 0x0098091c (int)    : min=0 max=1 step=1 default=0 value=0
+
+# Camera Controls
+
+#                   auto_exposure 0x009a0901 (menu)   : min=0 max=3 default=3 value=1
+#                                 1: Manual Mode
+#                                 3: Aperture Priority Mode
+#          exposure_time_absolute 0x009a0902 (int)    : min=3 max=2047 step=1 default=250 value=312
+#      exposure_dynamic_framerate 0x009a0903 (bool)   : default=0 value=1
+#                    pan_absolute 0x009a0908 (int)    : min=-36000 max=36000 step=3600 default=0 value=0
+#                   tilt_absolute 0x009a0909 (int)    : min=-36000 max=36000 step=3600 default=0 value=0
+#                  focus_absolute 0x009a090a (int)    : min=0 max=255 step=5 default=0 value=0 flags=inactive
+#      focus_automatic_continuous 0x009a090c (bool)   : default=1 value=1
+#                   zoom_absolute 0x009a090d (int)    : min=100 max=400 step=1 default=100 value=100
+

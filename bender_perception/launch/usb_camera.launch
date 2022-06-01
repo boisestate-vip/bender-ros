@@ -2,10 +2,12 @@
     
     <arg name="rviz" default="true" />
     <arg name="record" default="false" />
+    <arg name="rqt" default="false" />
+    
 
     <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" required="true" output="screen" >
         <param name="video_device" value="/dev/videoLogitech" />
-        <param name="camera_info_url" value="file://$(find bender_perception)/config/camera_info/usb_camera_info.yaml" />
+        <param name="camera_info_url" value="file://$(find bender_perception)/config/camera_info/usb_camera_info_wide.yaml" />
         <rosparam command="load" file="$(find bender_perception)/config/usb_camera_params.yaml" />
         <remap from="/usb_cam/image_raw" to="/bender_camera/image_color" />
     </node>
@@ -20,6 +22,9 @@
 
     <node name="$(anon rviz)" if="$(arg rviz)" pkg="rviz" type="rviz" 
         respawn="false" args="-d $(find bender_perception)/config/debug.rviz" output="screen"/>
+
+    <node name="rqt_gui_vision" pkg="rqt_gui" type="rqt_gui" if="$(arg rqt)"
+        args="--perspective-file $(find bender_perception)/config/rqt_gui.perspective" output="screen" />
 
     <include file="$(find bender_perception)/launch/vision.launch" />
 

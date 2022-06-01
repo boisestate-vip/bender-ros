@@ -1,0 +1,20 @@
+image_width: 848
+image_height: 480
+camera_name: bender_camera
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [521.5907587096741, 0, 415.4064739254035, 0, 521.9792436666925, 246.7507335982068, 0, 0, 1]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [0.07198023840771414, -0.1344811128658236, 0.00178377284043758, -0.001722198647170564, 0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [513.7291259765625, 0, 411.2102058630771, 0, 0, 526.2548217773438, 246.8946175391466, 0, 0, 0, 1, 0]
