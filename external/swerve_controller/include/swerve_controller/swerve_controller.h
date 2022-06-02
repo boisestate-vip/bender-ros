@@ -118,6 +118,8 @@ namespace swerve_controller
         realtime_tools::RealtimeBuffer<CommandTwist> command_twist_;
         CommandTwist command_struct_twist_;
         ros::Subscriber sub_command_;
+        ros::Subscriber x_listen;
+        ros::Subscriber y_listen;
 
         /// Odometry related:
         std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry>> odom_pub_;
@@ -159,10 +161,22 @@ namespace swerve_controller
         CommandTwist last0_cmd_;
         SpeedLimiter limiter_lin_;
         SpeedLimiter limiter_ang_;
+        
+        // gps message
+        std_msgs::Float32 gps_pose_x;
+        std_msgs::Float32 gps_pose_y;
+
 
         double lf_steering_last_, rf_steering_last_, lh_steering_last_, rh_steering_last_;
 
     private:
+    
+        void gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg);
+        
+        void gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg);
+        
+        void imuCB(const sensor_msgs::Imu::ConstPtr& msg);
+        
         void updateOdometry(const ros::Time &time);
 
         void updateCommand(const ros::Time &time, const ros::Duration &period);
@@ -178,6 +192,8 @@ namespace swerve_controller
         bool getPhysicalParams(ros::NodeHandle &controller_nh);
 
         void setOdomPubFields(ros::NodeHandle &root_nh, ros::NodeHandle &controller_nh);
+        
+        double combineData(double &odom, double &gps, double &odomWeight);
     };
 
     PLUGINLIB_EXPORT_CLASS(swerve_controller::SwerveController,

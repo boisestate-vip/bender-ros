@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find mavros)/launch/px4.launch"></include>
+
+    <node name="bender_navsensors" pkg="bender_navsensors" type="bender_navsensors" required="true" output="screen" >
+    </node>
+</launch>
+

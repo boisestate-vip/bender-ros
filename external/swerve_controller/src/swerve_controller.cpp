@@ -36,6 +36,7 @@
 
 #include <swerve_controller/swerve_controller.h>
 #include <string>
+#include <sensor_msgs/Imu.h>
 
 namespace swerve_controller
 {
@@ -238,9 +239,35 @@ namespace swerve_controller
         // Subscribe to Twist messages
         sub_command_ = controller_nh.subscribe("cmd_vel", 1,
                                                &SwerveController::cmdVelCallback, this);
+        // subscribe to gps x and y position
+        ros::Subscriber x_listen = nh.subscribe("bender_navsensors/position/x", 10, gpsCBX);
+        ros::Subscriber y_listen = nh.subscribe("bender_navsensors/position/y", 10, gpsCBY);
         return true;
+        
+        
+        
     }
 
+    // combine odometry and gps data with a given weight. weight will be a max of 1 and the other value will be weighted with the compliment of the provided weight
+    double SwerveController::combineData(double &odom, double &gps, double &odomWeight){
+        return ((odomWeight * odom) + ((1 - odomWeight) * gps));        
+    }
+    
+    // handle call back data from px4 imu
+    void SwerveController::imuCB(const sensor_msgs::Imu::ConstPtr& msg){
+        
+    }
+    
+    // call back for gps x position data
+    void SwerveController::gpsCBX(const std_msgs::Float32::ConstPtr & gpsMsg){
+        gps_pose_x.data = gpsMsg->data;        
+    }
+    
+    // call back for gps y position data
+    void SwerverController::gpsCBY(const std_msgs::Float32::ConstPtr & gpsMsg){
+        gps_pose_y.data = gpsMsg->data;        
+    }
+    
     void SwerveController::update(const ros::Time &time, const ros::Duration &period)
     {
         updateOdometry(time);
@@ -303,8 +330,8 @@ namespace swerve_controller
             if (odom_pub_->trylock())
             {
                 odom_pub_->msg_.header.stamp = time;
-                odom_pub_->msg_.pose.pose.position.x = odometry_.getX();
-                odom_pub_->msg_.pose.pose.position.y = odometry_.getY();
+                odom_pub_->msg_.pose.pose.position.x = combineData(odometry_.getX(), gps_pose_x, 0.5);
+                odom_pub_->msg_.pose.pose.position.y = combineData(odometry_.getY(), gps_pose_y, 0.5);
                 odom_pub_->msg_.pose.pose.orientation = orientation;
                 odom_pub_->msg_.twist.twist.linear.x = odometry_.getLinearX();
                 odom_pub_->msg_.twist.twist.linear.y = odometry_.getLinearY();
