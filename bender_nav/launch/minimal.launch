@@ -1,8 +1,11 @@
 <launch>
 
     <arg name="rqt" default="false" />
+    <arg name="lidar" default="true" />
+    <arg name="camera" default="true" />
 
-    <include file="$(find bender_perception)/launch/usb_camera.launch">
+    <include if="$(arg lidar)" file="$(find bender_perception)/launch/rplidar.launch" />
+    <include if="$(arg camera)" file="$(find bender_perception)/launch/usb_camera.launch">
         <arg name="rviz" value="false" />
         <arg name="rqt" value="$(arg rqt)" />
     </include>

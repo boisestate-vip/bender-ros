@@ -1,0 +1,7 @@
+<launch>
+
+<node pkg="bender_mission" name="bender_mission" type="main.py" output="screen">
+    <rosparam file="$(find bender_mission)/params/igvc.yaml" command="load" />
+</node>
+
+</launch>

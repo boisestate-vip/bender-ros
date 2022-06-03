@@ -177,7 +177,7 @@ TebLocalPlannerROS:
     # vertices: [[-0.6, -0.4], [-0.6, 0.4], [0.6, 0.4], [0.6, -0.4]]
     # type: "circular"
     # radius: 0.6
-  max_vel_x: 0.6
+  max_vel_x: 0.5
   max_vel_x_backwards: 0.3
   max_vel_theta: 0.785
   acc_lim_x: 0.5
@@ -189,7 +189,7 @@ TebLocalPlannerROS:
   wheelbase: 0.0
   cmd_angle_instead_rotvel: false
   max_vel_y: 0.3
-  max_vel_trans: 0.6
+  max_vel_trans: 0.5
   acc_lim_y: 0.5
 
   # GoalTolerance
@@ -200,7 +200,7 @@ TebLocalPlannerROS:
   theta_stopped_vel: 0.01
 
   # Obstacles
-  min_obstacle_dist: 0.45 # This value must also include our robot radius, since footprint_model is set to "point".
+  min_obstacle_dist: 0.55 # This value must also include our robot radius, since footprint_model is set to "point".
   inflation_dist: 1.0
   include_costmap_obstacles: true
   include_dynamic_obstacles: false
@@ -223,14 +223,14 @@ TebLocalPlannerROS:
   weight_acc_lim_x: 1.0
   weight_acc_lim_y: 1.0  # If robot is holonomic, set to 0 to speed up computation
   weight_acc_lim_theta: 1.0
-  weight_kinematics_nh: 0.5 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
+  weight_kinematics_nh: 10.0 # WE HAVE A HOLONOMIC ROBOT, JUST ADD A SMALL PENALTY (larger value reduces strafing)
   weight_kinematics_forward_drive: 2.0
   weight_kinematics_turning_radius: 0.0
   weight_optimaltime: 5.0 # must be > 0
   weight_shortest_path: 3.0
-  weight_obstacle: 50
+  weight_obstacle: 30
   weight_inflation: 0.1
-  weight_dynamic_obstacle: 100
+  weight_dynamic_obstacle: 0.01
   weight_dynamic_obstacle_inflation: 0.4
   weight_velocity_obstacle_ratio: 10.0
   weight_viapoint: 1.0
