@@ -8,7 +8,7 @@
 
   <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform" clear_params="true">
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
-    <remap from="gps/fix" to="global_position/global"/>
+    <remap from="gps/fix" to="mavros/global_position/global"/>
     <remap from="imu/data" to="mavros/imu/data"/>
   </node>
 

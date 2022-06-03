@@ -19,7 +19,7 @@ ekf_se_odom:
                  false, false, true,
                  false, false, false]
   odom0_queue_size: 10
-  odom0_nodelay: true
+  odom0_nodelay: false
   odom0_differential: false
   odom0_relative: false
 
@@ -30,7 +30,7 @@ ekf_se_odom:
                 false, false,  true,
                 true, true, false]
   imu0_queue_size: 10
-  imu0_nodelay: true
+  imu0_nodelay: false
   imu0_differential: false
   imu0_relative: false
   imu0_remove_gravitational_acceleration: true

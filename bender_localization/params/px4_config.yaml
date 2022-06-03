@@ -9,7 +9,7 @@ startup_px4_usb_quirk: true
 conn:
   heartbeat_rate: 1.0    # send hertbeat rate in Hertz
   timeout: 10.0          # hertbeat timeout in seconds
-  timesync_rate: 10.0    # TIMESYNC rate in Hertz (feature disabled if 0.0)
+  timesync_rate: 0.5    # TIMESYNC rate in Hertz (feature disabled if 0.0)
   system_time_rate: 1.0  # send system time to FCU rate in Hertz (disabled if 0.0)
 
 # sys_status
@@ -28,7 +28,7 @@ time:
 # global_position
 global_position:
   frame_id: "map"             # origin frame
-  child_frame_id: "base_link" # body-fixed frame
+  child_frame_id: "base_footprint" # body-fixed frame
   rot_covariance: 99999.0   # covariance for attitude?
   gps_uere: 1.0             # User Equivalent Range Error (UERE) of GPS sensor (m)
   use_relative_alt: true    # use relative altitude for local coordinates
@@ -36,11 +36,11 @@ global_position:
     send: false               # send TF?
     frame_id: "map"  # TF frame_id
     global_frame_id: "earth"  # TF earth frame_id
-    child_frame_id: "base_link" # TF child_frame_id
+    child_frame_id: "base_footprint" # TF child_frame_id
 
 # imu_pub
 imu:
-  frame_id: "base_link"
+  frame_id: "base_footprint"
   # need find actual values
   linear_acceleration_stdev: 0.0003
   angular_velocity_stdev: 0.0003490659 // 0.02 degrees
@@ -53,12 +53,6 @@ local_position:
   tf:
     send: false
     frame_id: "map"
-    child_frame_id: "base_link"
+    child_frame_id: "base_footprint"
     send_fcu: false
-
-# odom
-odometry:
-  fcu:
-    odom_parent_id_des: "map"    # desired parent frame rotation of the FCU's odometry
-    odom_child_id_des: "base_link"    # desired child frame rotation of the FCU's odometry
 

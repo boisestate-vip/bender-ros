@@ -171,6 +171,8 @@ namespace swerve_controller
 
         void minSteeringDifference(double &steering, double &previous_steering, double &speed);
 
+        bool isLargeSteering(const double steering, const double desired_steering);
+
         bool clipSteeringAngle(double &steering, double &speed);
 
         void cmdVelCallback(const geometry_msgs::Twist &command);

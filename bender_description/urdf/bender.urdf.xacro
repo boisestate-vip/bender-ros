@@ -37,12 +37,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 	<!-- Constants for robot dimensions -->
 	<xacro:property name="PI" value="3.1415926535897931"/>
-	<xacro:property name="height" value="0.3" /> <!-- height of the body -->
+	<xacro:property name="height" value="0.33" /> <!-- height of the body -->
 
 	<xacro:property name="body_m" value="25.0" /> <!-- mass of the body structure -->
-	<xacro:property name="body_l" value="0.857" /> <!-- length of the body structure -->
+	<xacro:property name="body_l" value="0.904" /> <!-- length of the body structure -->
 	<xacro:property name="body_w" value="0.622" /> <!-- width of the body structure -->
-	<xacro:property name="body_h" value="0.105" /> <!-- thickness of the body structure -->
+	<xacro:property name="body_h" value="0.4191" /> <!-- thickness of the body structure -->
 	<xacro:property name="leg_m" value="1" /> <!-- mass of a thigh leg -->
 	<xacro:property name="leg_r" value="0.025" /> <!-- radius of the leg cylinders -->
 	<xacro:property name="wheel_m" value="5" /> <!-- mass of a single wheel -->
@@ -341,7 +341,7 @@ POSSIBILITY OF SUCH DAMAGE.
     </xacro:logitech_c910>
 	<xacro:rplidar name="rplidar" connected_to="base_link">
 		<origin xyz="${body_l/2} 0 ${body_h/2 + lidar_mount_height}" 
-			    rpy="0 0 0" />
+			    rpy="0 0 ${PI}" />
     </xacro:rplidar>
 
 	<!-- ACTUATORS -->

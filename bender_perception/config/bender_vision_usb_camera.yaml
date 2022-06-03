@@ -1,13 +1,13 @@
 vision:
   scale: 1.0
   blur_intensity: 5
-  laser_dist_scale_x: 6.0 # 8.0
+  laser_dist_scale_x: 6.0 # 3.5
   laser_dist_scale_y: 1.0
-  laser_dist_offset: 1.346 # 0.673
-  gamma: 8.0
+  laser_dist_offset: 1.65 # 0.65
+  gamma: 4.0
   num_colors: 2
   smooth_kernel_size: 3
-  roi_from_top: 160
+  roi_from_top: 240
   roi_from_bot: 30
   color1_thresh_lb: 0
   color2_thresh_lb: 20
@@ -15,9 +15,9 @@ vision:
   color1_thresh_ub: 255
   color2_thresh_ub: 255
   color3_thresh_ub: 50
-  projection_distance: 1.345
+  projection_distance: 1.422 # 1.524
   threshold_adaptive: false
-  threshold_lock: true
+  threshold_lock: false
   adaptive_threshold_method: 1 # 0=ADAPTIVE_THRESH_MEAN_C; 1=ADAPTIVE_THRESH_GAUSSIAN_C
   adaptive_threshold_mean_subtract: 2.0
   adaptive_threshold_block_size: 11

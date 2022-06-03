@@ -397,28 +397,45 @@ namespace swerve_controller
             return;
         }
 
+        bool slow_before_steer = ( 
+            isLargeSteering(lf_steering, lf_steering_joint_->getPosition()) ||
+            isLargeSteering(rf_steering, rf_steering_joint_->getPosition()) ||
+            isLargeSteering(lh_steering, lh_steering_joint_->getPosition()) ||
+            isLargeSteering(rh_steering, rh_steering_joint_->getPosition()) 
+        );
+
         // Set wheels velocities
         if (lf_wheel_joint_ && rf_wheel_joint_ && lh_wheel_joint_ && rh_wheel_joint_)
         {
-            lf_wheel_joint_->setCommand(lf_speed);
-            rf_wheel_joint_->setCommand(rf_speed);
-            lh_wheel_joint_->setCommand(lh_speed);
-            rh_wheel_joint_->setCommand(rh_speed);
+            if (slow_before_steer)
+            {
+                brake();
+            } else 
+            {
+                lf_wheel_joint_->setCommand(lf_speed);
+                rf_wheel_joint_->setCommand(rf_speed);
+                lh_wheel_joint_->setCommand(lh_speed);
+                rh_wheel_joint_->setCommand(rh_speed);
+            }
         }
 
         // Set wheels steering angles
         if (lf_steering_joint_ && rf_steering_joint_ && lh_steering_joint_ && rh_steering_joint_)
         {
+            if (slow_before_steer && ( 
+                abs(lf_wheel_joint_->getVelocity()) + abs(rf_wheel_joint_->getVelocity()) + 
+                abs(lh_wheel_joint_->getVelocity()) + abs(rh_wheel_joint_->getVelocity()) > 0.4
+            )) { return ; }
             lf_steering_joint_->setCommand(lf_steering);
             rf_steering_joint_->setCommand(rf_steering);
             lh_steering_joint_->setCommand(lh_steering);
             rh_steering_joint_->setCommand(rh_steering);
+            lf_steering_last_ = lf_steering;
+            rf_steering_last_ = rf_steering;
+            lh_steering_last_ = lh_steering;
+            rh_steering_last_ = rh_steering;
         }
 
-        lf_steering_last_ = lf_steering;
-        rf_steering_last_ = rf_steering;
-        lh_steering_last_ = lh_steering;
-        rh_steering_last_ = rh_steering;
     }
 
     void SwerveController::brake()
@@ -430,10 +447,6 @@ namespace swerve_controller
             rf_wheel_joint_->setCommand(0.0);
             lh_wheel_joint_->setCommand(0.0);
             rh_wheel_joint_->setCommand(0.0);
-            // lf_steering_joint_->setCommand(0.0);
-            // rf_steering_joint_->setCommand(0.0);
-            // lh_steering_joint_->setCommand(0.0);
-            // rh_steering_joint_->setCommand(0.0);
         }
     }
 
@@ -490,6 +503,11 @@ namespace swerve_controller
             steering = equiv_steering;
             speed = -speed;
         }
+    }
+
+    bool SwerveController::isLargeSteering(const double steering, const double desired_steering)
+    {
+        return (abs(desired_steering - steering) > M_PI_4) ? true : false;
     }
 
     void SwerveController::cmdVelCallback(const geometry_msgs::Twist &command)

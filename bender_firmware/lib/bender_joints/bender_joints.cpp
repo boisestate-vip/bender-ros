@@ -28,8 +28,14 @@ void GenericJoint::update(unsigned long dt_ms)
     if (dt_ms <= 10000)
     {
         effort_last_ = effort_; 
-        effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
-                        effort_lower_, effort_upper_);
+        if (absf(error_) < 1.0f * M_PI / 180)
+        {
+            effort_ = 0.0;
+        } else
+        {
+            effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
+                            effort_lower_, effort_upper_);
+        }
     }
 }
 
@@ -55,7 +61,8 @@ PositionJoint::PositionJoint(uint8_t encAPin, uint8_t encBPin, uint8_t pwmPin, u
 void PositionJoint::update(unsigned long dt_ms)
 {
     setState(encoder_.read() / pulse_per_rev_ * 2 * M_PI);
-    // GenericJoint::update(dt_ms);
+    GenericJoint::update(dt_ms);
+    /*
     angles::shortest_angular_distance_with_limits(state_,
                                                   target_,
                                                   lower_limit_,
@@ -73,6 +80,7 @@ void PositionJoint::update(unsigned long dt_ms)
         effort_ = clamp(pid_controller_.computeCommand(error_, dt_ms),
                         effort_lower_, effort_upper_);
     }
+    */
 }
 
 void PositionJoint::getState(float &state)

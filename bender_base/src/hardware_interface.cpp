@@ -94,10 +94,15 @@ void BenderHardware::read()
     // CAN Bus
     for (auto& name : can_node_names)
     {
-        const int node_id = canbus_.axis(name).node_id;
-        joints_[node_id].position = canbus_.axis(name).pos_enc_estimate * 2.0 * M_PI;
-        joints_[node_id].velocity = canbus_.axis(name).vel_enc_estimate * 2.0 * M_PI;
-        joints_[node_id].effort = joints_[node_id].command;
+        const odrive_can_ros::ODriveAxis this_axis = canbus_.axis(name);
+        if (!this_axis.is_active_)
+        {
+            ROS_WARN_THROTTLE(10, "%s is inactive", name.c_str());
+        }
+        const int node_id = this_axis.node_id;
+        joints_[node_id].position = this_axis.pos_enc_estimate * 2.0 * M_PI;
+        joints_[node_id].velocity = this_axis.vel_enc_estimate * 2.0 * M_PI;
+        joints_[node_id].effort = this_axis.idq_second;
     }
 
     // Serial
@@ -128,13 +133,19 @@ void BenderHardware::write()
 	// CAN Bus
     for (auto& name : can_node_names)
     {
-        const int node_id = canbus_.axis(name).node_id;
+        const odrive_can_ros::ODriveAxis this_axis = canbus_.axis(name);
+        if (!this_axis.is_active_ && this_axis.last_msg_time_ms_ < 1000)
+        {
+            canbus_.set_input_vel(this_axis, 0.0f);
+            canbus_.set_axis_requested_state(this_axis, AxisState::AXIS_STATE_CLOSED_LOOP_CONTROL);
+        }
+        const int node_id = this_axis.node_id;
         float wheel_cmd = 0.0;
         // if (abs(joints_[node_id+4].position) - abs(joints_[node_id+4].command) <= 15*M_PI/180.0)
         {
             wheel_cmd = joints_[node_id].command / 2.0 / M_PI;
         }
-        canbus_.set_input_vel(canbus_.axis(name), wheel_cmd);
+        canbus_.set_input_vel(this_axis, wheel_cmd);
     }
     cmd_msg_.data.clear();
 	for (int i = 4; i < 8; i++)
