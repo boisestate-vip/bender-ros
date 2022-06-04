@@ -11,7 +11,7 @@ camera_frame_id: "bender_camera"
 autofocus: false
 autoexposure: false
 auto_white_balance: true
-exposure: 3
+exposure: 100
 white_balance: 6000 
 
 # Following params take values in 0-255, -1 means "leave alone"

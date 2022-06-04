@@ -2,6 +2,8 @@
 
 <node pkg="bender_mission" name="bender_mission" type="main.py" output="screen">
     <rosparam file="$(find bender_mission)/params/igvc.yaml" command="load" />
+    <remap from="gps/fix" to="/mavros/global_position/global" />
+    <remap from="compass/heading" to="/mavros/global_position/compass_hdg" />
 </node>
 
 </launch>
