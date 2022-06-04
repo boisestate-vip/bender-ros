@@ -10,4 +10,10 @@
     <remap from="/scan" to="/bender_sensors/lidar/scan"/>
 </node>
 
+<node name="rplidar_scan_filter" pkg="laser_filters" type="scan_to_scan_filter_chain" output="screen">
+    <rosparam command="load" file="$(find bender_perception)/config/scan_filter_config.yaml" />
+    <remap from="scan" to="/bender_sensors/lidar/scan" />
+    <remap from="scan_filtered" to="/bender_sensors/lidar/scan_filtered" />
+</node>
+
 </launch>

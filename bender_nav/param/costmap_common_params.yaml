@@ -21,7 +21,7 @@ obstacle_layer:
     raytrace_range: 5.0
  laser_scan_sensor: 
     data_type: LaserScan
-    topic: /bender_sensors/lidar/scan
+    topic: /bender_sensors/lidar/scan_filtered
     marking: true
     clearing: true
     obstacle_range: 5.0
